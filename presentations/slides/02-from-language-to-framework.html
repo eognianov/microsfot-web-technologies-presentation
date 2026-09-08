@@ -4,6 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Session 02 — From Language to Framework</title>
+<meta name="description" content="C# essentials, what an SDK, runtime and framework actually are, and a running ASP.NET Core MVC application in three commands.">
+<link rel="canonical" href="https://ms-web.eognyanov.com/presentations/slides/02-from-language-to-framework.html">
+<link rel="icon" type="image/svg+xml" href="../../design-system/components/images/favicon.svg">
+<link rel="icon" type="image/png" sizes="16x16" href="../../design-system/components/images/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../../design-system/components/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="../../design-system/components/images/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../../design-system/components/images/favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../../design-system/components/images/favicon-512.png">
+<link rel="apple-touch-icon" href="../../design-system/components/images/apple-touch-icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Microsoft Web Technologies">
+<meta property="og:title" content="Session 02 — From Language to Framework">
+<meta property="og:description" content="C# essentials, what an SDK, runtime and framework actually are, and a running ASP.NET Core MVC application in three commands.">
+<meta property="og:url" content="https://ms-web.eognyanov.com/presentations/slides/02-from-language-to-framework.html">
+<meta property="og:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Session 02 — From Language to Framework">
+<meta name="twitter:description" content="C# essentials, what an SDK, runtime and framework actually are, and a running ASP.NET Core MVC application in three commands.">
+<meta name="twitter:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
 <link rel="stylesheet" href="../../design-system/styles.css">
 <style>
 /* ── Deck-level extensions to the design system ────────────────────────────
@@ -220,7 +242,8 @@ code.inline{
 }
 </style>
 <style>
-#home{position:fixed;left:16px;bottom:14px;z-index:10;font-family:var(--font-sans-text);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home{position:fixed;left:16px;bottom:14px;z-index:10;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans-text);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home img{width:14px;height:14px;border-radius:3px;display:block}
 #home:hover,#home:focus-visible{opacity:1;outline:none}
 @media print{#home{display:none}}
 </style>
@@ -1418,7 +1441,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
 </section>
 
 </div></div>
-<a id="home" href="../../index.html">← Index</a>
+<a id="home" href="../../index.html"><img src="../../design-system/components/images/favicon.svg" alt="" width="14" height="14">← Index</a>
 <div id="hint">← → navigate · F fullscreen · P print</div>
 
 <script>
