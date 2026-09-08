@@ -81,6 +81,9 @@ strong{font-weight:600}
 .slide--dark .eyebrow{color:var(--brand-tint-10)}
 .slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
 .slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
 .section-no{
   font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
   color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
@@ -227,7 +230,7 @@ code.inline{
   <h1>Routing and URL Design</h1>
   <div class="rule"></div>
   <p class="lead">Who decides which code answers a path,<br>and how we choose the paths in the first place.</p>
-  <div class="foot"><span>Lecture 2 · Routing</span><span class="spacer"></span><span>~180 min</span></div>
+  <div class="foot"><span>Lecture 2 · Routing</span><span class="spacer"></span></div>
 </section>
 
 <!-- 2 ─ Where we left off -->
@@ -282,23 +285,23 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Recap and objectives</td><td class="center">10</td></tr>
-          <tr><td>2</td><td>What routing is; URLs as a public interface</td><td class="center">25</td></tr>
-          <tr><td>3</td><td>URL design principles</td><td class="center">20</td></tr>
-          <tr><td>4</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>5</td><td>Conventional routing in ASP.NET Core</td><td class="center">30</td></tr>
+          <tr><td>1</td><td>Recap and objectives</td></tr>
+          <tr><td>2</td><td>What routing is; URLs as a public interface</td></tr>
+          <tr><td>3</td><td>URL design principles</td></tr>
+          <tr><td>4</td><td class="muted">Break</td></tr>
+          <tr><td>5</td><td>Conventional routing in ASP.NET Core</td></tr>
         </tbody>
       </table>
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>6</td><td>Attribute routing and constraints</td><td class="center">25</td></tr>
-          <tr><td>7</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>8</td><td>Generating URLs; route order and conflicts</td><td class="center">15</td></tr>
-          <tr><td>9</td><td>Walkthrough: we design and implement the blog's URLs</td><td class="center">30</td></tr>
-          <tr><td>10</td><td>Wrap-up and Q&amp;A</td><td class="center">5</td></tr>
+          <tr><td>6</td><td>Attribute routing and constraints</td></tr>
+          <tr><td>7</td><td class="muted">Break</td></tr>
+          <tr><td>8</td><td>Generating URLs; route order and conflicts</td></tr>
+          <tr><td>9</td><td>Walkthrough: we design and implement the blog's URLs</td></tr>
+          <tr><td>10</td><td>Wrap-up and Q&amp;A</td></tr>
         </tbody>
       </table>
     </div>
@@ -309,7 +312,7 @@ code.inline{
 <!-- 5 ─ Section: what routing is -->
 <section class="slide slide--dark">
   <div class="section-no">01</div>
-  <p class="eyebrow">Block 2 · 25 min</p>
+  <p class="eyebrow">Block 2</p>
   <h2>What routing is</h2>
   <p class="lead" style="margin-top:var(--space-4)">A method, a path, and a decision to make.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -342,18 +345,18 @@ code.inline{
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 7 ─ Switchboard analogy -->
+<!-- 7 ─ Reception desk analogy -->
 <section class="slide">
   <p class="eyebrow">What routing is</p>
-  <h2>Analogy: the switchboard</h2>
+  <h2>Analogy: the reception desk</h2>
   <div class="rule"></div>
   <div class="content">
     <div class="cols cols-2-1">
       <ul class="list">
-        <li>A call comes in asking for extension 42.</li>
-        <li>The operator does not know what happens on extension 42, does not do the work, and does not care what it is about.</li>
-        <li>The operator knows exactly one thing: how to connect a <strong>number</strong> to a <strong>desk</strong>.</li>
-        <li>Routing is the switchboard between URLs and code.</li>
+        <li>A visitor walks in and asks for room 42.</li>
+        <li>The receptionist does not do the work that happens in room 42, and does not care what it is about.</li>
+        <li>The receptionist knows exactly one thing: how to send a <strong>room number</strong> to the <strong>right office</strong>.</li>
+        <li>Routing is the reception desk between URLs and code.</li>
       </ul>
       <div class="card card--elevated center">
         <h3>Two separate jobs</h3>
@@ -384,6 +387,29 @@ code.inline{
         <p>That freedom is exactly why routing exists — and why URL design became a job someone has to do.</p>
       </div>
     </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- ── URL and URI ── -->
+<section class="slide">
+  <p class="eyebrow">What routing is</p>
+  <h2>URL and URI — the difference, and why it barely matters here</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="card">
+        <span class="badge badge--neutral">URI</span>
+        <h3 style="margin-top:var(--space-2)">A name for something</h3>
+        <p>Uniform Resource <strong>Identifier</strong>: any string that names a resource, so two parties can be sure they mean the same thing. It need not say where the resource is or how to get it.</p>
+      </div>
+      <div class="card card--brand">
+        <span class="badge">URL</span>
+        <h3 style="margin-top:var(--space-2)">A name that is also an address</h3>
+        <p>Uniform Resource <strong>Locator</strong>: a URI that additionally tells you how to reach the resource — the scheme and host in <code class="inline">https://simpleblog.example.com/articles/42</code> are the "how" and "where".</p>
+      </div>
+    </div>
+    <div class="callout">Every URL is a URI; not every URI is a URL. In everyday web work the two are used interchangeably — this course says <strong>URL</strong>. The next slide quotes an essay titled "Cool <em>URIs</em> don't change"; read that as "cool URLs".</div>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
@@ -442,7 +468,7 @@ code.inline{
 <!-- 12 ─ Section: principles -->
 <section class="slide slide--dark">
   <div class="section-no">02</div>
-  <p class="eyebrow">Block 3 · 20 min</p>
+  <p class="eyebrow">Block 3</p>
   <h2>URL design principles</h2>
   <p class="lead" style="margin-top:var(--space-4)">Six rules that survive any language, any framework, any decade.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -490,7 +516,7 @@ code.inline{
 
 <!-- 15 ─ Exercise -->
 <section class="slide">
-  <p class="eyebrow">Together · 10 min</p>
+  <p class="eyebrow">Together</p>
   <h2>We design these nine URLs on the board</h2>
   <div class="rule"></div>
   <div class="content">
@@ -552,7 +578,7 @@ code.inline{
 <!-- 17 ─ Section: conventional routing -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
-  <p class="eyebrow">Block 5 · 30 min</p>
+  <p class="eyebrow">Block 5</p>
   <h2>Conventional routing in ASP.NET Core</h2>
   <p class="lead" style="margin-top:var(--space-4)">One template, described centrally, that covers the whole application.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -848,7 +874,7 @@ id         = <span class="h">3</span>
 <!-- 27 ─ Section: attribute routing -->
 <section class="slide slide--dark">
   <div class="section-no">04</div>
-  <p class="eyebrow">Block 6 · 25 min</p>
+  <p class="eyebrow">Block 6</p>
   <h2>Attribute routing and constraints</h2>
   <p class="lead" style="margin-top:var(--space-4)">Describing a URL next to the code that answers it.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1002,7 +1028,7 @@ id         = <span class="h">3</span>
 <!-- 34 ─ Section: generating URLs -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
-  <p class="eyebrow">Block 8 · 15 min</p>
+  <p class="eyebrow">Block 8</p>
   <h2>Generating URLs</h2>
   <p class="lead" style="margin-top:var(--space-4)">Ask the framework for the address. Never type it twice.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1105,7 +1131,7 @@ id         = <span class="h">3</span>
 
 <!-- 39 ─ Lab walkthrough -->
 <section class="slide">
-  <p class="eyebrow">Walkthrough · 30 min · on screen</p>
+  <p class="eyebrow">Walkthrough · on screen</p>
   <h2>We design and implement the blog's URLs</h2>
   <div class="rule"></div>
   <div class="content">
@@ -1191,6 +1217,21 @@ id         = <span class="h">3</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── Q&A ── -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Q&amp;A</p>
+  <h2>Questions and discussion</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>What still feels like magic, or does not fit together yet?</li>
+      <li>Where would you reach for this in your own project?</li>
+      <li>What should we run through once more?</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 42 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
@@ -1198,10 +1239,10 @@ id         = <span class="h">3</span>
   <div class="rule"></div>
   <div class="content">
     <ul class="list">
-      <li><strong>Routing in ASP.NET Core</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/fundamentals/routing</span></li>
-      <li><strong>Routing to controller actions</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/controllers/routing</span></li>
-      <li><strong>Route constraint reference</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/fundamentals/routing#route-constraint-reference</span></li>
-      <li><strong>Tim Berners-Lee — Cool URIs don't change</strong><br><span class="sm muted">www.w3.org/Provider/Style/URI</span></li>
+      <li><strong>Routing in ASP.NET Core</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/fundamentals/routing" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/fundamentals/routing</a></span></li>
+      <li><strong>Routing to controller actions</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/controllers/routing" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/controllers/routing</a></span></li>
+      <li><strong>Route constraint reference</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/fundamentals/routing#route-constraint-reference" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/fundamentals/routing#route-constraint-reference</a></span></li>
+      <li><strong>Tim Berners-Lee — Cool URIs don't change</strong><br><span class="sm muted"><a href="https://www.w3.org/Provider/Style/URI" target="_blank" rel="noopener">www.w3.org/Provider/Style/URI</a></span></li>
     </ul>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>

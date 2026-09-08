@@ -81,6 +81,9 @@ strong{font-weight:600}
 .slide--dark .eyebrow{color:var(--brand-tint-10)}
 .slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
 .slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
 .section-no{
   font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
   color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
@@ -227,7 +230,7 @@ code.inline{
   <h1>Forms, CRUD and Validation</h1>
   <div class="rule"></div>
   <p class="lead">Sending data to the server, saving it, checking it,<br>and refusing everything we did not ask for.</p>
-  <div class="foot"><span>Lecture 5 · CRUD, forms, validation, CSRF</span><span class="spacer"></span><span>~180 min</span></div>
+  <div class="foot"><span>Lecture 5 · CRUD, forms, validation, CSRF</span><span class="spacer"></span></div>
 </section>
 
 <!-- 2 ─ Framing -->
@@ -277,23 +280,23 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Recap and objectives</td><td class="center">10</td></tr>
-          <tr><td>2</td><td>CRUD; forms; the two-request dance</td><td class="center">30</td></tr>
-          <tr><td>3</td><td>Never trust the client; POST/Redirect/GET</td><td class="center">20</td></tr>
-          <tr><td>4</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>5</td><td>Razor forms and tag helpers</td><td class="center">25</td></tr>
+          <tr><td>1</td><td>Recap and objectives</td></tr>
+          <tr><td>2</td><td>CRUD; forms; the two-request dance</td></tr>
+          <tr><td>3</td><td>Never trust the client; POST/Redirect/GET</td></tr>
+          <tr><td>4</td><td class="muted">Break</td></tr>
+          <tr><td>5</td><td>Razor forms and tag helpers</td></tr>
         </tbody>
       </table>
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>6</td><td>Validation: annotations, <code class="inline">ModelState</code>, summaries</td><td class="center">25</td></tr>
-          <tr><td>7</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>8</td><td>CSRF and the token; Edit and Delete</td><td class="center">20</td></tr>
-          <tr><td>9</td><td>Walkthrough: full CRUD for Article</td><td class="center">25</td></tr>
-          <tr><td>10</td><td>Scaffolding and wrap-up</td><td class="center">5</td></tr>
+          <tr><td>6</td><td>Validation: annotations, <code class="inline">ModelState</code>, summaries</td></tr>
+          <tr><td>7</td><td class="muted">Break</td></tr>
+          <tr><td>8</td><td>CSRF and the token; Edit and Delete</td></tr>
+          <tr><td>9</td><td>Walkthrough: full CRUD for Article</td></tr>
+          <tr><td>10</td><td>Scaffolding and wrap-up</td></tr>
         </tbody>
       </table>
     </div>
@@ -304,7 +307,7 @@ code.inline{
 <!-- 5 ─ Section: CRUD and forms -->
 <section class="slide slide--dark">
   <div class="section-no">01</div>
-  <p class="eyebrow">Block 2 · 30 min</p>
+  <p class="eyebrow">Block 2</p>
   <h2>CRUD, forms, and the two-request dance</h2>
   <p class="lead" style="margin-top:var(--space-4)">Four operations, one HTML element, and why creating one record takes three requests.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -393,7 +396,7 @@ code.inline{
 <!-- 10 ─ Section: never trust the client -->
 <section class="slide slide--dark">
   <div class="section-no">02</div>
-  <p class="eyebrow">Block 3 · 20 min</p>
+  <p class="eyebrow">Block 3</p>
   <h2>Never trust the client</h2>
   <p class="lead" style="margin-top:var(--space-4)">The most important idea of the session — and the pattern that keeps a refresh from doing damage.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -569,7 +572,7 @@ code.inline{
 <!-- 17 ─ Section: Razor forms and tag helpers -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
-  <p class="eyebrow">Block 5 · 25 min · demo</p>
+  <p class="eyebrow">Block 5 · demo</p>
   <h2>Razor forms and tag helpers</h2>
   <p class="lead" style="margin-top:var(--space-4)">The same three ideas, now in ASP.NET Core MVC on .NET 10 — the action pair, model binding, and attributes that write the HTML for us.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -735,7 +738,7 @@ code.inline{
 <!-- 25 ─ Section: validation -->
 <section class="slide slide--dark">
   <div class="section-no">04</div>
-  <p class="eyebrow">Block 6 · 25 min · demo</p>
+  <p class="eyebrow">Block 6 · demo</p>
   <h2>Validation on the server</h2>
   <p class="lead" style="margin-top:var(--space-4)">Annotations for the rules a type can express, <code class="inline">ModelState</code> for everything else.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -810,7 +813,7 @@ code.inline{
 <!-- 29 ─ Section: CSRF, edit, delete -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
-  <p class="eyebrow">Block 8 · 20 min · demo</p>
+  <p class="eyebrow">Block 8 · demo</p>
   <h2>CSRF, and the rest of CRUD</h2>
   <p class="lead" style="margin-top:var(--space-4)">An attack that uses nothing but a form and your own cookies — then Edit and Delete.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1140,7 +1143,7 @@ $ <span class="k">dotnet aspnet-codegenerator</span> controller \
 
 <!-- 42 ─ Walkthrough -->
 <section class="slide">
-  <p class="eyebrow">Walkthrough · 25 min · on screen</p>
+  <p class="eyebrow">Walkthrough · on screen</p>
   <h2>Full CRUD for Article, by hand</h2>
   <div class="rule"></div>
   <div class="content">
@@ -1219,6 +1222,21 @@ $ <span class="k">dotnet aspnet-codegenerator</span> controller \
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── Q&A ── -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Q&amp;A</p>
+  <h2>Questions and discussion</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>What still feels like magic, or does not fit together yet?</li>
+      <li>Where would you reach for this in your own project?</li>
+      <li>What should we run through once more?</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 45 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
@@ -1226,12 +1244,12 @@ $ <span class="k">dotnet aspnet-codegenerator</span> controller \
   <div class="rule"></div>
   <div class="content">
     <ul class="list list--tight">
-      <li><strong>Forms and tag helpers</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/views/working-with-forms</span></li>
-      <li><strong>Model validation</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/models/validation</span></li>
-      <li><strong>Prevent cross-site request forgery attacks</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/security/anti-request-forgery</span></li>
-      <li><strong>Prevent over-posting</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/data/ef-mvc/crud#overposting</span></li>
-      <li><strong>Scaffolding a model</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/tutorials/first-mvc-app/adding-model</span></li>
-      <li><strong>OWASP Top Ten</strong><br><span class="sm muted">owasp.org/www-project-top-ten</span></li>
+      <li><strong>Forms and tag helpers</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/views/working-with-forms" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/views/working-with-forms</a></span></li>
+      <li><strong>Model validation</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/models/validation" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/models/validation</a></span></li>
+      <li><strong>Prevent cross-site request forgery attacks</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/security/anti-request-forgery" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/security/anti-request-forgery</a></span></li>
+      <li><strong>Prevent over-posting</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/data/ef-mvc/crud#overposting" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/data/ef-mvc/crud#overposting</a></span></li>
+      <li><strong>Scaffolding a model</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/tutorials/first-mvc-app/adding-model" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/tutorials/first-mvc-app/adding-model</a></span></li>
+      <li><strong>OWASP Top Ten</strong><br><span class="sm muted"><a href="https://owasp.org/www-project-top-ten" target="_blank" rel="noopener">owasp.org/www-project-top-ten</a></span></li>
     </ul>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>

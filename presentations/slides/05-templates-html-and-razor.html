@@ -81,6 +81,9 @@ strong{font-weight:600}
 .slide--dark .eyebrow{color:var(--brand-tint-10)}
 .slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
 .slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
 .section-no{
   font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
   color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
@@ -226,7 +229,7 @@ code.inline{
   <h1>Templates: HTML, CSS and Razor</h1>
   <div class="rule"></div>
   <p class="lead">The structure of a document, the look of a document,<br>and how a server turns data into one.</p>
-  <div class="foot"><span>Lecture 3 · Views, HTML/CSS, Razor</span><span class="spacer"></span><span>~180 min</span></div>
+  <div class="foot"><span>Lecture 3 · Views, HTML/CSS, Razor</span><span class="spacer"></span></div>
 </section>
 
 <!-- 2 ─ Where we left off -->
@@ -275,23 +278,23 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Recap and objectives</td><td class="center">10</td></tr>
-          <tr><td>2</td><td>HTML: structure and the common elements</td><td class="center">30</td></tr>
-          <tr><td>3</td><td>CSS: selectors and the box model</td><td class="center">25</td></tr>
-          <tr><td>4</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>5</td><td>Templates and server-side rendering</td><td class="center">15</td></tr>
+          <tr><td>1</td><td>Recap and objectives</td></tr>
+          <tr><td>2</td><td>HTML: structure and the common elements</td></tr>
+          <tr><td>3</td><td>CSS: selectors and the box model</td></tr>
+          <tr><td>4</td><td class="muted">Break</td></tr>
+          <tr><td>5</td><td>Templates and server-side rendering</td></tr>
         </tbody>
       </table>
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>6</td><td>Razor: syntax, <code class="inline">@model</code>, control flow</td><td class="center">30</td></tr>
-          <tr><td>7</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>8</td><td>Layouts, partial views, sections</td><td class="center">20</td></tr>
-          <tr><td>9</td><td>Lab: we give SimpleBlog real pages</td><td class="center">25</td></tr>
-          <tr><td>10</td><td>Wrap-up and Q&amp;A</td><td class="center">5</td></tr>
+          <tr><td>6</td><td>Razor: syntax, <code class="inline">@model</code>, control flow</td></tr>
+          <tr><td>7</td><td class="muted">Break</td></tr>
+          <tr><td>8</td><td>Layouts, partial views, sections</td></tr>
+          <tr><td>9</td><td>Lab: we give SimpleBlog real pages</td></tr>
+          <tr><td>10</td><td>Wrap-up and Q&amp;A</td></tr>
         </tbody>
       </table>
     </div>
@@ -302,7 +305,7 @@ code.inline{
 <!-- 5 ─ Section: HTML -->
 <section class="slide slide--dark">
   <div class="section-no">01</div>
-  <p class="eyebrow">Block 2 · 30 min</p>
+  <p class="eyebrow">Block 2</p>
   <h2>HTML: the structure of a document</h2>
   <p class="lead" style="margin-top:var(--space-4)">Labelling the parts of a page so that a browser knows what they are.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -476,7 +479,7 @@ code.inline{
 <!-- 12 ─ Section: CSS -->
 <section class="slide slide--dark">
   <div class="section-no">02</div>
-  <p class="eyebrow">Block 3 · 25 min</p>
+  <p class="eyebrow">Block 3</p>
   <h2>CSS: selectors and the box model</h2>
   <p class="lead" style="margin-top:var(--space-4)">Given elements labelled like that — how should they look?</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -628,7 +631,7 @@ code.inline{
 <!-- 18 ─ Section: templates -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
-  <p class="eyebrow">Block 5 · 15 min</p>
+  <p class="eyebrow">Block 5</p>
   <h2>Templates and server-side rendering</h2>
   <p class="lead" style="margin-top:var(--space-4)">We have data in a list and the browser needs HTML. Who converts one into the other?</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -734,7 +737,7 @@ code.inline{
 <!-- 22 ─ Section: Razor -->
 <section class="slide slide--dark">
   <div class="section-no">04</div>
-  <p class="eyebrow">Block 6 · 30 min</p>
+  <p class="eyebrow">Block 6</p>
   <h2>Razor: syntax, <code class="inline">@model</code>, control flow</h2>
   <p class="lead" style="margin-top:var(--space-4)">The same idea, with a name and a file extension.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -977,7 +980,7 @@ in the URL     /css/site.css</span></pre>
 <!-- 32 ─ Section: layouts -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
-  <p class="eyebrow">Block 8 · 20 min</p>
+  <p class="eyebrow">Block 8</p>
   <h2>Layouts, partial views and sections</h2>
   <p class="lead" style="margin-top:var(--space-4)">Ten pages need the same header, the same nav and the same footer. We write them once.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1265,7 +1268,7 @@ in the URL     /css/site.css</span></pre>
 
 <!-- 42 ─ Lab -->
 <section class="slide">
-  <p class="eyebrow">Lab · 25 min · demonstrated from the front</p>
+  <p class="eyebrow">Lab · demonstrated from the front</p>
   <h2>We give SimpleBlog real pages</h2>
   <div class="rule"></div>
   <div class="content">
@@ -1359,6 +1362,21 @@ in the URL     /css/site.css</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── Q&A ── -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Q&amp;A</p>
+  <h2>Questions and discussion</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>What still feels like magic, or does not fit together yet?</li>
+      <li>Where would you reach for this in your own project?</li>
+      <li>What should we run through once more?</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 45 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
@@ -1366,11 +1384,11 @@ in the URL     /css/site.css</span></pre>
   <div class="rule"></div>
   <div class="content">
     <ul class="list">
-      <li><strong>MDN — HTML basics</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics</span></li>
-      <li><strong>MDN — CSS first steps</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Learn/CSS/First_steps</span></li>
-      <li><strong>MDN — The box model</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model</span></li>
-      <li><strong>Razor syntax reference</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/views/razor</span></li>
-      <li><strong>Layouts</strong> · <strong>Partial views</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/views/layout · …/views/partial</span></li>
+      <li><strong>MDN — HTML basics</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics</a></span></li>
+      <li><strong>MDN — CSS first steps</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/First_steps" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Learn/CSS/First_steps</a></span></li>
+      <li><strong>MDN — The box model</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model</a></span></li>
+      <li><strong>Razor syntax reference</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/views/razor" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/views/razor</a></span></li>
+      <li><strong>Layouts</strong> · <strong>Partial views</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/views/layout" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/views/layout</a> · …/views/partial</span></li>
     </ul>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>

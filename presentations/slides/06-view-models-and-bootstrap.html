@@ -81,6 +81,9 @@ strong{font-weight:600}
 .slide--dark .eyebrow{color:var(--brand-tint-10)}
 .slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
 .slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
 .section-no{
   font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
   color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
@@ -226,7 +229,7 @@ code.inline{
   <h1>View Models and Bootstrap</h1>
   <div class="rule"></div>
   <p class="lead">Shaping the data a page needs, and making the result<br>work on a phone and on a projector.</p>
-  <div class="foot"><span>Lecture 3 · Passing data to views, Bootstrap styling</span><span class="spacer"></span><span>~180 min</span></div>
+  <div class="foot"><span>Lecture 3 · Passing data to views, Bootstrap styling</span><span class="spacer"></span></div>
 </section>
 
 <!-- 2 ─ Where we are -->
@@ -277,23 +280,23 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Recap and objectives</td><td class="center">10</td></tr>
-          <tr><td>2</td><td>Passing data to a view — three mechanisms</td><td class="center">30</td></tr>
-          <tr><td>3</td><td>View models: designing for the page</td><td class="center">25</td></tr>
-          <tr><td>4</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>5</td><td>CSS frameworks and responsive design</td><td class="center">25</td></tr>
+          <tr><td>1</td><td>Recap and objectives</td></tr>
+          <tr><td>2</td><td>Passing data to a view — three mechanisms</td></tr>
+          <tr><td>3</td><td>View models: designing for the page</td></tr>
+          <tr><td>4</td><td class="muted">Break</td></tr>
+          <tr><td>5</td><td>CSS frameworks and responsive design</td></tr>
         </tbody>
       </table>
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>6</td><td>The Bootstrap grid</td><td class="center">25</td></tr>
-          <tr><td>7</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>8</td><td>Components: navbar, card, table, badge</td><td class="center">15</td></tr>
-          <tr><td>9</td><td>Walkthrough: the SimpleBlog home page</td><td class="center">25</td></tr>
-          <tr><td>10</td><td>Wrap-up and Q&amp;A</td><td class="center">5</td></tr>
+          <tr><td>6</td><td>The Bootstrap grid</td></tr>
+          <tr><td>7</td><td class="muted">Break</td></tr>
+          <tr><td>8</td><td>Components: navbar, card, table, badge</td></tr>
+          <tr><td>9</td><td>Walkthrough: the SimpleBlog home page</td></tr>
+          <tr><td>10</td><td>Wrap-up and Q&amp;A</td></tr>
         </tbody>
       </table>
     </div>
@@ -304,7 +307,7 @@ code.inline{
 <!-- 5 ─ Section: passing data -->
 <section class="slide slide--dark">
   <div class="section-no">02</div>
-  <p class="eyebrow">Block 2 · 30 min</p>
+  <p class="eyebrow">Block 2</p>
   <h2>Passing data to a view</h2>
   <p class="lead" style="margin-top:var(--space-4)">Three mechanisms, in increasing order of discipline.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -447,7 +450,7 @@ code.inline{
 <!-- 12 ─ Section: view models -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
-  <p class="eyebrow">Block 3 · 25 min</p>
+  <p class="eyebrow">Block 3</p>
   <h2>View models: designing for the page</h2>
   <p class="lead" style="margin-top:var(--space-4)">One class, one screen, nothing spare.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -647,7 +650,7 @@ code.inline{
 <!-- 19 ─ Section: CSS frameworks and responsive design -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
-  <p class="eyebrow">Block 5 · 25 min</p>
+  <p class="eyebrow">Block 5</p>
   <h2>CSS frameworks and responsive design</h2>
   <p class="lead" style="margin-top:var(--space-4)">One page that adapts, rather than two sites that diverge.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -909,7 +912,7 @@ code.inline{
 <!-- 27 ─ Section: the Bootstrap grid -->
 <section class="slide slide--dark">
   <div class="section-no">06</div>
-  <p class="eyebrow">Block 6 · 25 min</p>
+  <p class="eyebrow">Block 6</p>
   <h2>The Bootstrap grid</h2>
   <p class="lead" style="margin-top:var(--space-4)">Container, row, column — and five breakpoints.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1023,7 +1026,7 @@ code.inline{
 <!-- 32 ─ Section: components -->
 <section class="slide slide--dark">
   <div class="section-no">08</div>
-  <p class="eyebrow">Block 8 · 15 min</p>
+  <p class="eyebrow">Block 8</p>
   <h2>Components</h2>
   <p class="lead" style="margin-top:var(--space-4)">Four of them: navbar, card, table, badge. Enough to build the site, few enough to remember.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1149,7 +1152,7 @@ code.inline{
 
 <!-- 37 ─ Lab walkthrough -->
 <section class="slide">
-  <p class="eyebrow">Walkthrough · 25 min · from the front</p>
+  <p class="eyebrow">Walkthrough · from the front</p>
   <h2>We build the SimpleBlog home page</h2>
   <div class="rule"></div>
   <div class="content">
@@ -1300,6 +1303,21 @@ code.inline{
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── Q&A ── -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Q&amp;A</p>
+  <h2>Questions and discussion</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>What still feels like magic, or does not fit together yet?</li>
+      <li>Where would you reach for this in your own project?</li>
+      <li>What should we run through once more?</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 43 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
@@ -1307,11 +1325,11 @@ code.inline{
   <div class="rule"></div>
   <div class="content">
     <ul class="list">
-      <li><strong>Views and view models in ASP.NET Core MVC</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/views/overview</span></li>
-      <li><strong>Passing data to views — ViewData and ViewBag</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/mvc/views/overview#pass-data-to-views</span></li>
-      <li><strong>Bootstrap 5 — grid system</strong><br><span class="sm muted">getbootstrap.com/docs/5.3/layout/grid/</span></li>
-      <li><strong>Bootstrap 5 — components and spacing utilities</strong><br><span class="sm muted">getbootstrap.com/docs/5.3/components/ · /utilities/spacing/</span></li>
-      <li><strong>MDN — Responsive design</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design</span></li>
+      <li><strong>Views and view models in ASP.NET Core MVC</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/views/overview" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/views/overview</a></span></li>
+      <li><strong>Passing data to views — ViewData and ViewBag</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/mvc/views/overview#pass-data-to-views" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/mvc/views/overview#pass-data-to-views</a></span></li>
+      <li><strong>Bootstrap 5 — grid system</strong><br><span class="sm muted"><a href="https://getbootstrap.com/docs/5.3/layout/grid/" target="_blank" rel="noopener">getbootstrap.com/docs/5.3/layout/grid/</a></span></li>
+      <li><strong>Bootstrap 5 — components and spacing utilities</strong><br><span class="sm muted"><a href="https://getbootstrap.com/docs/5.3/components/" target="_blank" rel="noopener">getbootstrap.com/docs/5.3/components/</a> · /utilities/spacing/</span></li>
+      <li><strong>MDN — Responsive design</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design</a></span></li>
     </ul>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>

@@ -81,6 +81,9 @@ strong{font-weight:600}
 .slide--dark .eyebrow{color:var(--brand-tint-10)}
 .slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
 .slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
 .section-no{
   font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
   color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
@@ -226,7 +229,7 @@ code.inline{
   <h1>How the Web Works</h1>
   <div class="rule"></div>
   <p class="lead">Client and server, URLs, HTTP requests and responses,<br>methods and status codes.</p>
-  <div class="foot"><span>Lecture 1 · HTTP</span><span class="spacer"></span><span>~180 min · no code</span></div>
+  <div class="foot"><span>Lecture 1 · HTTP</span><span class="spacer"></span><span>no code</span></div>
 </section>
 
 <!-- 2 ─ Before we start -->
@@ -274,23 +277,23 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Course intro: what we build, how you're assessed</td><td class="center">15</td></tr>
-          <tr><td>2</td><td>The client–server model</td><td class="center">25</td></tr>
-          <tr><td>3</td><td>Anatomy of a URL</td><td class="center">15</td></tr>
-          <tr><td>4</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>5</td><td>The HTTP request</td><td class="center">25</td></tr>
+          <tr><td>1</td><td>Course intro: what we build, how you're assessed</td></tr>
+          <tr><td>2</td><td>The client–server model</td></tr>
+          <tr><td>3</td><td>Anatomy of a URL</td></tr>
+          <tr><td>4</td><td class="muted">Break</td></tr>
+          <tr><td>5</td><td>The HTTP request</td></tr>
         </tbody>
       </table>
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>6</td><td>The HTTP response and status codes</td><td class="center">25</td></tr>
-          <tr><td>7</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>8</td><td>Demo: watching real requests in DevTools</td><td class="center">20</td></tr>
-          <tr><td>9</td><td>Walkthrough: we investigate a website together</td><td class="center">30</td></tr>
-          <tr><td>10</td><td>Wrap-up and Q&amp;A</td><td class="center">5</td></tr>
+          <tr><td>6</td><td>The HTTP response and status codes</td></tr>
+          <tr><td>7</td><td class="muted">Break</td></tr>
+          <tr><td>8</td><td>Demo: watching real requests in DevTools</td></tr>
+          <tr><td>9</td><td>Walkthrough: we investigate a website together</td></tr>
+          <tr><td>10</td><td>Wrap-up and Q&amp;A</td></tr>
         </tbody>
       </table>
     </div>
@@ -301,7 +304,7 @@ code.inline{
 <!-- 5 ─ Section: course intro -->
 <section class="slide slide--dark">
   <div class="section-no">01</div>
-  <p class="eyebrow">Block 1 · 15 min</p>
+  <p class="eyebrow">Block 1</p>
   <h2>Course intro</h2>
   <p class="lead" style="margin-top:var(--space-4)">What we build, how it works, how you're assessed.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -321,6 +324,7 @@ code.inline{
       <div class="card"><h3>Sessions 09–10</h3><p>Forms, CRUD and validation · debugging, logging and deployment.</p></div>
     </div>
     <div class="callout">The app is called <strong>SimpleBlog</strong>. Every session moves the same app forward, and each session's notes record exactly what state it is in — so a missed week is recoverable.</div>
+    <div class="callout">The <strong>blog</strong> subject is not fixed. If the group would rather build around something else — recipes, films, events, a game library — we can swap the <strong>Article</strong> entity for another one, and every concept in the course still applies.</div>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
@@ -357,10 +361,27 @@ code.inline{
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── What the web is ── -->
+<section class="slide">
+  <p class="eyebrow">The web</p>
+  <h2>What the web actually is</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <p class="lead">Two words that get used as if they mean the same thing — the <em>internet</em> and the <em>web</em> — and one program that ties them together.</p>
+    <div class="cols cols-3 cols--auto">
+      <div class="card"><h3>The internet</h3><p>The physical network: millions of machines connected by cables, fibre and radio, all able to send data to one another.</p></div>
+      <div class="card card--brand"><h3>The web</h3><p>One thing built on top of that network: a huge collection of documents and applications, each with its own address, fetched by asking for that address.</p></div>
+      <div class="card"><h3>A browser</h3><p>The program that does the asking. You give it an address, it fetches whatever is there and draws it on screen.</p></div>
+    </div>
+    <div class="callout">The web is not the only thing running on the internet — video calls, email and games use the same network without being part of the web. The web is the part made of linked, addressable pages you open in a browser.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 8 ─ Section: client–server -->
 <section class="slide slide--dark">
   <div class="section-no">02</div>
-  <p class="eyebrow">Block 2 · 25 min</p>
+  <p class="eyebrow">Block 2</p>
   <h2>The client–server model</h2>
   <p class="lead" style="margin-top:var(--space-4)">Who asks, who answers, and in what order.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -545,7 +566,7 @@ code.inline{
 <!-- 15 ─ Section: URL -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
-  <p class="eyebrow">Block 3 · 15 min</p>
+  <p class="eyebrow">Block 3</p>
   <h2>Anatomy of a URL</h2>
   <p class="lead" style="margin-top:var(--space-4)">Six parts, each with one job.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -599,7 +620,7 @@ scheme       host        port   path        query string   fragment</span></pre>
 <!-- 18 ─ Section: request -->
 <section class="slide slide--dark">
   <div class="section-no">04</div>
-  <p class="eyebrow">Block 5 · 25 min</p>
+  <p class="eyebrow">Block 5</p>
   <h2>The HTTP request</h2>
   <p class="lead" style="margin-top:var(--space-4)">What the client actually sends.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -676,7 +697,7 @@ scheme       host        port   path        query string   fragment</span></pre>
 <!-- 22 ─ Section: response -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
-  <p class="eyebrow">Block 6 · 25 min</p>
+  <p class="eyebrow">Block 6</p>
   <h2>The HTTP response</h2>
   <p class="lead" style="margin-top:var(--space-4)">What comes back, and what the number at the top means.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -774,7 +795,7 @@ scheme       host        port   path        query string   fragment</span></pre>
 <!-- 27 ─ Section: demo -->
 <section class="slide slide--dark">
   <div class="section-no">06</div>
-  <p class="eyebrow">Block 8 · 20 min · demo</p>
+  <p class="eyebrow">Block 8 · demo</p>
   <h2>Seeing it for real</h2>
   <p class="lead" style="margin-top:var(--space-4)">No .NET yet — nothing to run. The tool every one of you already has: DevTools.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -872,7 +893,7 @@ HTTP/1.1 <span class="ok">200 OK</span>
 
 <!-- 32 ─ Lab -->
 <section class="slide">
-  <p class="eyebrow">Walkthrough · 30 min · together</p>
+  <p class="eyebrow">Walkthrough · together</p>
   <h2>Let's investigate a website</h2>
   <div class="rule"></div>
   <div class="content">
@@ -906,7 +927,7 @@ HTTP/1.1 <span class="ok">200 OK</span>
         <h3 style="margin-top:var(--space-2)">Install the toolchain</h3>
         <p>We start coding in the next session.</p>
         <p>· .NET 10 SDK — <code class="inline">dotnet.microsoft.com/download</code></p>
-        <p>· VS Code + the <strong>C# Dev Kit</strong> extension, or Visual Studio Community on Windows.</p>
+        <p>· An editor: <strong>JetBrains Rider</strong> (free for non-commercial use), or VS Code + the <strong>C# Dev Kit</strong> extension, or Visual Studio Community on Windows.</p>
         <p>· We verify with <code class="inline">dotnet --version</code> before we begin.</p>
       </div>
       <div class="card">
@@ -962,6 +983,21 @@ HTTP/1.1 <span class="ok">200 OK</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── Q&A ── -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Q&amp;A</p>
+  <h2>Questions and discussion</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>What still feels like magic, or does not fit together yet?</li>
+      <li>Where would you reach for this in your own project?</li>
+      <li>What should we run through once more?</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 35 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
@@ -969,11 +1005,11 @@ HTTP/1.1 <span class="ok">200 OK</span>
   <div class="rule"></div>
   <div class="content">
     <ul class="list">
-      <li><strong>MDN — An overview of HTTP</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Web/HTTP/Overview</span></li>
-      <li><strong>MDN — HTTP request methods</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Web/HTTP/Methods</span></li>
-      <li><strong>MDN — HTTP response status codes</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Web/HTTP/Status</span></li>
-      <li><strong>MDN — What is a URL</strong><br><span class="sm muted">developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL</span></li>
-      <li><strong>Chrome DevTools — Network features reference</strong><br><span class="sm muted">developer.chrome.com/docs/devtools/network</span></li>
+      <li><strong>MDN — An overview of HTTP</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Web/HTTP/Overview</a></span></li>
+      <li><strong>MDN — HTTP request methods</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Web/HTTP/Methods</a></span></li>
+      <li><strong>MDN — HTTP response status codes</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Web/HTTP/Status</a></span></li>
+      <li><strong>MDN — What is a URL</strong><br><span class="sm muted"><a href="https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL" target="_blank" rel="noopener">developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL</a></span></li>
+      <li><strong>Chrome DevTools — Network features reference</strong><br><span class="sm muted"><a href="https://developer.chrome.com/docs/devtools/network" target="_blank" rel="noopener">developer.chrome.com/docs/devtools/network</a></span></li>
     </ul>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>

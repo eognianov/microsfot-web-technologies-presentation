@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=/1">
+<title>Въведение — Microsoft WEB технологии</title>
+<link rel="stylesheet" href="../../design-system/styles.css">
+<style>
+/* ── Deck-level extensions to the design system ────────────────────────────
+   Slides are authored on a fixed 1280×720 stage and scaled to the viewport,
+   so every size below is a *slide* size, not a screen size. Body copy is
+   stepped up from --fs-body (14px, UI density) to projection density. */
+:root{
+  --stage-w:1280px; --stage-h:720px;
+  --fs-slide-body:20px;  --lh-slide-body:30px;
+  --fs-slide-lead:24px;  --lh-slide-lead:34px;
+  --fs-slide-sm:16px;    --lh-slide-sm:24px;
+  --fs-slide-code:16px;  --lh-slide-code:26px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--neutral-grey-160);
+  font-family:var(--font-sans-text);
+  color:var(--text-primary);
+  overflow:hidden;
+}
+
+/* ── Stage ─────────────────────────────────────────────────────────────── */
+#stage{position:fixed;inset:0;display:grid;place-items:center}
+#deck{width:var(--stage-w);height:var(--stage-h);position:relative;transform-origin:center center}
+.slide{
+  position:absolute;inset:0;
+  width:var(--stage-w);height:var(--stage-h);
+  background:var(--surface-page);
+  display:none;flex-direction:column;
+  padding:var(--space-16) var(--space-16) var(--space-10);
+  overflow:hidden;
+}
+.slide.is-active{display:flex}
+
+/* ── Slide chrome ──────────────────────────────────────────────────────── */
+.eyebrow{
+  margin:0 0 var(--space-3);
+  font-family:var(--font-sans-text);
+  font-size:var(--fs-body-sm);line-height:var(--lh-body-sm);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--brand-pressed);
+}
+h1,h2,h3{margin:0;font-family:var(--font-sans);color:var(--text-primary)}
+h1{font-size:var(--fs-display);line-height:var(--lh-display);font-weight:var(--fw-display);letter-spacing:-.02em}
+h2{font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:var(--fw-title-1);letter-spacing:-.01em}
+h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:var(--fw-title-3)}
+.rule{width:56px;height:3px;background:var(--brand-base);border-radius:var(--radius-pill);margin:var(--space-4) 0 var(--space-6)}
+.body{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);color:var(--text-primary)}
+.lead{margin:0;font-size:var(--fs-slide-lead);line-height:var(--lh-slide-lead);color:var(--text-secondary)}
+.muted{color:var(--text-secondary)}
+.sm{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+strong{font-weight:600}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--space-5)}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.foot{
+  display:flex;align-items:center;gap:var(--space-4);
+  padding-top:var(--space-5);margin-top:auto;
+  border-top:1px solid var(--border-default);
+  font-size:var(--fs-caption);line-height:var(--lh-caption);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-disabled);
+}
+.foot .spacer{flex:1}
+
+/* ── Brand-block slides (title + section dividers) ─────────────────────── */
+.slide--brand{background:var(--brand-base);color:var(--text-on-brand);justify-content:center}
+.slide--brand h1,.slide--brand h2{color:var(--text-on-brand)}
+.slide--brand .eyebrow{color:var(--brand-tint-20)}
+.slide--brand .lead,.slide--brand .body{color:var(--brand-tint-30)}
+.slide--brand .rule{background:var(--neutral-white)}
+.slide--brand .foot{border-top-color:rgba(255,255,255,.24);color:var(--brand-tint-20)}
+.slide--dark{background:var(--brand-shade-20)}
+.slide--dark h1,.slide--dark h2{color:var(--text-on-brand)}
+.slide--dark .eyebrow{color:var(--brand-tint-10)}
+.slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
+.slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
+.section-no{
+  font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
+  color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
+}
+
+/* ── Layout helpers ────────────────────────────────────────────────────── */
+.cols{display:grid;gap:var(--space-6);flex:1;min-height:0}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-2-1{grid-template-columns:1.4fr 1fr}
+.cols--auto{flex:0 0 auto;min-height:auto}
+.stack{display:flex;flex-direction:column;gap:var(--space-4);min-height:0}
+.center{justify-content:center}
+
+/* ── Card (design-system surfaces/Card, slide-scaled) ──────────────────── */
+.card{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  display:flex;flex-direction:column;gap:var(--space-2);
+}
+.card--elevated{border:none;box-shadow:var(--shadow-8)}
+.card--brand{background:var(--brand-tint-40);border-color:var(--brand-tint-20)}
+.card h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3)}
+.card p{margin:0;font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--text-secondary)}
+
+/* ── Badge (design-system feedback/Badge, slide-scaled) ────────────────── */
+.badge{
+  display:inline-flex;align-items:center;align-self:flex-start;height:26px;padding:0 var(--space-3);
+  border-radius:var(--radius-pill);font-size:var(--fs-slide-sm);font-weight:600;
+  background:var(--brand-tint-40);color:var(--brand-pressed);white-space:nowrap;
+}
+.badge--neutral{background:var(--surface-subtle);color:var(--text-secondary)}
+.badge--success{background:var(--color-success-bg);color:var(--color-success)}
+.badge--warning{background:var(--color-warning-bg);color:var(--color-warning)}
+.badge--danger{background:var(--color-danger-bg);color:var(--color-danger)}
+.badge--mono{font-family:var(--font-mono);font-weight:600}
+
+/* ── Lists ─────────────────────────────────────────────────────────────── */
+ul.list,ol.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-4)}
+ul.list li,ol.list li{
+  position:relative;padding-left:var(--space-8);
+  font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);
+}
+ul.list li::before{
+  content:"";position:absolute;left:var(--space-2);top:11px;
+  width:8px;height:8px;border-radius:var(--radius-circular);background:var(--brand-base);
+}
+ol.list{counter-reset:step}
+ol.list li{counter-increment:step;padding-left:var(--space-10)}
+ol.list li::before{
+  content:counter(step);position:absolute;left:0;top:2px;
+  width:28px;height:28px;border-radius:var(--radius-circular);
+  background:var(--brand-tint-40);color:var(--brand-pressed);
+  font-family:var(--font-sans);font-size:var(--fs-slide-sm);font-weight:600;
+  display:grid;place-items:center;
+}
+.list--tight li{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+.list--tight{gap:var(--space-3)}
+
+/* ── Slide 8 cards list sizing ─────────────────────────────────────── */
+.slide:nth-of-type(8) .card .list li{font-size:0.7em}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+table{
+  width:100%;border-collapse:collapse;
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);overflow:hidden;
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+}
+thead th{
+  text-align:left;background:var(--surface-subtle);color:var(--text-secondary);
+  font-weight:600;font-size:var(--fs-body-sm);letter-spacing:.06em;text-transform:uppercase;
+  padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);
+}
+tbody td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody th{
+  text-align:left;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);
+  font-weight:600;white-space:nowrap;
+}
+tbody tr:last-child th{border-bottom:none}
+td.center,th.center{text-align:center}
+
+/* ── Code ──────────────────────────────────────────────────────────────── */
+pre,code{font-family:var(--font-mono)}
+code.inline{
+  background:var(--surface-subtle);border:1px solid var(--border-default);
+  border-radius:var(--radius-sm);padding:1px 6px;font-size:.92em;color:var(--brand-pressed);
+}
+.slide--brand code.inline,.slide--dark code.inline{
+  background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24);color:var(--neutral-white);
+}
+
+/* ── Callout ───────────────────────────────────────────────────────────── */
+.callout{
+  background:var(--brand-tint-40);border:1px solid var(--brand-tint-20);
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--brand-shade-10);
+}
+.callout--warn{background:var(--color-warning-bg);border-color:#f0d98a;color:var(--color-warning)}
+
+/* ── Big statement ─────────────────────────────────────────────────────── */
+.statement{margin:0;font-family:var(--font-sans);font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:600}
+
+/* ── Progress bar ──────────────────────────────────────────────────────── */
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--brand-tint-10);width:0;
+  transition:width var(--duration-normal) var(--ease-standard);z-index:10}
+
+/* ── Help hint ─────────────────────────────────────────────────────────── */
+#hint{
+  position:fixed;right:16px;bottom:14px;z-index:10;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--neutral-grey-90);font-family:var(--font-sans-text);
+  transition:opacity var(--duration-slow) var(--ease-standard);
+}
+#hint.is-hidden{opacity:0}
+
+/* ── Print / PDF export: one slide per landscape page ──────────────────── */
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:var(--neutral-white);overflow:visible}
+  #stage{position:static;display:block}
+  #deck{width:auto;height:auto;transform:none!important}
+  #progress,#hint{display:none}
+  .slide{position:static;display:flex!important;page-break-after:always;break-after:page}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage"><div id="deck">
+
+<!-- 1 ─ Заглавие -->
+<section class="slide slide--brand">
+  <p class="eyebrow">Въведение в курса</p>
+  <h1>Microsoft WEB технологии</h1>
+  <div class="rule"></div>
+  <p class="lead">Какво ще правим през следващите десет сесии,<br>кой съм аз и как се полага изпитът.</p>
+  <div class="foot"><span>УниБИТ · задочно · 2026&ndash;2027</span><span class="spacer"></span><span>въведение</span></div>
+</section>
+
+<!-- 2 ─ Езикът на курса -->
+<section class="slide">
+  <p class="eyebrow">Езикът на курса</p>
+  <h2>Тази въвеждаща презентация е на български. Сесиите 01&ndash;10 са на английски.</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <p class="lead">Говорим на български в залата. Слайдовете на сесиите и кодът са на английски &mdash; по няколко причини.</p>
+    <div class="cols cols-2">
+      <ul class="list">
+        <li>.NET, документацията, съобщенията за грешки и общността са на английски. Учим термините така, както ще ги срещаме на практика.</li>
+        <li>Индустрията работи на английски: код, ревюта, issue&#8209;та, интервюта за работа.</li>
+      </ul>
+      <ul class="list">
+        <li>Всяка сесия завършва с речник <strong>EN &rarr; BG</strong> за новите термини.</li>
+        <li>Обяснението остава на български &mdash; спрете ме винаги, когато дума на слайда не е ясна.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 3 ─ За мен -->
+<section class="slide">
+  <p class="eyebrow">За мен</p>
+  <h2>Емилиян Огнянов - e.ognianov@unibit.bg</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="stack">
+      <p class="body"><strong>6&#8209;та година програмист в SAP Labs Bulgaria &middot; в момента на позиция Senior Fullstack developer.</strong></p>
+      <p class="body"><strong>Вътрешни SAP проекти:</strong></p>
+      <ul class="list list--tight">
+        <li>Миграция на от Hug към FastApi.</li>
+        <li>Смяна на UI framework пренаписване на Front End</li>
+        <li>Интеграция на LLM workflow за полуавтоматична комуникация към потребители.</li>
+      </ul>
+      <p class="body"><strong>8+ години опит:</strong></p>
+      <ul class="list list--tight">
+        <li>Fullstack developer &mdash; <a href="https://vodi4ka.com/" target="_blank" rel="noopener">vodi4ka.com</a>.</li>
+        <li>Миграция на .NET Framework към .NET 8 на SULS (Software University Learning System).</li>
+        <li>Приложение за генериране на изображения с изкуствен интелект &mdash; FastAPI, Vue.js, AWS, Lora, ComfyUI.</li>
+      </ul>
+    </div>
+    <p class="body"><strong>Студент в УниБИТ, 3&#8209;ти курс, специалност &bdquo;Компютърни науки&ldquo;.</strong></p>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 4 ─ Какво представлява курсът -->
+<section class="slide">
+  <p class="eyebrow">Курсът</p>
+  <h2>Какво представлява този курс</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <p class="lead">Десет сесии, които превеждат от &bdquo;как всъщност работи уебът&ldquo; до уеб приложение
+      с база данни на ASP.NET Core MVC върху .NET 10.</p>
+    <div class="cols cols-3 cols--auto">
+      <div class="card">
+        <h3>Първо идеята, после .NET</h3>
+        <p>Всяко понятие се въвежда без специфична за Microsoft терминология, за да е приложимо към всеки стек. После го назоваваме и го изграждаме в .NET.</p>
+      </div>
+      <div class="card">
+        <h3>Едно приложение, стъпка по стъпка</h3>
+        <p>Изграждаме един малък сайт за статии / новини, по едно движение на сесия. Темата е може и да е &mdash; рецепти, филми, събития, каталог с игри.</p>
+      </div>
+      <div class="card card--brand">
+        <h3>Без начални знания</h3>
+        <p>Нито един термин не се използва, преди да е дефиниран.</p>
+      </div>
+    </div>
+    <div class="callout">Формат: тридневен, десет часа на ден.
+      Няма домашни &mdash; това, което се предава и оценява, е финалният проект.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 5 ─ Десетте сесии -->
+<section class="slide">
+  <p class="eyebrow">Курсът</p>
+  <h2>Десетте сесии</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <table>
+        <thead><tr><th style="width:34px">№</th><th>Сесия</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td>Как работи уебът</td></tr>
+          <tr><td>02</td><td>От езика към фреймуърка</td></tr>
+          <tr><td>03</td><td>Обработка на заявка</td></tr>
+          <tr><td>04</td><td>Маршрутизиране и дизайн на URL</td></tr>
+          <tr><td>05</td><td>Шаблони: HTML, CSS и Razor</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th style="width:34px">№</th><th>Сесия</th></tr></thead>
+        <tbody>
+          <tr><td>06</td><td>View модели и Bootstrap</td></tr>
+          <tr><td>07</td><td>Данни, бази от данни и ORM</td></tr>
+          <tr><td>08</td><td>Code&#8209;first и миграции</td></tr>
+          <tr><td>09</td><td>Форми, CRUD и валидация</td></tr>
+          <tr><td>10</td><td>Дебъгване, логване и деплой</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 6 ─ Секция: финалният проект -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Оценяване</p>
+  <h2>Финалният проект</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Завършено уеб приложение, представено и защитено онлайн.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 7 ─ Какво предаваш -->
+<section class="slide">
+  <p class="eyebrow">Финален проект</p>
+  <h2>Задание</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>Завършено уеб приложение. <strong>Свободна тема</strong> &mdash; собствена идея или копие на съществуващо приложение или част от него.</li>
+      <li>Проектът се <strong>представя и защитава онлайн</strong>.</li>
+      <li>Работа <strong>индивидуално или в екип до трима души</strong>. Изискванията за екип се повишават (виж слайд 9).</li>
+      <li>Екипите използват <strong>Git репозитори</strong>, в което ясно се вижда приносът на всеки член.</li>
+      <li>Екипите изпращат <strong>темата и състава на лектора предварително</strong>. Ако участник се откаже, изискванията не се занижават.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 8 ─ Всяка секция носи по една единица -->
+<section class="slide">
+  <p class="eyebrow">Финален проект · оценяване</p>
+  <h2>Всяка секция носи по една единица към оценката</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3">
+      <div class="card">
+        <h3>Структура и функционалност</h3>
+        <ul class="list">
+          <li>Начална страница.</li>
+          <li>Страница &bdquo;за проекта&ldquo;: екип, основни функции, използвани технологии.</li>
+          <li>MVC архитектура (Model&ndash;View&ndash;Controller).</li>
+          <li>Навигационно меню до основните секции.</li>
+          <li>Поне <strong>N</strong> страници с динамично съдържание &mdash; списък с книги, информация за събития, потребителски профили.</li>
+          <li>.NET 10 или по&#8209;нова.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Потребителски интерфейс</h3>
+        <ul class="list">
+          <li>Стилизираща библиотека &mdash; Bootstrap или Tailwind CSS.</li>
+          <li>Razor изгледи за визуализация.</li>
+          <li>Ясно оформление и лесна навигация.</li>
+          <li>Поне <strong>L</strong> от: Layout (основен шаблон), Partial View, Section.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Работа с данни</h3>
+        <ul class="list">
+        <li><strong>SQL база данни</strong> чрез Entity Framework.</li>
+        <li>Пълна <strong>CRUD</strong> функционалност за поне <strong>E</strong> обекта &mdash; книги, автори, членове.</li>
+        <li><strong>Валидация</strong> на данните &mdash; и в модела, и в изгледите.</li>
+        <li>Обработени <strong>изключения и грешки</strong> &mdash; грешен вход, липсващи данни.</li>
+      </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 10 ─ Мащабиране по екип -->
+<section class="slide">
+  <p class="eyebrow">Финален проект · оценяване</p>
+  <h2>Мащабиране по екип</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="stack" style="align-items:center">
+      <table>
+        <thead><tr><th>Екип</th><th class="center">N</th><th class="center">E</th><th class="center">L</th></tr></thead>
+        <tbody>
+          <tr><th>1 човек</th><td class="center">3</td><td class="center">1</td><td class="center">1</td></tr>
+          <tr><th>2 души</th><td class="center">5</td><td class="center">2</td><td class="center">2</td></tr>
+          <tr><th>3 души</th><td class="center">8</td><td class="center">3</td><td class="center">3</td></tr>
+        </tbody>
+      </table>
+      <p class="sm muted"><strong>N</strong> = страници с динамично съдържание, <strong>E</strong> = обекти с пълна CRUD функционалност,
+        <strong>L</strong> = техники от Layout / Partial View / Section. Всеки член над първия умножава и трите по 1.5, закръглено нагоре.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 11 ─ Бонус точки -->
+<section class="slide">
+  <p class="eyebrow">Финален проект · оценяване</p>
+  <h2>Бонус точки</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="card">
+      <h3>По желание, за допълнителни точки</h3>
+      <ul class="list">
+        <li>Връзки &bdquo;един към много&ldquo; или &bdquo;много към много&ldquo;.</li>
+        <li>Търсене / филтриране на данни.</li>
+        <li>Регистрация и вход на потребители.</li>
+        <li>JavaScript фреймуърк &mdash; Vue, React, Angular, Svelte.</li>
+        <li>Пагинация и сортиране на данни.</li>
+        <li>Система за коментари, оценки или рейтинги.</li>
+        <li>Качване и управление на изображения.</li>
+        <li>Експорт на данни (PDF, CSV).</li>
+        <li>Email известяване &mdash; изпращане на имейли при нови публикации.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 12 ─ Секция: въпроси към залата -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Преди да започнем</p>
+  <h2>Няколко въпроса към залата</h2>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 13 ─ Въпрос 1 -->
+<section class="slide slide--brand">
+  <p class="eyebrow">Вдигнете ръка</p>
+  <p class="statement" style="color:var(--neutral-white)">Кой работи като програмист в момента?</p>
+  <div class="rule"></div>
+  <p class="lead">На пълен работен ден, на непълен, на свободна практика, стаж &mdash; всичко се брои.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 14 ─ Въпрос 2 -->
+<section class="slide slide--brand">
+  <p class="eyebrow">Вдигнете ръка</p>
+  <p class="statement" style="color:var(--neutral-white)">Кой е писал код преди &mdash; на какъвто и да е език?</p>
+  <div class="rule"></div>
+  <p class="lead">Училище, курс, хоби проект, копиране докато сработи. Всичко се брои.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 15 ─ Въпрос 3 -->
+<section class="slide slide--brand">
+  <p class="eyebrow">Вдигнете ръка</p>
+  <p class="statement" style="color:var(--neutral-white)">Кой е използвал нещо от изброените?</p>
+  <div class="rule"></div>
+  <p class="lead">C# или .NET &nbsp;&middot;&nbsp; ASP.NET или MVC &nbsp;&middot;&nbsp; Entity Framework или друг ORM
+    &nbsp;&middot;&nbsp; SQL &nbsp;&middot;&nbsp; Razor или друг шаблонен енджин &nbsp;&middot;&nbsp; Bootstrap</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 16 ─ Ресурси -->
+<section class="slide">
+  <p class="eyebrow">Ресурси</p>
+  <h2>Къде е всичко</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="card">
+        <h3>Moodle &mdash; материали по курса</h3>
+        <p>&bull; Курс: <strong>Microsoft WEB технологии - задочно/2026-2027</strong></p>
+        <p>&bull; <a href="https://edu.unibit.bg/course/view.php?id=4262" target="_blank" rel="noopener">edu.unibit.bg/course/view.php?id=4262</a></p>
+        <p>&bull; Ключ за записване: <code class="inline">MSWEB2026</code></p>
+        <p>&bull; Слайдове, записки по сесиите, речник EN &rarr; BG и пълното задание за проекта.</p>
+      </div>
+      <div class="card card--brand">
+        <h3>GitHub &mdash; целият код</h3>
+        <p>&bull; <a href="https://github.com/eognianov/unibit-microsoft-web-technologies" target="_blank" rel="noopener">github.com/eognianov/unibit-microsoft-web-technologies</a></p>
+        <p>&bull; Всеки код пример от курса, в състоянието му за всяка сесия.</p>
+        <p>&bull; Плюс кодът от предишни курсове.</p>
+        <p>&bull; Клонирай го сега &mdash; теглим от него в Сесия 02.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 17 ─ Закриване -->
+<section class="slide slide--brand">
+  <p class="eyebrow">Следва</p>
+  <h1 style="font-size:var(--fs-title-1);line-height:var(--lh-title-1)">01 · Как работи уебът</h1>
+  <div class="rule"></div>
+  <p class="lead">Клиент и сървър, URL адреси, HTTP заявки и отговори, методи и статус кодове.<br>Без код &mdash; инструментът е браузърът.</p>
+  <div class="foot"><span>Въпроси?</span><span class="spacer"></span><span>Microsoft Web Technologies</span></div>
+</section>
+
+</div></div>
+<div id="hint">← → навигация · F цял екран · P печат</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var deck = document.getElementById('deck');
+  var progress = document.getElementById('progress');
+  var hint = document.getElementById('hint');
+  var total = slides.length;
+  var i = 0;
+
+  slides.forEach(function(s, n){
+    var num = s.querySelector('.num');
+    if (num) num.textContent = (n + 1) + ' / ' + total;
+  });
+
+  function show(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-active', k === i); });
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+
+  function fit(){
+    var scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    deck.style.transform = 'scale(' + scale + ')';
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+
+  document.getElementById('stage').addEventListener('click', function(e){
+    show(e.clientX < window.innerWidth / 3 ? i - 1 : i + 1);
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function(){ show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+
+  fit();
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  setTimeout(function(){ hint.classList.add('is-hidden'); }, 4000);
+})();
+</script>
+</body>
+</html>

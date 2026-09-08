@@ -81,6 +81,9 @@ strong{font-weight:600}
 .slide--dark .eyebrow{color:var(--brand-tint-10)}
 .slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
 .slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
 .section-no{
   font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
   color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
@@ -160,6 +163,7 @@ tbody th{
 }
 tbody tr:last-child th{border-bottom:none}
 td.center,th.center{text-align:center}
+table.tight-rows thead th,table.tight-rows tbody td,table.tight-rows tbody th{padding-top:var(--space-2);padding-bottom:var(--space-2)}
 
 /* ── Code ──────────────────────────────────────────────────────────────── */
 pre,code{font-family:var(--font-mono)}
@@ -226,7 +230,7 @@ code.inline{
   <h1>From Language to Framework</h1>
   <div class="rule"></div>
   <p class="lead">Four words people confuse, the C# we actually need,<br>and a running web application in three commands.</p>
-  <div class="foot"><span>Lecture 1 · .NET, C#, tooling, first project</span><span class="spacer"></span><span>~180 min · the densest session</span></div>
+  <div class="foot"><span>Lecture 1 · .NET, C#, tooling, first project</span><span class="spacer"></span><span>the densest session</span></div>
 </section>
 
 <!-- 2 ─ Framing -->
@@ -283,23 +287,23 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Recap, objectives, install check</td><td class="center">10</td></tr>
-          <tr><td>2</td><td>Language, runtime, SDK, framework</td><td class="center">20</td></tr>
-          <tr><td>3</td><td>C# essentials I: values, decisions, repetition</td><td class="center">30</td></tr>
-          <tr><td>4</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>5</td><td>C# essentials II: collections, methods, classes, exceptions</td><td class="center">35</td></tr>
+          <tr><td>1</td><td>Recap, objectives, install check</td></tr>
+          <tr><td>2</td><td>Language, runtime, SDK, framework</td></tr>
+          <tr><td>3</td><td>C# essentials I: values, decisions, repetition</td></tr>
+          <tr><td>4</td><td class="muted">Break</td></tr>
+          <tr><td>5</td><td>C# essentials II: collections, methods, classes, exceptions</td></tr>
         </tbody>
       </table>
       <table>
-        <thead><tr><th style="width:34px">#</th><th>Block</th><th class="center" style="width:64px">Min</th></tr></thead>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
         <tbody>
-          <tr><td>6</td><td>Querying collections: four operators</td><td class="center">15</td></tr>
-          <tr><td>7</td><td class="muted">Break</td><td class="center">10</td></tr>
-          <tr><td>8</td><td>Demo: creating and running SimpleBlog</td><td class="center">15</td></tr>
-          <tr><td>9</td><td>Walkthrough: we build and explore a project</td><td class="center">30</td></tr>
-          <tr><td>10</td><td>Wrap-up and Q&amp;A</td><td class="center">5</td></tr>
+          <tr><td>6</td><td>Querying collections: four operators</td></tr>
+          <tr><td>7</td><td class="muted">Break</td></tr>
+          <tr><td>8</td><td>Demo: creating and running SimpleBlog</td></tr>
+          <tr><td>9</td><td>Walkthrough: we build and explore a project</td></tr>
+          <tr><td>10</td><td>Wrap-up and Q&amp;A</td></tr>
         </tbody>
       </table>
     </div>
@@ -310,7 +314,7 @@ code.inline{
 <!-- 5 ─ Section: recap and install check -->
 <section class="slide slide--dark">
   <div class="section-no">01</div>
-  <p class="eyebrow">Block 1 · 10 min</p>
+  <p class="eyebrow">Block 1</p>
   <h2>Recap and install check</h2>
   <p class="lead" style="margin-top:var(--space-4)">Everyone with a working toolchain before the first line is typed.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -348,7 +352,7 @@ the output to paste when asking anyone for help.</span></pre>
 <!-- 7 ─ Section: the four words -->
 <section class="slide slide--dark">
   <div class="section-no">02</div>
-  <p class="eyebrow">Block 2 · 20 min</p>
+  <p class="eyebrow">Block 2</p>
   <h2>Language, runtime, SDK, framework</h2>
   <p class="lead" style="margin-top:var(--space-4)">Four words, no brand names. These ideas transfer to every stack there is.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -579,7 +583,7 @@ the output to paste when asking anyone for help.</span></pre>
 <!-- 16 ─ Section: C# essentials I -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
-  <p class="eyebrow">Block 3 · 30 min · live coding</p>
+  <p class="eyebrow">Block 3 · live coding</p>
   <h2>C# essentials I</h2>
   <p class="lead" style="margin-top:var(--space-4)">Values, decisions, repetition. Every slide here is a shape; the rest is typed on screen.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -673,11 +677,17 @@ $ <span class="k">dotnet run</span>
   <div class="content">
     <div class="cols cols-2-1">
 <pre><span class="k">if</span> (views &gt; 1000)
+{
     Console.WriteLine(<span class="h">"Popular"</span>);
+}
 <span class="k">else if</span> (views &gt; 100)
+{
     Console.WriteLine(<span class="h">"Doing fine"</span>);
+}
 <span class="k">else</span>
+{
     Console.WriteLine(<span class="h">"Needs promotion"</span>);
+}
 
 <span class="k">string</span> label = views &gt; 1000 ? <span class="h">"hot"</span> : <span class="h">"normal"</span>;</pre>
       <ul class="list list--tight">
@@ -696,14 +706,23 @@ $ <span class="k">dotnet run</span>
   <div class="rule"></div>
   <div class="content">
     <div class="cols cols-2-1">
-<pre><span class="k">switch</span> (status)
+<pre style="font-size:14px;line-height:22px"><span class="k">switch</span> (status)
 {
     <span class="k">case</span> <span class="h">"draft"</span>:
-        Console.WriteLine(<span class="h">"Not visible"</span>); <span class="k">break</span>;
+    {
+        Console.WriteLine(<span class="h">"Not visible"</span>);
+        <span class="k">break</span>;
+    }
     <span class="k">case</span> <span class="h">"published"</span>:
-        Console.WriteLine(<span class="h">"Live"</span>);        <span class="k">break</span>;
+    {
+        Console.WriteLine(<span class="h">"Live"</span>);
+        <span class="k">break</span>;
+    }
     <span class="k">default</span>:
-        Console.WriteLine(<span class="h">"Unknown"</span>);     <span class="k">break</span>;
+    {
+        Console.WriteLine(<span class="h">"Unknown"</span>);
+        <span class="k">break</span>;
+    }
 }</pre>
       <ul class="list list--tight">
         <li>One value, compared against several fixed possibilities.</li>
@@ -726,7 +745,11 @@ $ <span class="k">dotnet run</span>
     Console.WriteLine($<span class="h">"Article {i}"</span>);
 
 <span class="k">int</span> n = 0;
-<span class="k">while</span> (n &lt; 3) { Console.WriteLine(n); n++; }
+<span class="k">while</span> (n &lt; 3)
+{
+    Console.WriteLine(n);
+    n++;
+}
 
 <span class="k">foreach</span> (<span class="k">var</span> word <span class="k">in</span> words)
     Console.WriteLine(word);</pre>
@@ -748,7 +771,7 @@ $ <span class="k">dotnet run</span>
 <!-- 23 ─ Section: C# essentials II -->
 <section class="slide slide--dark">
   <div class="section-no">04</div>
-  <p class="eyebrow">Block 5 · 35 min · live coding</p>
+  <p class="eyebrow">Block 5 · live coding</p>
   <h2>C# essentials II</h2>
   <p class="lead" style="margin-top:var(--space-4)">Collections, methods, classes and exceptions &#8212; the four ideas the rest of the course rests on.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -819,7 +842,11 @@ Console.WriteLine(views[<span class="h">"First post"</span>]);</pre>
     <div class="cols cols-2-1">
 <pre><span class="k">string</span> Shorten(<span class="k">string</span> text, <span class="k">int</span> maxLength)
 {
-    <span class="k">if</span> (text.Length &lt;= maxLength) <span class="k">return</span> text;
+    <span class="k">if</span> (text.Length &lt;= maxLength)
+    {
+        <span class="k">return</span> text;
+    }
+
     <span class="k">return</span> text.Substring(0, maxLength) + <span class="h">"..."</span>;
 }
 
@@ -919,7 +946,7 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
 <!-- 30 ─ Section: querying collections -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
-  <p class="eyebrow">Block 6 · 15 min · live coding</p>
+  <p class="eyebrow">Block 6 · live coding</p>
   <h2>Querying collections</h2>
   <p class="lead" style="margin-top:var(--space-4)">Four operators that answer almost every question you will ever ask a list.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -937,13 +964,17 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
 <span class="k">foreach</span> (<span class="k">var</span> a <span class="k">in</span> articles)
 {
     <span class="k">if</span> (a.PublishedOn.Year == 2026)
+    {
         chosen.Add(a);
+    }
 }
 chosen.Sort(<span class="c">/* by date, descending */</span>);
 
 <span class="k">var</span> titles = <span class="k">new</span> List&lt;<span class="k">string</span>&gt;();
 <span class="k">foreach</span> (<span class="k">var</span> a <span class="k">in</span> chosen)
-    titles.Add(a.Title);</pre>
+{
+    titles.Add(a.Title);
+}</pre>
       <ul class="list list--tight">
         <li>Twelve lines, three of which are the actual question.</li>
         <li>Every list we ever filter needs the same twelve lines again.</li>
@@ -1037,7 +1068,7 @@ chosen.Sort(<span class="c">/* by date, descending */</span>);
 <!-- 35 ─ Section: first project -->
 <section class="slide slide--dark">
   <div class="section-no">06</div>
-  <p class="eyebrow">Block 8 · 15 min · demo</p>
+  <p class="eyebrow">Block 8 · demo</p>
   <h2>The first MVC project</h2>
   <p class="lead" style="margin-top:var(--space-4)">A website in three commands, with no code written &#8212; the framework from Block 2, doing its job.</p>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
@@ -1201,7 +1232,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <h2>Common misconceptions</h2>
   <div class="rule"></div>
   <div class="content">
-    <table>
+    <table class="tight-rows">
       <thead><tr><th style="width:42%">Misconception</th><th>Correction</th></tr></thead>
       <tbody>
         <tr><td>"C# and .NET are the same thing."</td><td>C# is the language; .NET is the platform that runs it. Other languages run on .NET too.</td></tr>
@@ -1243,7 +1274,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
 
 <!-- 42 ─ Walkthrough -->
 <section class="slide">
-  <p class="eyebrow">Walkthrough · 30 min · together</p>
+  <p class="eyebrow">Walkthrough · together</p>
   <h2>We build it on screen, step by step</h2>
   <div class="rule"></div>
   <div class="content">
@@ -1305,7 +1336,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="rule"></div>
   <div class="content">
     <div class="cols cols-2">
-      <table>
+      <table class="tight-rows">
         <thead><tr><th style="width:45%">English</th><th>Български</th></tr></thead>
         <tbody>
           <tr><td>language / runtime</td><td>език / среда за изпълнение</td></tr>
@@ -1318,7 +1349,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
           <tr><td>collection</td><td>колекция</td></tr>
         </tbody>
       </table>
-      <table>
+      <table class="tight-rows">
         <thead><tr><th style="width:45%">English</th><th>Български</th></tr></thead>
         <tbody>
           <tr><td>method / parameter / return value</td><td>метод / параметър / връщана стойност</td></tr>
@@ -1336,6 +1367,21 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
+<!-- ── Q&A ── -->
+<section class="slide slide--dark">
+  <p class="eyebrow">Q&amp;A</p>
+  <h2>Questions and discussion</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <ul class="list">
+      <li>What still feels like magic, or does not fit together yet?</li>
+      <li>Where would you reach for this in your own project?</li>
+      <li>What should we run through once more?</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
 <!-- 45 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
@@ -1343,11 +1389,11 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="rule"></div>
   <div class="content">
     <ul class="list">
-      <li><strong>.NET download and install</strong><br><span class="sm muted">dotnet.microsoft.com/download</span></li>
-      <li><strong>A tour of the C# language</strong><br><span class="sm muted">learn.microsoft.com/dotnet/csharp/tour-of-csharp/</span></li>
-      <li><strong><code class="inline">dotnet new</code> &#8212; CLI reference</strong><br><span class="sm muted">learn.microsoft.com/dotnet/core/tools/dotnet-new</span></li>
-      <li><strong>LINQ basics</strong><br><span class="sm muted">learn.microsoft.com/dotnet/csharp/linq/</span></li>
-      <li><strong>ASP.NET Core fundamentals and project structure</strong><br><span class="sm muted">learn.microsoft.com/aspnet/core/fundamentals/</span></li>
+      <li><strong>.NET download and install</strong><br><span class="sm muted"><a href="https://dotnet.microsoft.com/download" target="_blank" rel="noopener">dotnet.microsoft.com/download</a></span></li>
+      <li><strong>A tour of the C# language</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/" target="_blank" rel="noopener">learn.microsoft.com/dotnet/csharp/tour-of-csharp/</a></span></li>
+      <li><strong><code class="inline">dotnet new</code> &#8212; CLI reference</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/dotnet/core/tools/dotnet-new" target="_blank" rel="noopener">learn.microsoft.com/dotnet/core/tools/dotnet-new</a></span></li>
+      <li><strong>LINQ basics</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/dotnet/csharp/linq/" target="_blank" rel="noopener">learn.microsoft.com/dotnet/csharp/linq/</a></span></li>
+      <li><strong>ASP.NET Core fundamentals and project structure</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/fundamentals/" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/fundamentals/</a></span></li>
     </ul>
   </div>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
