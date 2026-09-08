@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Session 03 — Handling a Request</title>
 <link rel="stylesheet" href="../../design-system/styles.css">
 <style>
@@ -27,8 +27,8 @@ body{
 }
 
 /* ── Stage ─────────────────────────────────────────────────────────────── */
-#stage{position:fixed;inset:0;display:grid;place-items:center}
-#deck{width:var(--stage-w);height:var(--stage-h);position:relative;transform-origin:center center}
+#stage{position:fixed;inset:0;overflow:hidden}
+#deck{width:var(--stage-w);height:var(--stage-h);position:absolute;top:0;left:0;transform-origin:0 0}
 .slide{
   position:absolute;inset:0;
   width:var(--stage-w);height:var(--stage-h);
@@ -213,8 +213,8 @@ code.inline{
 @media print{
   @page{size:1280px 720px;margin:0}
   body{background:var(--neutral-white);overflow:visible}
-  #stage{position:static;display:block}
-  #deck{width:auto;height:auto;transform:none!important}
+  #stage{position:static;display:block;overflow:visible}
+  #deck{position:static;width:auto;height:auto;transform:none!important}
   #progress,#hint{display:none}
   .slide{position:static;display:flex!important;page-break-after:always;break-after:page}
 }
@@ -1277,8 +1277,17 @@ code.inline{
   }
 
   function fit(){
-    var scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
-    deck.style.transform = 'scale(' + scale + ')';
+    var vp = window.visualViewport;
+    var vw = vp ? vp.width : window.innerWidth;
+    var vh = vp ? vp.height : window.innerHeight;
+    var scale = Math.min(vw / 1280, vh / 720);
+    var x = (vw - 1280 * scale) / 2;
+    var y = (vh - 720 * scale) / 2;
+    deck.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')';
+  }
+  function refit(){
+    requestAnimationFrame(fit);
+    setTimeout(fit, 250);
   }
 
   document.addEventListener('keydown', function(e){
@@ -1296,7 +1305,11 @@ code.inline{
     show(e.clientX < window.innerWidth / 3 ? i - 1 : i + 1);
   });
 
-  window.addEventListener('resize', fit);
+  window.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', refit);
+  }
   window.addEventListener('hashchange', function(){ show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
 
   fit();
