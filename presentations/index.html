@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Course decks — Microsoft Web Technologies</title>
+<link rel="stylesheet" href="../design-system/styles.css">
+<style>
+/* ── Index of the session decks ───────────────────────────────────────────
+   A normal scrolling page on the shared design tokens. The --fs-slide-*
+   overrides mirror the decks so type feels the same when projected. */
+:root{
+  --fs-slide-body:20px;  --lh-slide-body:30px;
+  --fs-slide-lead:24px;  --lh-slide-lead:34px;
+  --fs-slide-sm:16px;    --lh-slide-sm:24px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--surface-page);
+  font-family:var(--font-sans-text);
+  color:var(--text-primary);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Header (brand block, matching the decks' title slides) ─────────────── */
+.masthead{
+  background:var(--brand-base);color:var(--text-on-brand);
+  padding:var(--space-16) var(--space-10) var(--space-12);
+}
+.masthead .wrap{max-width:1120px;margin:0 auto}
+.eyebrow{
+  margin:0 0 var(--space-4);
+  font-size:var(--fs-body-sm);line-height:var(--lh-body-sm);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--brand-tint-20);
+}
+h1{
+  margin:0;font-family:var(--font-sans);
+  font-size:var(--fs-display);line-height:var(--lh-display);
+  font-weight:var(--fw-display);letter-spacing:-.02em;color:var(--text-on-brand);
+}
+.rule{width:56px;height:3px;background:var(--neutral-white);border-radius:var(--radius-pill);margin:var(--space-5) 0 var(--space-6)}
+.lead{
+  margin:0;max-width:60ch;
+  font-size:var(--fs-slide-lead);line-height:var(--lh-slide-lead);
+  color:var(--brand-tint-30);
+}
+
+/* ── Grid ─────────────────────────────────────────────────────────────── */
+main{max-width:1120px;margin:0 auto;padding:var(--space-12) var(--space-10) var(--space-16)}
+.grid{
+  display:grid;gap:var(--space-6);
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+}
+
+/* ── Deck card ────────────────────────────────────────────────────────── */
+.deck{
+  display:flex;flex-direction:column;gap:var(--space-3);
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);padding:var(--space-6);
+  text-decoration:none;color:inherit;
+  transition:box-shadow var(--duration-normal) var(--ease-standard),
+             border-color var(--duration-normal) var(--ease-standard),
+             transform var(--duration-normal) var(--ease-standard);
+}
+.deck:hover,.deck:focus-visible{
+  box-shadow:var(--shadow-8);border-color:var(--brand-tint-20);
+  transform:translateY(-2px);outline:none;
+}
+.deck .no{
+  display:inline-flex;align-items:center;align-self:flex-start;
+  height:26px;padding:0 var(--space-3);border-radius:var(--radius-pill);
+  background:var(--brand-tint-40);color:var(--brand-pressed);
+  font-family:var(--font-mono);font-size:var(--fs-slide-sm);font-weight:600;
+}
+.deck h2{
+  margin:0;font-family:var(--font-sans);
+  font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:var(--fw-title-3);
+  color:var(--text-primary);
+}
+.deck .open{
+  margin-top:auto;padding-top:var(--space-2);
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);font-weight:600;
+  color:var(--brand-pressed);
+}
+.deck .open::after{content:" \2192"}
+
+@media print{
+  body{background:var(--neutral-white)}
+  .masthead{background:none;color:var(--text-primary);padding:var(--space-10) 0}
+  .eyebrow{color:var(--brand-pressed)}
+  .lead{color:var(--text-secondary)}
+  .rule{background:var(--brand-base)}
+  .deck{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Microsoft Web Technologies</p>
+    <h1>Course decks</h1>
+    <div class="rule"></div>
+    <p class="lead">Ten sessions plus the course intro. Each deck is a self-contained
+      slideshow — arrow keys or click to navigate, <strong>F</strong> for fullscreen,
+      <strong>P</strong> to print.</p>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <a class="deck" href="slides/00-course-intro.html">
+      <span class="no">00</span>
+      <h2>Course intro</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/01-how-the-web-works.html">
+      <span class="no">01</span>
+      <h2>How the web works</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/02-from-language-to-framework.html">
+      <span class="no">02</span>
+      <h2>From language to framework</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/03-handling-a-request.html">
+      <span class="no">03</span>
+      <h2>Handling a request</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/04-routing-and-url-design.html">
+      <span class="no">04</span>
+      <h2>Routing and URL design</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/05-templates-html-and-razor.html">
+      <span class="no">05</span>
+      <h2>Templates: HTML, CSS and Razor</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/06-view-models-and-bootstrap.html">
+      <span class="no">06</span>
+      <h2>View models and Bootstrap</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/07-data-databases-and-orms.html">
+      <span class="no">07</span>
+      <h2>Data, databases and ORMs</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/08-code-first-and-migrations.html">
+      <span class="no">08</span>
+      <h2>Code-first and migrations</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/09-forms-crud-and-validation.html">
+      <span class="no">09</span>
+      <h2>Forms, CRUD and validation</h2>
+      <span class="open">Open deck</span>
+    </a>
+    <a class="deck" href="slides/10-debugging-logging-deployment.html">
+      <span class="no">10</span>
+      <h2>Debugging, logging and deployment</h2>
+      <span class="open">Open deck</span>
+    </a>
+  </div>
+</main>
+
+</body>
+</html>

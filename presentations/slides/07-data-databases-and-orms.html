@@ -218,6 +218,11 @@ code.inline{
   .slide{position:static;display:flex!important;page-break-after:always;break-after:page}
 }
 </style>
+<style>
+#home{position:fixed;left:16px;bottom:14px;z-index:10;font-family:var(--font-sans-text);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home:hover,#home:focus-visible{opacity:1;outline:none}
+@media print{#home{display:none}}
+</style>
 </head>
 <body>
 <div id="progress"></div>
@@ -1391,6 +1396,7 @@ builder.Services.<span class="h">AddDbContext</span>&lt;ApplicationDbContext&gt;
 </section>
 
 </div></div>
+<a id="home" href="../index.html">← Index</a>
 <div id="hint">← → navigate · F fullscreen · P print</div>
 
 <script>
