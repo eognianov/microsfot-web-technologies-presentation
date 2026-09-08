@@ -573,10 +573,6 @@ code.inline{
     else if (e.key === 'p' || e.key === 'P') { window.print(); }
   });
 
-  document.getElementById('stage').addEventListener('click', function(e){
-    show(e.clientX < window.innerWidth / 3 ? i - 1 : i + 1);
-  });
-
   window.addEventListener('resize', refit);
   window.addEventListener('orientationchange', refit);
   if (window.visualViewport) {
