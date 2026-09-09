@@ -1,0 +1,1377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Project Template — SimpleMVCTemplate</title>
+<meta name="description" content="What the prepared SimpleMVCTemplate starter gives us, how to install it, and how to grow it into a project of our own.">
+<link rel="canonical" href="https://ms-web.eognyanov.com/presentations/slides/11-the-project-template.html">
+<link rel="icon" type="image/svg+xml" href="../../design-system/components/images/favicon.svg">
+<link rel="icon" type="image/png" sizes="16x16" href="../../design-system/components/images/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../../design-system/components/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="../../design-system/components/images/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../../design-system/components/images/favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../../design-system/components/images/favicon-512.png">
+<link rel="apple-touch-icon" href="../../design-system/components/images/apple-touch-icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Microsoft Web Technologies">
+<meta property="og:title" content="The Project Template — SimpleMVCTemplate">
+<meta property="og:description" content="What the prepared SimpleMVCTemplate starter gives us, how to install it, and how to grow it into a project of our own.">
+<meta property="og:url" content="https://ms-web.eognyanov.com/presentations/slides/11-the-project-template.html">
+<meta property="og:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Project Template — SimpleMVCTemplate">
+<meta name="twitter:description" content="What the prepared SimpleMVCTemplate starter gives us, how to install it, and how to grow it into a project of our own.">
+<meta name="twitter:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
+<link rel="stylesheet" href="../../design-system/styles.css">
+<style>
+/* ── Deck-level extensions to the design system ────────────────────────────
+   Slides are authored on a fixed 1280×720 stage and scaled to the viewport,
+   so every size below is a *slide* size, not a screen size. Body copy is
+   stepped up from --fs-body (14px, UI density) to projection density. */
+:root{
+  --stage-w:1280px; --stage-h:720px;
+  --fs-slide-body:20px;  --lh-slide-body:30px;
+  --fs-slide-lead:24px;  --lh-slide-lead:34px;
+  --fs-slide-sm:16px;    --lh-slide-sm:24px;
+  --fs-slide-code:16px;  --lh-slide-code:26px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--neutral-grey-160);
+  font-family:var(--font-sans-text);
+  color:var(--text-primary);
+  overflow:hidden;
+}
+
+/* ── Stage ─────────────────────────────────────────────────────────────── */
+#stage{position:fixed;inset:0;overflow:hidden}
+#deck{width:var(--stage-w);height:var(--stage-h);position:absolute;top:0;left:0;transform-origin:0 0}
+.slide{
+  position:absolute;inset:0;
+  width:var(--stage-w);height:var(--stage-h);
+  background:var(--surface-page);
+  display:none;flex-direction:column;
+  padding:var(--space-16) var(--space-16) var(--space-10);
+  overflow:hidden;
+}
+.slide.is-active{display:flex}
+
+/* ── Slide chrome ──────────────────────────────────────────────────────── */
+.eyebrow{
+  margin:0 0 var(--space-3);
+  font-family:var(--font-sans-text);
+  font-size:var(--fs-body-sm);line-height:var(--lh-body-sm);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--brand-pressed);
+}
+h1,h2,h3{margin:0;font-family:var(--font-sans);color:var(--text-primary)}
+h1{font-size:var(--fs-display);line-height:var(--lh-display);font-weight:var(--fw-display);letter-spacing:-.02em}
+h2{font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:var(--fw-title-1);letter-spacing:-.01em}
+h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:var(--fw-title-3)}
+.rule{width:56px;height:3px;background:var(--brand-base);border-radius:var(--radius-pill);margin:var(--space-4) 0 var(--space-6)}
+.body{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);color:var(--text-primary)}
+.lead{margin:0;font-size:var(--fs-slide-lead);line-height:var(--lh-slide-lead);color:var(--text-secondary)}
+.muted{color:var(--text-secondary)}
+.sm{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+strong{font-weight:600}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--space-5)}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.foot{
+  display:flex;align-items:center;gap:var(--space-4);
+  padding-top:var(--space-5);margin-top:auto;
+  border-top:1px solid var(--border-default);
+  font-size:var(--fs-caption);line-height:var(--lh-caption);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-disabled);
+}
+.foot .spacer{flex:1}
+
+/* ── Brand-block slides (title + section dividers) ─────────────────────── */
+.slide--brand{background:var(--brand-base);color:var(--text-on-brand);justify-content:center}
+.slide--brand h1,.slide--brand h2{color:var(--text-on-brand)}
+.slide--brand .eyebrow{color:var(--brand-tint-20)}
+.slide--brand .lead,.slide--brand .body{color:var(--brand-tint-30)}
+.slide--brand .rule{background:var(--neutral-white)}
+.slide--brand .foot{border-top-color:rgba(255,255,255,.24);color:var(--brand-tint-20)}
+.slide--dark{background:var(--brand-shade-20)}
+.slide--dark h1,.slide--dark h2{color:var(--text-on-brand)}
+.slide--dark .eyebrow{color:var(--brand-tint-10)}
+.slide--dark .lead,.slide--dark .body{color:var(--brand-tint-30)}
+.slide--dark .foot{border-top-color:rgba(255,255,255,.18);color:var(--brand-tint-10)}
+.slide--dark ul.list li,.slide--dark ol.list li{color:var(--brand-tint-30)}
+.slide--dark ul.list li::before{background:var(--brand-tint-20)}
+.slide a{color:inherit;text-underline-offset:2px}
+.section-no{
+  font-family:var(--font-sans);font-size:120px;line-height:1;font-weight:600;
+  color:rgba(255,255,255,.22);letter-spacing:-.03em;margin-bottom:var(--space-4);
+}
+
+/* ── Layout helpers ────────────────────────────────────────────────────── */
+.cols{display:grid;gap:var(--space-6);flex:1;min-height:0}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-2-1{grid-template-columns:1.4fr 1fr}
+.cols--auto{flex:0 0 auto;min-height:auto}
+.stack{display:flex;flex-direction:column;gap:var(--space-4);min-height:0}
+.center{justify-content:center}
+
+/* ── Card (design-system surfaces/Card, slide-scaled) ──────────────────── */
+.card{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  display:flex;flex-direction:column;gap:var(--space-2);
+}
+.card--elevated{border:none;box-shadow:var(--shadow-8)}
+.card--brand{background:var(--brand-tint-40);border-color:var(--brand-tint-20)}
+.card h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3)}
+.card p{margin:0;font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--text-secondary)}
+
+/* ── Badge (design-system feedback/Badge, slide-scaled) ────────────────── */
+.badge{
+  display:inline-flex;align-items:center;align-self:flex-start;height:26px;padding:0 var(--space-3);
+  border-radius:var(--radius-pill);font-size:var(--fs-slide-sm);font-weight:600;
+  background:var(--brand-tint-40);color:var(--brand-pressed);white-space:nowrap;
+}
+.badge--neutral{background:var(--surface-subtle);color:var(--text-secondary)}
+.badge--success{background:var(--color-success-bg);color:var(--color-success)}
+.badge--warning{background:var(--color-warning-bg);color:var(--color-warning)}
+.badge--danger{background:var(--color-danger-bg);color:var(--color-danger)}
+.badge--mono{font-family:var(--font-mono);font-weight:600}
+
+/* ── Lists ─────────────────────────────────────────────────────────────── */
+ul.list,ol.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-4)}
+ul.list li,ol.list li{
+  position:relative;padding-left:var(--space-8);
+  font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);
+}
+ul.list li::before{
+  content:"";position:absolute;left:var(--space-2);top:11px;
+  width:8px;height:8px;border-radius:var(--radius-circular);background:var(--brand-base);
+}
+ol.list{counter-reset:step}
+ol.list li{counter-increment:step;padding-left:var(--space-10)}
+ol.list li::before{
+  content:counter(step);position:absolute;left:0;top:2px;
+  width:28px;height:28px;border-radius:var(--radius-circular);
+  background:var(--brand-tint-40);color:var(--brand-pressed);
+  font-family:var(--font-sans);font-size:var(--fs-slide-sm);font-weight:600;
+  display:grid;place-items:center;
+}
+.list--tight li{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+.list--tight{gap:var(--space-3)}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+table{
+  width:100%;border-collapse:collapse;
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);overflow:hidden;
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+}
+thead th{
+  text-align:left;background:var(--surface-subtle);color:var(--text-secondary);
+  font-weight:600;font-size:var(--fs-body-sm);letter-spacing:.06em;text-transform:uppercase;
+  padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);
+}
+tbody td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody th{
+  text-align:left;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border-default);
+  font-weight:600;white-space:nowrap;
+}
+tbody tr:last-child th{border-bottom:none}
+td.center,th.center{text-align:center}
+
+/* ── Code ──────────────────────────────────────────────────────────────── */
+pre,code{font-family:var(--font-mono)}
+pre{
+  margin:0;background:var(--brand-shade-30);color:var(--brand-tint-30);
+  border-radius:var(--radius-lg);padding:var(--space-5) var(--space-6);
+  font-size:var(--fs-slide-code);line-height:var(--lh-slide-code);
+  overflow:hidden;white-space:pre;
+}
+pre .k{color:#4fc3f7;font-weight:600}
+pre .h{color:var(--neutral-white)}
+pre .c{color:var(--neutral-grey-90)}
+pre .ok{color:#6bd66b;font-weight:600}
+code.inline{
+  background:var(--surface-subtle);border:1px solid var(--border-default);
+  border-radius:var(--radius-sm);padding:1px 6px;font-size:.92em;color:var(--brand-pressed);
+}
+.slide--brand code.inline,.slide--dark code.inline{
+  background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24);color:var(--neutral-white);
+}
+
+/* ── Callout ───────────────────────────────────────────────────────────── */
+.callout{
+  background:var(--brand-tint-40);border:1px solid var(--brand-tint-20);
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--brand-shade-10);
+}
+.callout--warn{background:var(--color-warning-bg);border-color:#f0d98a;color:var(--color-warning)}
+
+/* ── Big statement ─────────────────────────────────────────────────────── */
+.statement{margin:0;font-family:var(--font-sans);font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:600}
+
+/* ── Progress bar ──────────────────────────────────────────────────────── */
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--brand-tint-10);width:0;
+  transition:width var(--duration-normal) var(--ease-standard);z-index:10}
+
+/* ── Help hint ─────────────────────────────────────────────────────────── */
+#hint{
+  position:fixed;right:16px;bottom:14px;z-index:10;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--neutral-grey-90);font-family:var(--font-sans-text);
+  transition:opacity var(--duration-slow) var(--ease-standard);
+}
+#hint.is-hidden{opacity:0}
+
+/* ── Print / PDF export: one slide per landscape page ──────────────────── */
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:var(--neutral-white);overflow:visible}
+  #stage{position:static;display:block;overflow:visible}
+  #deck{position:static;width:auto;height:auto;transform:none!important}
+  #progress,#hint{display:none}
+  .slide{position:static;display:flex!important;page-break-after:always;break-after:page}
+}
+</style>
+<style>
+#home{position:fixed;left:16px;bottom:14px;z-index:10;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans-text);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home img{width:14px;height:14px;border-radius:3px;display:block}
+#home:hover,#home:focus-visible{opacity:1;outline:none}
+@media print{#home{display:none}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage"><div id="deck">
+
+
+<!-- 1 ─ Title -->
+<section class="slide slide--brand">
+  <p class="eyebrow">Microsoft Web Technologies · Project deck</p>
+  <h1>The project template</h1>
+  <div class="rule"></div>
+  <p class="lead">Everything the course taught, already wired together —<br>so the time we have goes into our idea, not into plumbing.</p>
+  <div class="foot"><span>SimpleMVCTemplate · ASP.NET Core 10 · Identity · EF Core · Repository</span><span class="spacer"></span><span>github.com/eognianov/SimpleMVCTemplate</span></div>
+</section>
+
+<!-- 2 ─ Why this deck -->
+<section class="slide">
+  <p class="eyebrow">Where we are</p>
+  <h2>Ten sessions of pieces. Here they are, already assembled.</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="card">
+        <span class="badge badge--neutral">What we did</span>
+        <h3 style="margin-top:var(--space-2)">We built each piece by hand</h3>
+        <p>A controller. A route. A view. A <code class="inline">DbContext</code>. A migration. A form with validation. Every one of them from an empty file, so we know what it does.</p>
+      </div>
+      <div class="card card--brand">
+        <span class="badge">What this is</span>
+        <h3 style="margin-top:var(--space-2)">A starting point with all of it in place</h3>
+        <p>The same pieces, plus login and registration, an administrator account and a database that works on any machine. We start our project from here.</p>
+      </div>
+    </div>
+    <div class="callout">Nothing in the template is new material. If a file surprises us, the session that explains it is named on the slide.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 3 ─ Objectives -->
+<section class="slide">
+  <p class="eyebrow">Objectives</p>
+  <h2>By the end of this deck we can…</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <ol class="list">
+        <li>Say what a project template is, and how it differs from copying a folder.</li>
+        <li>Install the template once and create any number of renamed projects from it.</li>
+        <li>Configure the administrator account and get a first run working.</li>
+      </ol>
+      <ol class="list" style="counter-reset:step 3">
+        <li>Find our way around the folders and name the job of each one.</li>
+        <li>Add an entity, a controller and views on top of what is already there.</li>
+        <li>Decide when the generic repository is enough and when to write our own.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 4 ─ Agenda -->
+<section class="slide">
+  <p class="eyebrow">Agenda</p>
+  <h2>Six blocks</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <table>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>What a template is, and what is inside this one</td></tr>
+          <tr><td>2</td><td>Installing it, and creating our project</td></tr>
+          <tr><td>3</td><td>The first run: admin account, database, login</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th style="width:34px">#</th><th>Block</th></tr></thead>
+        <tbody>
+          <tr><td>4</td><td>A tour of the folders</td></tr>
+          <tr><td>5</td><td>Growing it: entity → repository → controller → views</td></tr>
+          <tr><td>6</td><td>Our own project, and the rules that come with it</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 5 ─ Section 01 -->
+<section class="slide slide--dark">
+  <div class="section-no">01</div>
+  <p class="eyebrow">Block 1</p>
+  <h2>What a template is</h2>
+  <p class="lead" style="margin-top:var(--space-4)">The idea first — it belongs to no language and no vendor.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 6 ─ The idea -->
+<section class="slide">
+  <p class="eyebrow">The idea</p>
+  <h2>A template is a project with the boring decisions already made</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3">
+      <div class="card">
+        <span class="badge badge--neutral">Not this</span>
+        <h3 style="margin-top:var(--space-2)">Copying a folder</h3>
+        <p>The old project's name is baked into the folder, the project file, the namespaces and every <code class="inline">using</code>. Renaming it by hand is a long afternoon of find-and-replace, and it is easy to miss one.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--neutral">Not this either</span>
+        <h3 style="margin-top:var(--space-2)">A library we install</h3>
+        <p>A library is code we call and never see. A template is code we <em>own</em> from the moment it is created: every file is ours to read and change.</p>
+      </div>
+      <div class="card card--brand">
+        <span class="badge">This</span>
+        <h3 style="margin-top:var(--space-2)">A blueprint the tool stamps out</h3>
+        <p>We register it with our tooling once. From then on, one command produces a fresh, correctly named copy — as often as we like.</p>
+      </div>
+    </div>
+    <div class="callout">Every stack has this. <code class="inline">dotnet new</code>, <code class="inline">npm create</code>, <code class="inline">django-admin startproject</code>, <code class="inline">rails new</code> — the same idea with different spelling.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 7 ─ Built in -->
+<section class="slide">
+  <p class="eyebrow">What is inside</p>
+  <h2>Six things, already working</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3">
+      <div class="card">
+        <span class="badge badge--mono">MVC</span>
+        <h3 style="margin-top:var(--space-2)">Controllers, views, layout</h3>
+        <p>A home page, a shared layout and Bootstrap, exactly as in Sessions 03–06.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">Identity</span>
+        <h3 style="margin-top:var(--space-2)">Login and registration</h3>
+        <p>Real accounts, hashed passwords, an <code class="inline">Admin</code> role and one seeded administrator.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">EF Core</span>
+        <h3 style="margin-top:var(--space-2)">SQLite <em>or</em> PostgreSQL</h3>
+        <p>One setting in <code class="inline">appsettings.json</code> picks the provider — Sessions 07–08.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">Repository</span>
+        <h3 style="margin-top:var(--space-2)">One data-access pattern</h3>
+        <p><code class="inline">IRepository&lt;T&gt;</code> registered for every entity at once, with no per-entity code.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">Comments</span>
+        <h3 style="margin-top:var(--space-2)">Teaching code</h3>
+        <p>Every file is commented in English and Bulgarian. It is meant to be read, not just run.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">Rename</span>
+        <h3 style="margin-top:var(--space-2)">Our name everywhere</h3>
+        <p>Folders, project file, solution and namespaces all take the name we pass in.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 8 ─ What it does not do -->
+<section class="slide">
+  <p class="eyebrow">Honesty</p>
+  <h2>And three things it deliberately does not do</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3">
+      <div class="card">
+        <span class="badge badge--warning">No entities</span>
+        <h3 style="margin-top:var(--space-2)">The domain is empty</h3>
+        <p>There is no <code class="inline">Article</code>, no <code class="inline">Product</code>, no <code class="inline">Recipe</code>. The subject of our project is the one thing the template cannot guess.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--warning">No migrations</span>
+        <h3 style="margin-top:var(--space-2)">The first one is ours</h3>
+        <p>Migrations are tied to a database provider, so shipping one would force a choice on us. We create it after we have chosen.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--warning">No credentials</span>
+        <h3 style="margin-top:var(--space-2)">The admin fields are blank</h3>
+        <p>A template with a default password in it is a template whose password is on every machine in the room. We fill ours in.</p>
+      </div>
+    </div>
+    <div class="callout">All three are one-off steps, and all three are on the next few slides.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 9 ─ Section 02 -->
+<section class="slide slide--dark">
+  <div class="section-no">02</div>
+  <p class="eyebrow">Block 2 · demo</p>
+  <h2>Installing it, and creating our project</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Two commands to install. One command per project, forever after.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 10 ─ Prerequisites -->
+<section class="slide">
+  <p class="eyebrow">Before we start</p>
+  <h2>Two things have to be on the machine</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="stack">
+        <div class="card">
+          <h3>The .NET 10 SDK</h3>
+          <p>The same one we installed in Session 02. Check it:</p>
+        </div>
+        <pre><span class="c"># prints the installed SDK version</span>
+dotnet --version
+<span class="ok">10.0.100</span></pre>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3>The EF Core command line tools</h3>
+          <p>A global tool, installed once per machine. This is what creates migrations.</p>
+        </div>
+        <pre>dotnet tool install --global dotnet-ef</pre>
+      </div>
+    </div>
+    <div class="callout">Both are per-machine, not per-project. Once they are there, every project on this machine can use them.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 11 ─ Install the template -->
+<section class="slide">
+  <p class="eyebrow">Step 1 of 2 · once per machine</p>
+  <h2>Clone the template and register it</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre><span class="c"># get the source</span>
+git clone https://github.com/eognianov/SimpleMVCTemplate.git
+
+cd SimpleMVCTemplate
+
+<span class="c"># register it with `dotnet new`</span>
+dotnet new install .</pre>
+      <div class="stack">
+        <div class="card">
+          <h3>What that second command does</h3>
+          <p>It reads <code class="inline">.template.config/template.json</code> and adds the template to the list <code class="inline">dotnet new</code> knows about. Nothing is compiled and nothing is copied yet.</p>
+        </div>
+        <div class="card">
+          <h3>Undo, and update</h3>
+          <p><code class="inline">dotnet new uninstall .</code> removes it. After a <code class="inline">git pull</code>, run <code class="inline">dotnet new install .</code> again to pick up the changes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 12 ─ Create the project -->
+<section class="slide">
+  <p class="eyebrow">Step 2 of 2 · once per project</p>
+  <h2>Stamp out a project with our own name</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre><span class="c"># anywhere OUTSIDE the cloned template folder</span>
+dotnet new simple-mvc -n <span class="h">MyName.MyApp</span>
+
+cd <span class="h">MyName.MyApp</span></pre>
+      <div class="stack">
+        <div class="card card--brand">
+          <h3><code class="inline">simple-mvc</code></h3>
+          <p>The template's short name, from <code class="inline">template.json</code>. <code class="inline">dotnet new list</code> shows it alongside <code class="inline">mvc</code>, <code class="inline">console</code> and the rest.</p>
+        </div>
+        <div class="card">
+          <h3><code class="inline">-n MyName.MyApp</code></h3>
+          <p>The name of our project. Pick it once and pick it well — it becomes the namespace of every file.</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout--warn">Create it somewhere else on disk. The clone is the <em>source</em> of the template; our project is a separate folder with its own git history.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 13 ─ The rename -->
+<section class="slide">
+  <p class="eyebrow">What just happened</p>
+  <h2>Every <code class="inline" style="font-size:.8em">SimpleMVCTemplate</code> became <code class="inline" style="font-size:.8em">MyName.MyApp</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <table>
+      <thead><tr><th style="width:24%">Where</th><th style="width:38%">In the template</th><th>In our project</th></tr></thead>
+      <tbody>
+        <tr><th>Folders</th><td><code class="inline">SimpleMVCTemplate/</code></td><td><code class="inline">MyName.MyApp/</code></td></tr>
+        <tr><th>Project file</th><td><code class="inline">SimpleMVCTemplate.csproj</code></td><td><code class="inline">MyName.MyApp.csproj</code></td></tr>
+        <tr><th>Solution</th><td><code class="inline">SimpleMVCTemplate.sln</code></td><td><code class="inline">MyName.MyApp.sln</code></td></tr>
+        <tr><th>Namespaces</th><td><code class="inline">namespace SimpleMVCTemplate.Models;</code></td><td><code class="inline">namespace MyName.MyApp.Models;</code></td></tr>
+        <tr><th>Usings</th><td><code class="inline">using SimpleMVCTemplate.Data;</code></td><td><code class="inline">using MyName.MyApp.Data;</code></td></tr>
+      </tbody>
+    </table>
+    <div class="callout">One line in <code class="inline">template.json</code> makes this work: <code class="inline">"sourceName": "SimpleMVCTemplate"</code>. The tool replaces that exact string everywhere — which is why the word is never used as part of another word anywhere in the template.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 14 ─ Section 03 -->
+<section class="slide slide--dark">
+  <div class="section-no">03</div>
+  <p class="eyebrow">Block 3 · demo</p>
+  <h2>The first run</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Three steps between a fresh folder and a page we can log into.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 15 ─ Admin credentials -->
+<section class="slide">
+  <p class="eyebrow">First run · step 1</p>
+  <h2>Fill in the administrator account</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="stack">
+        <p class="body"><code class="inline">appsettings.json</code> ships <strong>empty</strong>:</p>
+        <pre>"Identity": {
+  "Admin": {
+    "Email": <span class="h">""</span>,
+    "Password": <span class="h">""</span>
+  }
+}</pre>
+      </div>
+      <div class="stack">
+        <p class="body">Before the first run, put real values in:</p>
+        <pre>"Identity": {
+  "Admin": {
+    "Email": <span class="ok">"admin@example.com"</span>,
+    "Password": <span class="ok">"Admin123!"</span>
+  }
+}</pre>
+      </div>
+    </div>
+    <div class="callout callout--warn">If either field is blank the seeder does nothing — deliberately, because a deployed app may not want a seeded admin. The symptom is <em>"no account exists and I cannot log in"</em>, with no error message anywhere.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 16 ─ Password rules -->
+<section class="slide">
+  <p class="eyebrow">First run · step 1, continued</p>
+  <h2>The password has to satisfy the rules in <code class="inline" style="font-size:.75em">Program.cs</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre>.AddDefaultIdentity&lt;ApplicationUser&gt;(options =&gt;
+{
+    options.SignIn.RequireConfirmedAccount = <span class="k">false</span>;
+    options.Password.RequiredLength        = <span class="h">6</span>;
+    options.Password.RequireDigit          = <span class="k">true</span>;
+    options.Password.RequireUppercase      = <span class="k">false</span>;
+    options.Password.RequireNonAlphanumeric = <span class="k">false</span>;
+})</pre>
+      <div class="stack">
+        <div class="card card--brand">
+          <h3>These are our rules</h3>
+          <p>They are relaxed on purpose, so nobody loses twenty minutes to a rejected password. Tighten them for a real application.</p>
+        </div>
+        <div class="card">
+          <h3>They apply to everyone</h3>
+          <p>Not just the seeded admin — the same rules validate every registration on the sign-up page.</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout">If the seeder reports <em>"could not create the admin user"</em>, the password we chose broke one of these lines.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 17 ─ First migration and run -->
+<section class="slide">
+  <p class="eyebrow">First run · steps 2 and 3</p>
+  <h2>Create the first migration, then run</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre><span class="c"># the INNER folder, next to the .csproj</span>
+cd MyName.MyApp
+
+<span class="c"># step 2 — describe the schema</span>
+dotnet ef migrations add InitialCreate -o Data/Migrations
+
+<span class="c"># step 3 — run it</span>
+dotnet run</pre>
+      <div class="stack">
+        <div class="card">
+          <h3>Why a migration is needed at all</h3>
+          <p>Identity brings its own tables — users, roles, logins, claims. Without a migration there is no schema, and start-up fails.</p>
+        </div>
+        <div class="card card--brand">
+          <h3><code class="inline">dotnet run</code> does the rest</h3>
+          <p>Start-up calls <code class="inline">Database.Migrate()</code> and then the seeder, so the database is created and the admin account exists before the first request is served.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 18 ─ What we get -->
+<section class="slide">
+  <p class="eyebrow">First run · the result</p>
+  <h2>A working site, before we have written a line</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <ul class="list">
+        <li>A home page and a privacy page on a shared Bootstrap layout.</li>
+        <li><strong>Register</strong> and <strong>Log in</strong> in the navigation bar, both fully working.</li>
+        <li>An <code class="inline">app.db</code> SQLite file sitting next to the executable.</li>
+      </ul>
+      <ul class="list">
+        <li>An <code class="inline">Admin</code> role, and one user in it — the address we just configured.</li>
+        <li>Password hashing, anti-forgery tokens and cookie sign-in, none of which we had to write.</li>
+        <li>A development exception page while we develop, and <code class="inline">/Home/Error</code> in production — Session 10.</li>
+      </ul>
+    </div>
+    <div class="callout">Open the URL the console prints, and log in with the email and password from step 1.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 19 ─ Section 04 -->
+<section class="slide slide--dark">
+  <div class="section-no">04</div>
+  <p class="eyebrow">Block 4</p>
+  <h2>A tour of the folders</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Every folder has one job. Knowing which is which is most of finding our way around.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 20 ─ Layout -->
+<section class="slide">
+  <p class="eyebrow">The map</p>
+  <h2>What is where</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <pre style="font-size:14px;line-height:20px">MyName.MyApp/
+├── MyName.MyApp.sln
+└── MyName.MyApp/
+    ├── <span class="h">Data/</span>
+    │   ├── AppDbContext.cs
+    │   ├── DatabaseProviderSelector.cs
+    │   ├── DesignTimeDbContextFactory.cs
+    │   ├── DbSeeder.cs
+    │   └── Migrations/         <span class="c">← ours</span>
+    ├── <span class="h">Models/</span>
+    │   ├── BaseEntity.cs
+    │   ├── ApplicationUser.cs
+    │   └── ViewModels/
+    ├── <span class="h">Repositories/</span>
+    ├── <span class="h">Controllers/</span>
+    ├── <span class="h">Views/</span>
+    ├── Areas/Identity/Pages/Account/
+    ├── wwwroot/
+    ├── appsettings.json
+    └── Program.cs</pre>
+      <ul class="list list--tight" style="gap:var(--space-4)">
+        <li><strong>Data/</strong> — everything that talks to the database, including the Identity tables.</li>
+        <li><strong>Models/</strong> — our entities. <code class="inline">BaseEntity</code> gives each one an <code class="inline">Id</code>; <code class="inline">ViewModels/</code> is for the shapes a view needs (Session 06).</li>
+        <li><strong>Repositories/</strong> — <code class="inline">IRepository&lt;T&gt;</code> and its implementation. The only door to the data.</li>
+        <li><strong>Controllers/</strong> and <strong>Views/</strong> — Sessions 03 and 05, unchanged.</li>
+        <li><strong>Areas/Identity/</strong> — Login, Register and Logout as real files we can edit.</li>
+        <li><strong>wwwroot/</strong> — CSS, JavaScript, images: files the browser fetches directly.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 21 ─ Program.cs -->
+<section class="slide">
+  <p class="eyebrow">The wiring</p>
+  <h2><code class="inline" style="font-size:.75em">Program.cs</code> is the whole configuration, on one screen</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre style="font-size:15px;line-height:23px"><span class="c">// the database, provider from appsettings.json</span>
+builder.Services.AddDbContext&lt;AppDbContext&gt;(o =&gt;
+    DatabaseProviderSelector.Configure(o, builder.Configuration));
+
+<span class="c">// accounts, roles, and their storage</span>
+builder.Services
+    .AddDefaultIdentity&lt;ApplicationUser&gt;(...)
+    .AddRoles&lt;IdentityRole&gt;()
+    .AddEntityFrameworkStores&lt;AppDbContext&gt;();
+
+<span class="c">// ONE line covers every entity we will ever add</span>
+builder.Services.AddScoped(
+    <span class="k">typeof</span>(IRepository&lt;&gt;), <span class="k">typeof</span>(Repository&lt;&gt;));
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();</pre>
+      <div class="stack">
+        <div class="card card--brand">
+          <h3>Registering, not calling</h3>
+          <p>Each line teaches the container how to build something. Nothing runs yet — the container hands the object to whichever constructor asks for it, exactly as in Session 07.</p>
+        </div>
+        <div class="card">
+          <h3>The open generic</h3>
+          <p><code class="inline">IRepository&lt;&gt;</code> with nothing inside the angle brackets means <em>any</em> <code class="inline">T</code>. Add a tenth entity and there is still nothing to register.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 22 ─ Data folder -->
+<section class="slide">
+  <p class="eyebrow">Data/</p>
+  <h2>Four files, four jobs</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="card">
+        <span class="badge badge--mono">AppDbContext.cs</span>
+        <h3 style="margin-top:var(--space-2)">The database, as C#</h3>
+        <p>It inherits <code class="inline">IdentityDbContext&lt;ApplicationUser&gt;</code>, so the users, roles and claims tables come with it. Our own <code class="inline">DbSet</code>s go here.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">DatabaseProviderSelector.cs</span>
+        <h3 style="margin-top:var(--space-2)">SQLite or PostgreSQL</h3>
+        <p>Reads <code class="inline">Database:Provider</code> and configures the matching provider. One place, so nothing can disagree.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">DesignTimeDbContextFactory.cs</span>
+        <h3 style="margin-top:var(--space-2)">For the tools</h3>
+        <p><code class="inline">dotnet ef</code> runs without starting the app, so it needs its own way to build a context. It calls the same selector.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--mono">DbSeeder.cs</span>
+        <h3 style="margin-top:var(--space-2)">The first data</h3>
+        <p>Creates the <code class="inline">Admin</code> role and the admin user from configuration, on every start-up, and does nothing if they already exist.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 23 ─ Provider choice -->
+<section class="slide">
+  <p class="eyebrow">A decision to make early</p>
+  <h2>Which database — and why it is hard to change later</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="stack">
+        <pre>"Database": {
+  "Provider": <span class="ok">"Sqlite"</span>     <span class="c">// or "PostgreSql"</span>
+},
+"ConnectionStrings": {
+  "Sqlite": "DataSource=app.db;Cache=Shared",
+  "PostgreSql": "Host=localhost;Port=5432;..."
+}</pre>
+        <div class="card">
+          <h3>SQLite is the default</h3>
+          <p>It works with no server, no installation and no password: the database is a file. Recommended unless our project genuinely needs more.</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="callout callout--warn"><strong>Migrations are provider-specific.</strong> A SQLite migration contains <code class="inline">TEXT</code> and <code class="inline">INTEGER</code>; a PostgreSQL one contains <code class="inline">character varying</code> and <code class="inline">timestamp with time zone</code>. They are not interchangeable.</div>
+        <pre><span class="c"># switching provider means starting the schema over</span>
+rm -rf Data/Migrations
+dotnet ef migrations add InitialCreate -o Data/Migrations
+dotnet ef database update</pre>
+        <p class="body sm muted">And the old database, with everything in it, is gone. Choose once, at the start.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 24 ─ Section 05 -->
+<section class="slide slide--dark">
+  <div class="section-no">05</div>
+  <p class="eyebrow">Block 5 · demo</p>
+  <h2>Growing it into our project</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Entity, then controller, then views. The same four steps for every feature we will ever add.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 25 ─ Add an entity -->
+<section class="slide">
+  <p class="eyebrow">Step 1 · the entity</p>
+  <h2>A class, a <code class="inline" style="font-size:.75em">DbSet</code>, a migration</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <pre style="font-size:15px;line-height:23px"><span class="c">// Models/Product.cs</span>
+<span class="k">namespace</span> MyName.MyApp.Models;
+
+<span class="k">public class</span> <span class="h">Product</span> : BaseEntity
+{
+    [Required]
+    [MaxLength(100)]
+    <span class="k">public string</span> Name { <span class="k">get</span>; <span class="k">set</span>; } = <span class="k">string</span>.Empty;
+
+    <span class="k">public decimal</span> Price { <span class="k">get</span>; <span class="k">set</span>; }
+}</pre>
+      <div class="stack">
+        <pre style="font-size:15px;line-height:23px"><span class="c">// Data/AppDbContext.cs</span>
+<span class="k">public</span> DbSet&lt;Product&gt; Products =&gt; Set&lt;Product&gt;();</pre>
+        <pre style="font-size:15px;line-height:23px">dotnet ef migrations add AddProduct -o Data/Migrations
+dotnet ef database update</pre>
+        <div class="card card--brand">
+          <h3>That is the whole registration</h3>
+          <p><code class="inline">IRepository&lt;Product&gt;</code> is now injectable. No line was added to <code class="inline">Program.cs</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 26 ─ BaseEntity -->
+<section class="slide">
+  <p class="eyebrow">Why <code class="inline" style="font-size:.7em">: BaseEntity</code></p>
+  <h2>Four lines that make the generic repository possible</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="stack">
+        <pre><span class="k">public abstract class</span> BaseEntity
+{
+    <span class="k">public int</span> Id { <span class="k">get</span>; <span class="k">set</span>; }
+}</pre>
+        <pre><span class="k">public interface</span> IRepository&lt;T&gt;
+    <span class="k">where</span> T : BaseEntity</pre>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3>The constraint is the point</h3>
+          <p><code class="inline">where T : BaseEntity</code> promises the compiler that every <code class="inline">T</code> has an <code class="inline">Id</code>. Without that promise, <code class="inline">GetById</code> could not be written once for all entities.</p>
+        </div>
+        <div class="card">
+          <h3><code class="inline">abstract</code> means "never on its own"</h3>
+          <p>There is no such thing as a <code class="inline">BaseEntity</code> in the database. It exists only to be inherited.</p>
+        </div>
+        <div class="callout">Forgetting <code class="inline">: BaseEntity</code> is the usual reason <code class="inline">IRepository&lt;MyThing&gt;</code> refuses to compile.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 27 ─ The seven methods -->
+<section class="slide">
+  <p class="eyebrow">Step 2 · the repository</p>
+  <h2>Seven methods, and one of them is the one everybody forgets</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <table>
+      <thead><tr><th style="width:34%">Method</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><th><code class="inline">T? GetById(int id)</code></th><td>The entity with that id, or <code class="inline">null</code>. The <code class="inline">?</code> forces us to handle "not found".</td></tr>
+        <tr><th><code class="inline">IEnumerable&lt;T&gt; GetAll()</code></th><td>Every row of that type.</td></tr>
+        <tr><th><code class="inline">Find(Expression&lt;…&gt;)</code></th><td>The rows matching a condition — <code class="inline">Find(p =&gt; p.Price &lt; 10)</code>.</td></tr>
+        <tr><th><code class="inline">Add / Update / Remove</code></th><td>Mark an entity as new, changed or deleted. Nothing reaches the database.</td></tr>
+        <tr><th><code class="inline">SaveChanges()</code></th><td><strong>Writes everything, in one transaction.</strong> Without it, nothing was saved.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">Why <code class="inline">Expression&lt;Func&lt;T,bool&gt;&gt;</code> and not a plain <code class="inline">Func</code>? A plain delegate is compiled code EF Core cannot look inside, so it would load the whole table and filter in memory. An expression is a <em>description</em> of the condition, which EF Core translates into SQL <code class="inline">WHERE</code> — the filtering happens in the database.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 28 ─ The rule -->
+<section class="slide">
+  <p class="eyebrow">The rule</p>
+  <h2>A controller never touches <code class="inline" style="font-size:.75em">AppDbContext</code></h2>
+  <div class="rule"></div>
+  <div class="content center">
+    <div class="cols cols-3 cols--auto">
+      <div class="card">
+        <span class="badge">One</span>
+        <h3 style="margin-top:var(--space-2)">The controller stays small</h3>
+        <p>No EF Core in it at all — just "get these, show this view".</p>
+      </div>
+      <div class="card">
+        <span class="badge">Two</span>
+        <h3 style="margin-top:var(--space-2)">It can be tested</h3>
+        <p>A test can hand it a fake repository, with no database anywhere.</p>
+      </div>
+      <div class="card">
+        <span class="badge">Three</span>
+        <h3 style="margin-top:var(--space-2)">The rules live in one place</h3>
+        <p>Change how data is fetched once, instead of in nine controllers.</p>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:var(--space-8);text-align:center">If a controller has <code class="inline">_context</code> in it, something has gone wrong.</p>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 29 ─ Controller -->
+<section class="slide">
+  <p class="eyebrow">Step 3 · the controller</p>
+  <h2>Ask for the repository; the container provides it</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre style="font-size:14px;line-height:21px"><span class="k">public class</span> ProductController : Controller
+{
+    <span class="k">private readonly</span> IRepository&lt;Product&gt; _products;
+
+    <span class="c">// injected — we never call `new`</span>
+    <span class="k">public</span> ProductController(IRepository&lt;Product&gt; products)
+        =&gt; _products = products;
+
+    <span class="c">// GET /Product</span>
+    <span class="k">public</span> IActionResult Index()
+        =&gt; View(_products.GetAll());
+
+    <span class="c">// GET /Product/Details/5</span>
+    <span class="k">public</span> IActionResult Details(<span class="k">int</span> id)
+    {
+        <span class="k">var</span> product = _products.GetById(id);
+        <span class="k">return</span> product <span class="k">is null</span> ? NotFound() : View(product);
+    }
+}</pre>
+      <div class="stack">
+        <div class="card card--brand">
+          <h3>Nine lines, no database code</h3>
+          <p>The route (<code class="inline">{controller}/{action}/{id?}</code>, Session 04) and the container (Session 07) do the rest.</p>
+        </div>
+        <div class="card">
+          <h3><code class="inline">NotFound()</code> is a 404</h3>
+          <p>A missing id is the client's mistake, not ours — Session 01's 4xx versus 5xx, in one line.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 30 ─ Write actions -->
+<section class="slide">
+  <p class="eyebrow">Step 3, continued</p>
+  <h2>The write half: validate, save, redirect</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre style="font-size:15px;line-height:23px"><span class="c">// POST /Product/Create</span>
+[HttpPost]
+[ValidateAntiForgeryToken]
+<span class="k">public</span> IActionResult Create(Product product)
+{
+    <span class="k">if</span> (!ModelState.IsValid)
+    {
+        <span class="k">return</span> View(product);   <span class="c">// show the errors</span>
+    }
+
+    _products.Add(product);
+    _products.<span class="h">SaveChanges</span>();       <span class="c">// or nothing happens</span>
+    <span class="k">return</span> RedirectToAction(<span class="k">nameof</span>(Index));
+}</pre>
+        <div class="stack">
+        <div class="card">
+          <h3>All three are from Session 09</h3>
+          <p><code class="inline">ModelState.IsValid</code> checks the annotations on the model; <code class="inline">[ValidateAntiForgeryToken]</code> blocks CSRF; the redirect stops a refresh from posting twice.</p>
+        </div>
+        <div class="callout callout--warn"><code class="inline">Add</code> without <code class="inline">SaveChanges</code> is the single most common "my data disappeared".</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 31 ─ Views -->
+<section class="slide">
+  <p class="eyebrow">Step 4 · the views</p>
+  <h2>Five files under <code class="inline" style="font-size:.75em">Views/Product/</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <ul class="list">
+        <li><code class="inline">Index.cshtml</code> — the list.</li>
+        <li><code class="inline">Details.cshtml</code> — one item.</li>
+        <li><code class="inline">Create.cshtml</code> — the form.</li>
+        <li><code class="inline">Edit.cshtml</code> — the same form, pre-filled.</li>
+        <li><code class="inline">Delete.cshtml</code> — "are you sure?".</li>
+      </ul>
+      <div class="stack">
+        <div class="card">
+          <h3>The layout is already there</h3>
+          <p><code class="inline">_ViewStart.cshtml</code> points every view at <code class="inline">Views/Shared/_Layout.cshtml</code>, so a new view inherits the navigation bar, Bootstrap and the login links for free.</p>
+        </div>
+        <div class="card card--brand">
+          <h3>Tag helpers do the forms</h3>
+          <p><code class="inline">asp-for</code>, <code class="inline">asp-validation-for</code> and <code class="inline">asp-action</code> are already imported in <code class="inline">_ViewImports.cshtml</code> — Session 09.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 32 ─ Custom repository -->
+<section class="slide">
+  <p class="eyebrow">When seven is not enough</p>
+  <h2>Write a specific repository — and only then</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2-1">
+      <pre style="font-size:13px;line-height:20px"><span class="c">// Repositories/IProductRepository.cs</span>
+<span class="k">public interface</span> IProductRepository : IRepository&lt;Product&gt;
+{
+    IEnumerable&lt;Product&gt; GetCheaperThan(<span class="k">decimal</span> price);
+}
+
+<span class="c">// Repositories/ProductRepository.cs</span>
+<span class="k">public class</span> ProductRepository
+    : Repository&lt;Product&gt;, IProductRepository
+{
+    <span class="k">public</span> ProductRepository(AppDbContext c) : <span class="k">base</span>(c) { }
+
+    <span class="k">public</span> IEnumerable&lt;Product&gt; GetCheaperThan(<span class="k">decimal</span> price)
+        =&gt; DbSet.Where(p =&gt; p.Price &lt; price)
+                .OrderBy(p =&gt; p.Price)
+                .ToList();
+}
+
+<span class="c">// Program.cs — this one DOES need registering</span>
+builder.Services.AddScoped&lt;IProductRepository,
+                          ProductRepository&gt;();</pre>
+      <div class="stack">
+        <div class="card card--brand">
+          <h3>Usually we do not need one</h3>
+          <p>The open-generic registration already covers every entity. Add a specific repository only for a query the seven methods cannot express — loading related data with <code class="inline">Include</code>, for example.</p>
+        </div>
+        <div class="card">
+          <h3>Inherit, do not replace</h3>
+          <p>Inheriting <code class="inline">Repository&lt;Product&gt;</code> keeps all seven methods. <code class="inline">DbSet</code> and <code class="inline">Context</code> are <code class="inline">protected</code>, so they are ours to use.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 33 ─ Authorization -->
+<section class="slide">
+  <p class="eyebrow">Using the accounts we were given</p>
+  <h2>Two attributes, and the site has private areas</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="stack">
+        <pre>[Authorize]                    <span class="c">// any signed-in user</span>
+<span class="k">public class</span> ProductController : Controller</pre>
+        <pre>[Authorize(Roles = <span class="ok">"Admin"</span>)]   <span class="c">// administrators only</span>
+<span class="k">public class</span> AdminController : Controller</pre>
+        <pre>[AllowAnonymous]               <span class="c">// an exception, on one action</span>
+<span class="k">public</span> IActionResult Index() =&gt; View();</pre>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3>Where the check happens</h3>
+          <p>Before our action runs. An anonymous visitor is sent to the login page; a signed-in user without the role gets access denied.</p>
+        </div>
+        <div class="card card--brand">
+          <h3>The <code class="inline">Admin</code> role already exists</h3>
+          <p>The seeder created it on first start-up, with our account in it. Nothing else to set up.</p>
+        </div>
+        <div class="callout">Views can ask too: <code class="inline">User.Identity.IsAuthenticated</code> and <code class="inline">User.IsInRole("Admin")</code> decide whether a button is even drawn.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 34 ─ Section 06 -->
+<section class="slide slide--dark">
+  <div class="section-no">06</div>
+  <p class="eyebrow">Block 6</p>
+  <h2>Our own project</h2>
+  <p class="lead" style="margin-top:var(--space-4)">What to build, how big to make it, and the two rules that are not negotiable.</p>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 35 ─ From template to project -->
+<section class="slide">
+  <p class="eyebrow">The whole path</p>
+  <h2>From empty folder to our own application</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <ol class="list list--tight">
+        <li>Clone the template, <code class="inline">dotnet new install .</code> — once per machine.</li>
+        <li><code class="inline">dotnet new simple-mvc -n MyName.MyApp</code>.</li>
+        <li>Fill in the admin email and password.</li>
+        <li>Choose the provider. SQLite unless there is a reason.</li>
+        <li>Write the entities of our domain, each <code class="inline">: BaseEntity</code>.</li>
+      </ol>
+      <ol class="list list--tight" style="counter-reset:step 5">
+        <li>Add a <code class="inline">DbSet</code> per entity, then the migration.</li>
+        <li>A controller per entity, taking <code class="inline">IRepository&lt;T&gt;</code>.</li>
+        <li>The five views, on the layout that is already there.</li>
+        <li><code class="inline">[Authorize]</code> where the site should be private.</li>
+        <li><code class="inline">git init</code>, commit, and push — with no secrets in it.</li>
+      </ol>
+    </div>
+    <div class="callout">Steps 5 to 8 repeat for every entity. Everything before them happens exactly once.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 36 ─ Scope -->
+<section class="slide">
+  <p class="eyebrow">Choosing a subject</p>
+  <h2>Small domain, complete application</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3">
+      <div class="card card--brand">
+        <span class="badge">Right size</span>
+        <h3 style="margin-top:var(--space-2)">Two or three entities</h3>
+        <p>A recipe book. A film catalogue. A team roster. A reading list. Something whose rules we can explain in one sentence.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--neutral">What is graded</span>
+        <h3 style="margin-top:var(--space-2)">That it works end to end</h3>
+        <p>Create, list, view, edit and delete, with validation that actually rejects bad input, and pages that are private when they should be.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--warning">What sinks projects</span>
+        <h3 style="margin-top:var(--space-2)">Ambition without a first migration</h3>
+        <p>Nine entities and a payment gateway, none of it running. One entity that works beats five that do not.</p>
+      </div>
+    </div>
+    <div class="callout">Start with one entity, end to end, on day one. Add the second only once the first is complete.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 37 ─ Rules -->
+<section class="slide">
+  <p class="eyebrow">Not negotiable</p>
+  <h2>Two rules about what goes into git</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <div class="card">
+        <span class="badge badge--danger">Rule one</span>
+        <h3 style="margin-top:var(--space-2)">No real credentials, ever</h3>
+        <p>For coursework, an admin password and a connection string in <code class="inline">appsettings.json</code> are fine. A <em>real</em> password pushed to GitHub is public within seconds and stays in the history after it is deleted.</p>
+        <p style="margin-top:var(--space-2)">Real applications keep them in user-secrets or environment variables.</p>
+      </div>
+      <div class="card">
+        <span class="badge badge--danger">Rule two</span>
+        <h3 style="margin-top:var(--space-2)">No <code class="inline">bin/</code>, <code class="inline">obj/</code> or <code class="inline">*.db</code></h3>
+        <p>They are build output and data — regenerated on any machine, and useless in a repository. The template's <code class="inline">.gitignore</code> already covers all three.</p>
+        <p style="margin-top:var(--space-2)">Commit the migration files, though: they <em>are</em> source.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 38 ─ Troubleshooting -->
+<section class="slide">
+  <p class="eyebrow">When it does not work</p>
+  <h2>The failures we will actually hit</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <table>
+      <thead><tr><th style="width:44%">Symptom</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">dotnet ef</code> not found</td><td><code class="inline">dotnet tool install --global dotnet-ef</code></td></tr>
+        <tr><td>No migrations found, or tables missing</td><td><code class="inline">dotnet ef migrations add InitialCreate -o Data/Migrations</code></td></tr>
+        <tr><td>No admin account exists, and no error</td><td><code class="inline">Identity:Admin:Email</code> or <code class="inline">Password</code> is blank</td></tr>
+        <tr><td>"Could not create the admin user"</td><td>The password breaks the rules in <code class="inline">Program.cs</code></td></tr>
+        <tr><td>Column-type errors after switching provider</td><td>Delete <code class="inline">Data/Migrations/</code> and the database, then start the schema again</td></tr>
+        <tr><td>Changes are not saved</td><td>A missing <code class="inline">SaveChanges()</code> after <code class="inline">Add</code> / <code class="inline">Update</code> / <code class="inline">Remove</code></td></tr>
+        <tr><td>Unknown value for <code class="inline">Database:Provider</code></td><td>It must be exactly <code class="inline">Sqlite</code> or <code class="inline">PostgreSql</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 39 ─ Check for understanding -->
+<section class="slide">
+  <p class="eyebrow">Check for understanding</p>
+  <h2>Six questions</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <ol class="list list--tight">
+        <li>Why is the template installed once but used many times?</li>
+        <li>What does <code class="inline">sourceName</code> in <code class="inline">template.json</code> control?</li>
+        <li>Why does the template ship with no migrations?</li>
+      </ol>
+      <ol class="list list--tight" style="counter-reset:step 3">
+        <li>Adding a tenth entity — how many lines change in <code class="inline">Program.cs</code>?</li>
+        <li>Which of the seven repository methods actually writes to the database?</li>
+        <li>A controller has <code class="inline">AppDbContext</code> injected into it. What is wrong?</li>
+      </ol>
+    </div>
+    <div class="callout">Answers, in order: it is a blueprint, not a copy · the string replaced by our project name · migrations are provider-specific · none — the open generic already covers it · <code class="inline">SaveChanges()</code> · it has skipped the repository, the one door to the data.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 40 ─ References -->
+<section class="slide">
+  <p class="eyebrow">References</p>
+  <h2>Where to read more</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <ul class="list list--tight">
+        <li><strong>The template, and its README</strong><br><span class="sm muted"><a href="https://github.com/eognianov/SimpleMVCTemplate" target="_blank" rel="noopener">github.com/eognianov/SimpleMVCTemplate</a></span></li>
+        <li><strong>Same README, in Bulgarian</strong><br><span class="sm muted"><a href="https://github.com/eognianov/SimpleMVCTemplate/blob/main/README.bg.md" target="_blank" rel="noopener">README.bg.md</a></span></li>
+        <li><strong>Custom templates for <code class="inline">dotnet new</code></strong><br><span class="sm muted"><a href="https://learn.microsoft.com/dotnet/core/tools/custom-templates" target="_blank" rel="noopener">learn.microsoft.com/dotnet/core/tools/custom-templates</a></span></li>
+        <li><strong>Introduction to Identity</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/security/authentication/identity" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/security/authentication/identity</a></span></li>
+      </ul>
+      <ul class="list list--tight">
+        <li><strong>EF Core migrations</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/ef/core/managing-schemas/migrations" target="_blank" rel="noopener">learn.microsoft.com/ef/core/managing-schemas/migrations</a></span></li>
+        <li><strong>Dependency injection in ASP.NET Core</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/fundamentals/dependency-injection</a></span></li>
+        <li><strong>Authorize with a specific scheme / role</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/security/authorization/roles" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/security/authorization/roles</a></span></li>
+        <li><strong>Safe storage of app secrets</strong><br><span class="sm muted"><a href="https://learn.microsoft.com/aspnet/core/security/app-secrets" target="_blank" rel="noopener">learn.microsoft.com/aspnet/core/security/app-secrets</a></span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 41 ─ Closing -->
+<section class="slide slide--brand">
+  <p class="eyebrow">What is left</p>
+  <h1 style="font-size:var(--fs-title-1);line-height:var(--lh-title-1)">The plumbing is done. The idea is not.</h1>
+  <div class="rule"></div>
+  <p class="lead">Login, roles, a database and a data-access pattern are already in the box.<br>What the application is <em>for</em> is the only part nobody can hand us.</p>
+  <div class="foot"><span>github.com/eognianov/SimpleMVCTemplate</span><span class="spacer"></span><span>Microsoft Web Technologies</span></div>
+</section>
+</div></div>
+<a id="home" href="../../index.html"><img src="../../design-system/components/images/favicon.svg" alt="" width="14" height="14">← Index</a>
+<div id="hint">← → navigate · F fullscreen · P print</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var deck = document.getElementById('deck');
+  var progress = document.getElementById('progress');
+  var hint = document.getElementById('hint');
+  var total = slides.length;
+  var i = 0;
+
+  slides.forEach(function(s, n){
+    var num = s.querySelector('.num');
+    if (num) num.textContent = (n + 1) + ' / ' + total;
+  });
+
+  function show(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-active', k === i); });
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+
+  function fit(){
+    var vp = window.visualViewport;
+    var vw = vp ? vp.width : window.innerWidth;
+    var vh = vp ? vp.height : window.innerHeight;
+    var scale = Math.min(vw / 1280, vh / 720);
+    var x = (vw - 1280 * scale) / 2;
+    var y = (vh - 720 * scale) / 2;
+    deck.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ')';
+  }
+  function refit(){
+    requestAnimationFrame(fit);
+    setTimeout(fit, 250);
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+
+  var touchStartX = null, touchStartY = null;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) { touchStartX = null; return; }
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (touchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    touchStartX = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(dx < 0 ? i + 1 : i - 1);
+  }, { passive: true });
+
+  window.addEventListener('resize', refit);
+
+  window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', refit);
+  }
+  window.addEventListener('hashchange', function(){ show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+
+  fit();
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  setTimeout(function(){ hint.classList.add('is-hidden'); }, 4000);
+})();
+</script>
+</body>
+</html>
