@@ -843,8 +843,9 @@ $env:<span class="k">ASPNETCORE_ENVIRONMENT</span>=<span class="h">"Production"<
     <span class="k">private readonly</span> ApplicationDbContext _context;
     <span class="k">private readonly</span> ILogger&lt;ArticlesController&gt; _logger;
 
-    <span class="k">public</span> <span class="h">ArticlesController</span>(ApplicationDbContext context,
-                              ILogger&lt;ArticlesController&gt; logger)
+    <span class="k">public</span> <span class="h">ArticlesController</span>(
+        ApplicationDbContext context,
+        ILogger&lt;ArticlesController&gt; logger)
     {
         _context = context;
         _logger = logger;
@@ -865,7 +866,7 @@ $env:<span class="k">ASPNETCORE_ENVIRONMENT</span>=<span class="h">"Production"<
   <h2>Structured logging: the braces are not string formatting</h2>
   <div class="rule"></div>
   <div class="content">
-    <div class="cols cols-2">
+    <div class="cols cols-2-1">
 <pre><span class="k">public async</span> Task&lt;IActionResult&gt; Details(<span class="k">int</span> id)
 {
     <span class="k">var</span> article = <span class="k">await</span> _context.Articles.FindAsync(id);

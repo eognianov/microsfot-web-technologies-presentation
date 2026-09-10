@@ -364,7 +364,8 @@ the output to paste when asking anyone for help.</span></pre>
       <div class="stack">
         <div class="card card--brand">
           <h3>What must be installed</h3>
-          <p>The .NET 10 SDK, plus an editor: VS Code with the C# Dev Kit extension, or Visual Studio Community on Windows.</p>
+          <p>The .NET 10 SDK, plus an editor: JetBrains Rider, VS Code with the C# Dev Kit, or Visual Studio Community.</p>
+          <p>Rider is free for non-commercial use with no student email; a student email adds the whole JetBrains suite.</p>
         </div>
         <div class="card">
           <h3>If it fails</h3>
@@ -570,7 +571,7 @@ the output to paste when asking anyone for help.</span></pre>
       <thead><tr><th style="width:210px">Name</th><th style="width:150px">Which word</th><th>What it is for us</th></tr></thead>
       <tbody>
         <tr><th>C#</th><td>the language</td><td>Statically typed, object-oriented, general purpose. What we type.</td></tr>
-        <tr><th>.NET</th><td>the platform</td><td>The runtime that executes C#, plus a large standard library. Runs on Windows, macOS and Linux. Current version: <strong>.NET 10</strong>.</td></tr>
+        <tr><th>.NET</th><td>the platform</td><td>The platform underneath: a runtime, a large standard library, and the tooling around them. C# is one of several languages that target it, and a web app is one of many things it builds. Windows, macOS and Linux. Current version: <strong>.NET 10</strong>.</td></tr>
         <tr><th>.NET SDK</th><td>the kit</td><td>What we installed. It gives us the <code class="inline">dotnet</code> command.</td></tr>
         <tr><th>ASP.NET Core</th><td>the framework</td><td>The web framework that runs on .NET. It owns the loop; we fill in the parts that are ours.</td></tr>
         <tr><th>ASP.NET Core MVC</th><td>a structure</td><td>One particular way of organising a web app with ASP.NET Core &#8212; the subject of Session 03.</td></tr>
@@ -580,7 +581,39 @@ the output to paste when asking anyone for help.</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 15 ─ Why this language -->
+<!-- 15 ─ What .NET covers -->
+<section class="slide">
+  <p class="eyebrow">Now the names</p>
+  <h2>One platform, many languages, many kinds of application</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <p class="body">The same runtime and the same standard library sit underneath all of these:</p>
+    <div class="cols cols-2">
+      <ul class="list list--tight">
+        <li><strong>Web apps and HTTP APIs</strong> &#8212; ASP.NET Core.</li>
+        <li><strong>Desktop and mobile apps</strong> &#8212; Windows, macOS, iOS, Android.</li>
+        <li><strong>Games</strong> &#8212; Unity is scripted in C#.</li>
+        <li><strong>Cloud services, containers and background jobs.</strong></li>
+        <li><strong>Command-line tools</strong> &#8212; <code class="inline">dotnet</code> itself is one.</li>
+        <li><strong>Machine learning, and devices down to a Raspberry Pi.</strong></li>
+      </ul>
+      <div class="stack">
+        <div class="card card--brand">
+          <h3>More than one language</h3>
+          <p>C# is the one we type, but F# and Visual Basic compile down to the same instructions and use the same libraries. The platform is not the language.</p>
+        </div>
+        <div class="card">
+          <h3>More than one kind of machine</h3>
+          <p>Windows, macOS and Linux; x64 and ARM; a laptop, a server, a container, a phone, a Raspberry Pi. Same build, different machine.</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout">Our corner is <strong>ASP.NET Core, in C#, on a server</strong> &#8212; the same SDK and the same <code class="inline">dotnet</code> command as all the rest.</div>
+  </div>
+  <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 16 ─ Why this language -->
 <section class="slide">
   <p class="eyebrow">Now the names</p>
   <h2>Why C# for the web?</h2>
@@ -608,7 +641,7 @@ the output to paste when asking anyone for help.</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 16 ─ Section: C# essentials I -->
+<!-- 17 ─ Section: C# essentials I -->
 <section class="slide slide--dark">
   <div class="section-no">03</div>
   <p class="eyebrow">Block 3 · live coding</p>
@@ -617,7 +650,7 @@ the output to paste when asking anyone for help.</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 17 ─ Scratch project -->
+<!-- 18 ─ Scratch project -->
 <section class="slide">
   <p class="eyebrow">C# essentials I</p>
   <h2>A scratch project to type into</h2>
@@ -644,7 +677,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 18 ─ Values and types -->
+<!-- 19 ─ Values and types -->
 <section class="slide">
   <p class="eyebrow">C# essentials I</p>
   <h2>Variables and types</h2>
@@ -668,7 +701,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 19 ─ Static typing and interpolation -->
+<!-- 20 ─ Static typing and interpolation -->
 <section class="slide">
   <p class="eyebrow">C# essentials I</p>
   <h2>The compiler is a friend, not a critic</h2>
@@ -697,7 +730,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 20 ─ Decisions -->
+<!-- 21 ─ Decisions -->
 <section class="slide">
   <p class="eyebrow">C# essentials I</p>
   <h2>Decisions</h2>
@@ -727,7 +760,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 21 ─ switch -->
+<!-- 22 ─ switch -->
 <section class="slide">
   <p class="eyebrow">C# essentials I</p>
   <h2>Many branches on one value: <code class="inline">switch</code></h2>
@@ -762,7 +795,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 22 ─ Repetition -->
+<!-- 23 ─ Repetition -->
 <section class="slide">
   <p class="eyebrow">C# essentials I</p>
   <h2>Repetition</h2>
@@ -800,7 +833,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 23 ─ Section: C# essentials II -->
+<!-- 24 ─ Section: C# essentials II -->
 <section class="slide slide--dark">
   <div class="section-no">04</div>
   <p class="eyebrow">Block 5 · live coding</p>
@@ -809,7 +842,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 24 ─ Three collections -->
+<!-- 25 ─ Three collections -->
 <section class="slide">
   <p class="eyebrow">C# essentials II</p>
   <h2>Three collections, three questions</h2>
@@ -837,7 +870,7 @@ $ <span class="k">dotnet run</span>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 25 ─ Collections in code -->
+<!-- 26 ─ Collections in code -->
 <section class="slide">
   <p class="eyebrow">C# essentials II</p>
   <h2>The same three, in code</h2>
@@ -865,7 +898,7 @@ Console.WriteLine(views[<span class="h">"First post"</span>]);</pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 26 ─ Methods -->
+<!-- 27 ─ Methods -->
 <section class="slide">
   <p class="eyebrow">C# essentials II</p>
   <h2>Methods: name a thing once, use it everywhere</h2>
@@ -893,7 +926,7 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 27 ─ Classes -->
+<!-- 28 ─ Classes -->
 <section class="slide">
   <p class="eyebrow">C# essentials II</p>
   <h2>Classes, objects and properties</h2>
@@ -924,7 +957,7 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 28 ─ Exceptions -->
+<!-- 29 ─ Exceptions -->
 <section class="slide">
   <p class="eyebrow">C# essentials II</p>
   <h2>When something goes wrong: <code class="inline">try / catch / finally</code></h2>
@@ -954,7 +987,7 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 29 ─ Exceptions: the connection to 500 -->
+<!-- 30 ─ Exceptions: the connection to 500 -->
 <section class="slide">
   <p class="eyebrow">C# essentials II</p>
   <h2>An uncaught exception has a status code</h2>
@@ -975,7 +1008,7 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 30 ─ Section: querying collections -->
+<!-- 31 ─ Section: querying collections -->
 <section class="slide slide--dark">
   <div class="section-no">05</div>
   <p class="eyebrow">Block 6 · live coding</p>
@@ -984,7 +1017,7 @@ Console.WriteLine(Shorten(<span class="h">"A long title"</span>, 6));</pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 31 ─ The problem -->
+<!-- 32 ─ The problem -->
 <section class="slide">
   <p class="eyebrow">Querying collections</p>
   <h2>"Given 500 articles: this year's, newest first, titles only."</h2>
@@ -1017,7 +1050,7 @@ chosen.Sort(<span class="c">/* by date, descending */</span>);
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 32 ─ Where and Select -->
+<!-- 33 ─ Where and Select -->
 <section class="slide">
   <p class="eyebrow">Querying collections</p>
   <h2><code class="inline">Where</code> and <code class="inline">Select</code></h2>
@@ -1046,7 +1079,7 @@ chosen.Sort(<span class="c">/* by date, descending */</span>);
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 33 ─ OrderBy and FirstOrDefault -->
+<!-- 34 ─ OrderBy and FirstOrDefault -->
 <section class="slide">
   <p class="eyebrow">Querying collections</p>
   <h2><code class="inline">OrderBy</code> and <code class="inline">FirstOrDefault</code></h2>
@@ -1078,7 +1111,7 @@ chosen.Sort(<span class="c">/* by date, descending */</span>);
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 34 ─ The pipeline -->
+<!-- 35 ─ The pipeline -->
 <section class="slide">
   <p class="eyebrow">Querying collections</p>
   <h2>Chained, they read like the sentence we started with</h2>
@@ -1097,7 +1130,7 @@ chosen.Sort(<span class="c">/* by date, descending */</span>);
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 35 ─ Section: first project -->
+<!-- 36 ─ Section: first project -->
 <section class="slide slide--dark">
   <div class="section-no">06</div>
   <p class="eyebrow">Block 8 · demo</p>
@@ -1106,7 +1139,7 @@ chosen.Sort(<span class="c">/* by date, descending */</span>);
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 36 ─ Creating SimpleBlog -->
+<!-- 37 ─ Creating SimpleBlog -->
 <section class="slide">
   <p class="eyebrow">Demo</p>
   <h2>Creating and running SimpleBlog</h2>
@@ -1131,7 +1164,7 @@ Content root path: /work/SimpleBlog</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 37 ─ In the browser, and watch -->
+<!-- 38 ─ In the browser, and watch -->
 <section class="slide">
   <p class="eyebrow">Demo</p>
   <h2>Back to DevTools, and then hot reload</h2>
@@ -1162,7 +1195,7 @@ watch : Hot reload succeeded.</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 38 ─ Diagram: project structure -->
+<!-- 39 ─ Diagram: project structure -->
 <section class="slide">
   <p class="eyebrow">What is in the box</p>
   <h2>The generated project, folder by folder</h2>
@@ -1223,7 +1256,7 @@ watch : Hot reload succeeded.</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 39 ─ Program.cs -->
+<!-- 40 ─ Program.cs -->
 <section class="slide">
   <p class="eyebrow">What is in the box</p>
   <h2>Reading <code class="inline">Program.cs</code> as prose</h2>
@@ -1258,7 +1291,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 40 ─ Misconceptions -->
+<!-- 41 ─ Misconceptions -->
 <section class="slide">
   <p class="eyebrow">Wrap-up</p>
   <h2>Common misconceptions</h2>
@@ -1282,7 +1315,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 41 ─ Check for understanding -->
+<!-- 42 ─ Check for understanding -->
 <section class="slide">
   <p class="eyebrow">Check for understanding</p>
   <h2>Six questions</h2>
@@ -1304,7 +1337,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 42 ─ Walkthrough -->
+<!-- 43 ─ Walkthrough -->
 <section class="slide">
   <p class="eyebrow">Walkthrough · together</p>
   <h2>We build it on screen, step by step</h2>
@@ -1334,7 +1367,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 43 ─ Before we move on -->
+<!-- 44 ─ Before we move on -->
 <section class="slide">
   <p class="eyebrow">Wrap-up</p>
   <h2>Before we move on</h2>
@@ -1361,7 +1394,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 44 ─ Glossary -->
+<!-- 45 ─ Glossary -->
 <section class="slide">
   <p class="eyebrow">Glossary</p>
   <h2>Речник · EN → BG</h2>
@@ -1414,7 +1447,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 45 ─ References -->
+<!-- 46 ─ References -->
 <section class="slide">
   <p class="eyebrow">References</p>
   <h2>Where to read more</h2>
@@ -1431,7 +1464,7 @@ app.Run();              <span class="c">// "start listening"</span></pre>
   <div class="foot"><span>Microsoft Web Technologies</span><span class="spacer"></span><span class="num"></span></div>
 </section>
 
-<!-- 46 ─ Closing -->
+<!-- 47 ─ Closing -->
 <section class="slide slide--brand">
   <p class="eyebrow">Next session</p>
   <h1 style="font-size:var(--fs-title-1);line-height:var(--lh-title-1)"><a href="03-handling-a-request.html">03 · Handling a Request</a></h1>

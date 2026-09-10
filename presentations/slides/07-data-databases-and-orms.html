@@ -185,6 +185,7 @@ tbody th{
 }
 tbody tr:last-child th{border-bottom:none}
 td.center,th.center{text-align:center}
+table.tight-rows thead th,table.tight-rows tbody td,table.tight-rows tbody th{padding-top:var(--space-2);padding-bottom:var(--space-2)}
 
 /* ── Code ──────────────────────────────────────────────────────────────── */
 pre,code{font-family:var(--font-mono)}
@@ -495,7 +496,7 @@ code.inline{
   <h2>Seven words, one line each</h2>
   <div class="rule"></div>
   <div class="content">
-    <table>
+    <table class="tight-rows">
       <thead><tr><th style="width:230px">Term</th><th>Meaning</th></tr></thead>
       <tbody>
         <tr><th>Table</th><td>One kind of thing — articles, users, categories.</td></tr>
@@ -1291,7 +1292,7 @@ builder.Services.<span class="h">AddDbContext</span>&lt;ApplicationDbContext&gt;
   <h2>We wire up the database</h2>
   <div class="rule"></div>
   <div class="content">
-    <p class="lead">We do it once on screen, in <strong>SimpleBlog</strong>, in this order. Follow along on your own machine and stop me at any step that does not land.</p>
+    <p class="lead">We do it once on screen, in <strong>SimpleBlog</strong>, in this order. Stop us at any step that does not land.</p>
     <div class="cols cols-2">
       <ol class="list list--tight">
         <li>We install the two packages and the tool, then open <code class="inline">.csproj</code> to see what changed.</li>
@@ -1346,7 +1347,7 @@ builder.Services.<span class="h">AddDbContext</span>&lt;ApplicationDbContext&gt;
   <div class="rule"></div>
   <div class="content">
     <div class="cols cols-2">
-      <table>
+      <table class="tight-rows">
         <thead><tr><th style="width:45%">English</th><th>Български</th></tr></thead>
         <tbody>
           <tr><td>persistence</td><td>постоянно съхранение</td></tr>
@@ -1359,7 +1360,7 @@ builder.Services.<span class="h">AddDbContext</span>&lt;ApplicationDbContext&gt;
           <tr><td>entity</td><td>същност / ентити</td></tr>
         </tbody>
       </table>
-      <table>
+      <table class="tight-rows">
         <thead><tr><th style="width:45%">English</th><th>Български</th></tr></thead>
         <tbody>
           <tr><td>ORM (object–relational mapper)</td><td>обектно-релационно съответствие</td></tr>

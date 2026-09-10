@@ -185,6 +185,7 @@ tbody th{
 }
 tbody tr:last-child th{border-bottom:none}
 td.center,th.center{text-align:center}
+table.tight-rows thead th,table.tight-rows tbody td,table.tight-rows tbody th{padding-top:var(--space-2);padding-bottom:var(--space-2)}
 
 /* ── Code ──────────────────────────────────────────────────────────────── */
 pre,code{font-family:var(--font-mono)}
@@ -478,7 +479,7 @@ code.inline{
   <h2>The same four pages, twice</h2>
   <div class="rule"></div>
   <div class="content">
-    <table>
+    <table class="tight-rows">
       <thead><tr><th style="width:42%">Bad</th><th style="width:36%">Good</th><th>What changed</th></tr></thead>
       <tbody>
         <tr><td><code class="inline">/page.aspx?id=42&amp;t=3</code></td><td><code class="inline">/articles/42</code></td><td>The path identifies the thing; no file extension, no mystery letters.</td></tr>
@@ -805,7 +806,8 @@ app.MapControllerRoute(
 <pre>app.MapControllerRoute(
     name: <span class="h">"archive"</span>,
     pattern: <span class="h">"archive/{year:int}/{month:int}"</span>,
-    defaults: <span class="k">new</span> { controller = <span class="h">"Articles"</span>, action = <span class="h">"Archive"</span> });
+    defaults: <span class="k">new</span> { controller = <span class="h">"Articles"</span>,
+                    action = <span class="h">"Archive"</span> });
 
 app.MapControllerRoute(
     name: <span class="h">"default"</span>,

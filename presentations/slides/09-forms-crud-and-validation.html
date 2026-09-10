@@ -823,7 +823,7 @@ code.inline{
   <h2>The rules an annotation cannot express</h2>
   <div class="rule"></div>
   <div class="content">
-    <p class="lead">Anything needing the database, another field or the current date, we check ourselves — reporting it into the same <code class="inline">ModelState</code>.</p>
+    <p class="lead">Rules that need the database, another field or today's date, we check ourselves.</p>
 <pre><span class="k">if</span> (<span class="k">await</span> _context.Articles.AnyAsync(a =&gt; a.Title == article.Title))
     ModelState.<span class="h">AddModelError</span>(nameof(article.Title),
         <span class="ok">"An article with this title already exists."</span>);

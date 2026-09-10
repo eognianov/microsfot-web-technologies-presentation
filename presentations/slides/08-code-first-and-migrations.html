@@ -1178,8 +1178,8 @@ code.inline{
   <div class="content">
     <div class="cols cols-2">
       <ol class="list list--tight">
-        <li>We annotate <code class="inline">Article</code>: title required and at most 200, author required and at most 100, summary optional and at most 500, body multiline, <code class="inline">PublishedOn</code> a date labelled "Published on".</li>
-        <li>We run <code class="inline">migrations add InitialCreate</code> and — before applying anything — open the file and name the line each annotation produced.</li>
+        <li>We annotate <code class="inline">Article</code>: title and author required with length limits, summary optional, body multiline, <code class="inline">PublishedOn</code> a labelled date.</li>
+        <li>We run <code class="inline">migrations add InitialCreate</code> and, before applying it, name the line each annotation produced.</li>
         <li>We skim <code class="inline">migrations script</code>, then run <code class="inline">database update</code>.</li>
         <li>We open the database file, confirm the columns and their nullability, and find <code class="inline">__EFMigrationsHistory</code>.</li>
       </ol>

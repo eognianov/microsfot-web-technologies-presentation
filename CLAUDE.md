@@ -100,10 +100,21 @@ content change, in the page console:
 [...document.querySelectorAll('.slide')].forEach((s,i)=>{
   const p=s.className; s.classList.add('is-active');
   const oy=s.scrollHeight-s.clientHeight, ox=s.scrollWidth-s.clientWidth;
-  if(oy>1||ox>1) console.log(`slide ${i+1}: y+${oy} x+${ox}`);
+  if(oy>1||ox>1) console.log(`slide ${i+1}: SELF y+${oy} x+${ox}`);
+  s.querySelectorAll('.cols,.stack,.card,.content,ul.list,ol.list,table,.callout').forEach(el=>{
+    const dy=el.scrollHeight-el.clientHeight, dx=el.scrollWidth-el.clientWidth;
+    if(dy>2||dx>2) console.log(`slide ${i+1}: <${el.tagName.toLowerCase()} class="${el.className}"> y+${dy} x+${dx}`);
+  });
   s.className=p;
 });
 ```
+
+**Measuring only `.slide` is not enough.** `.cols` and `.stack` both set `min-height:0`,
+so content overflowing *inside* them is clipped without ever growing the slide's
+`scrollHeight` — the slide measures clean while a card's bottom border sits off-screen.
+The descendant pass above is the part that catches it. Ignore 1–2px hits; those are
+sub-pixel rounding, not real clipping. A clean report is still not proof: screenshot the
+slides you changed and look at them.
 
 ### Layout traps, all hit in practice
 
