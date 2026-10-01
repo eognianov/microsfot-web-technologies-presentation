@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Exercises 2 — Controllers and routing</title>
+<meta name="description" content="Exercise set 2 for decks 03–04: ten tasks that give RecipeBox a controller, actions, status codes and clean URLs.">
+<link rel="canonical" href="https://ms-web.eognyanov.com/presentations/slides/ex02-controllers-and-routing.html">
+<link rel="icon" type="image/svg+xml" href="../../design-system/components/images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../../design-system/components/images/favicon-32.png">
+<link rel="apple-touch-icon" href="../../design-system/components/images/apple-touch-icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Microsoft Web Technologies">
+<meta property="og:title" content="Exercises 2 — Controllers and routing">
+<meta property="og:description" content="Exercise set 2 for decks 03–04: ten tasks that give RecipeBox a controller, actions, status codes and clean URLs.">
+<meta property="og:url" content="https://ms-web.eognyanov.com/presentations/slides/ex02-controllers-and-routing.html">
+<meta property="og:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
+<link rel="stylesheet" href="../../design-system/styles.css">
+<style>
+/* ── Exercise-deck extensions ──────────────────────────────────────────────
+   Same stage, scale and type tokens as the lecture decks, so the two read as
+   one course. What differs is deliberate, so an exercise deck is recognisable
+   at a glance on the projector:
+     · a teal "lab" accent replaces brand blue on block slides and accents
+       (Fluent shared-colour teal — the design system has no second hue);
+     · every task and hint slide carries a left rail with the task number —
+       teal for the brief, amber for the hints;
+     · solutions sit behind a click-to-reveal cover. */
+:root{
+  --stage-w:1280px; --stage-h:720px;
+  --fs-slide-body:20px;  --lh-slide-body:30px;
+  --fs-slide-lead:24px;  --lh-slide-lead:34px;
+  --fs-slide-sm:16px;    --lh-slide-sm:24px;
+  --fs-slide-code:14px;  --lh-slide-code:21px;
+
+  --lab-shade-30:#012b2c; --lab-shade-20:#024345; --lab-shade-10:#025c5f;
+  --lab-base:#038387;     --lab-tint-10:#2aa0a4;
+  --lab-tint-20:#a6dfe1;  --lab-tint-30:#cdeeef;  --lab-tint-40:#ebf8f8;
+
+  --rail-w:88px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--neutral-grey-160);font-family:var(--font-sans-text);color:var(--text-primary);overflow:hidden}
+
+/* ── Stage ─────────────────────────────────────────────────────────────── */
+#stage{position:fixed;inset:0;overflow:hidden}
+#deck{width:var(--stage-w);height:var(--stage-h);position:absolute;top:0;left:0;transform-origin:0 0}
+.slide{
+  position:absolute;inset:0;width:var(--stage-w);height:var(--stage-h);
+  background:var(--surface-page);
+  display:none;flex-direction:column;
+  padding:var(--space-12) var(--space-16) var(--space-8);
+  overflow:hidden;
+}
+.slide.is-active{display:flex}
+
+/* ── Rail ──────────────────────────────────────────────────────────────── */
+.slide--rail{padding-left:calc(var(--rail-w) + var(--space-12))}
+.rail{
+  position:absolute;left:0;top:0;bottom:0;width:var(--rail-w);
+  background:var(--lab-base);color:var(--neutral-white);
+  display:flex;flex-direction:column;align-items:center;
+  padding:var(--space-12) 0 var(--space-8);
+}
+.rail__label{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.rail__no{font-family:var(--font-sans);font-size:44px;line-height:52px;font-weight:600;letter-spacing:-.02em;margin-top:var(--space-1)}
+.rail__part{
+  margin-top:auto;width:36px;height:36px;border-radius:var(--radius-circular);
+  border:2px solid rgba(255,255,255,.5);display:grid;place-items:center;
+  font-family:var(--font-sans);font-size:var(--fs-slide-sm);font-weight:600;
+}
+.rail--hint{background:var(--color-warning-bg);color:var(--color-warning);border-right:1px solid #f0d98a}
+.rail--hint .rail__part{border-color:rgba(157,93,0,.45)}
+.rail--info{background:var(--lab-shade-20)}
+
+/* ── Slide chrome ──────────────────────────────────────────────────────── */
+.head{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)}
+.eyebrow{
+  margin:0;font-size:var(--fs-body-sm);line-height:var(--lh-body-sm);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--lab-shade-10);
+}
+.slide--hint .eyebrow{color:var(--color-warning)}
+h1,h2,h3{margin:0;font-family:var(--font-sans);color:var(--text-primary)}
+h1{font-size:var(--fs-display);line-height:var(--lh-display);font-weight:var(--fw-display);letter-spacing:-.02em}
+h2{font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:var(--fw-title-1);letter-spacing:-.01em}
+h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:var(--fw-title-3)}
+.slide--hint h2{font-size:var(--fs-title-2);line-height:var(--lh-title-2)}
+.rule{width:56px;height:3px;background:var(--lab-base);border-radius:var(--radius-pill);margin:var(--space-4) 0 var(--space-5)}
+.slide--hint .rule{background:var(--color-warning)}
+.body{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body)}
+.lead{margin:0;font-size:var(--fs-slide-lead);line-height:var(--lh-slide-lead);color:var(--text-secondary)}
+.goal{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);color:var(--text-secondary)}
+.muted{color:var(--text-secondary)}
+.sm{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+strong{font-weight:600}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--space-5)}
+
+.foot{
+  display:flex;align-items:center;gap:var(--space-4);
+  padding-top:var(--space-4);margin-top:auto;border-top:1px solid var(--border-default);
+  font-size:var(--fs-caption);line-height:var(--lh-caption);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-disabled);
+}
+.foot .spacer{flex:1}
+
+/* ── Block slides (teal, not brand blue) ───────────────────────────────── */
+.slide--lab{background:var(--lab-base);color:var(--neutral-white);justify-content:center}
+.slide--lab h1,.slide--lab h2{color:var(--neutral-white)}
+.slide--lab .eyebrow{color:var(--lab-tint-30)}
+.slide--lab .lead{color:var(--lab-tint-30)}
+.slide--lab .rule{background:var(--neutral-white)}
+.slide--lab .foot{border-top-color:rgba(255,255,255,.28);color:var(--lab-tint-30)}
+.slide--part{background:var(--lab-shade-20)}
+.slide--part .eyebrow{color:var(--lab-tint-20)}
+.part-letter{font-family:var(--font-sans);font-size:140px;line-height:1;font-weight:600;color:rgba(255,255,255,.2);margin-bottom:var(--space-4)}
+.stats{display:flex;gap:var(--space-3);margin-top:var(--space-8)}
+.stat{
+  border:1px solid rgba(255,255,255,.4);border-radius:var(--radius-pill);
+  padding:var(--space-2) var(--space-5);font-size:var(--fs-slide-sm);font-weight:600;color:var(--neutral-white);
+}
+.slide--lab code.inline{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:var(--neutral-white)}
+
+/* ── Layout ────────────────────────────────────────────────────────────── */
+.cols{display:grid;gap:var(--space-6);flex:1;min-height:0}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-task{grid-template-columns:1.25fr 1fr}
+.cols-task > .card{align-self:start}
+.cols-hint{grid-template-columns:1fr 2fr}
+.cols--auto{flex:0 0 auto;min-height:auto}
+.stack{display:flex;flex-direction:column;gap:var(--space-4);min-height:0}
+
+/* ── Cards, badges ─────────────────────────────────────────────────────── */
+.card{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  display:flex;flex-direction:column;gap:var(--space-2);
+}
+.card h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3)}
+.card p{margin:0;font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--text-secondary)}
+.card--lab{background:var(--lab-tint-40);border-color:var(--lab-tint-20)}
+.card--hint{background:var(--color-warning-bg);border-color:#f0d98a}
+.badge{
+  display:inline-flex;align-items:center;align-self:flex-start;height:24px;padding:0 var(--space-3);
+  border-radius:var(--radius-pill);font-size:var(--fs-body-sm);font-weight:600;white-space:nowrap;
+  background:var(--lab-tint-40);color:var(--lab-shade-10);border:1px solid var(--lab-tint-20);
+}
+.badge--time{background:var(--surface-card);color:var(--text-secondary);border-color:var(--border-strong)}
+.badge--opt{background:var(--surface-subtle);color:var(--text-secondary);border-color:var(--border-default)}
+.badge--warn{background:var(--color-warning-bg);color:var(--color-warning);border-color:#f0d98a}
+
+/* ── Lists ─────────────────────────────────────────────────────────────── */
+ul.list,ol.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.list li,ol.list li{position:relative;padding-left:var(--space-8);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+ul.list li::before{content:"";position:absolute;left:var(--space-2);top:8px;width:8px;height:8px;border-radius:var(--radius-circular);background:var(--lab-base)}
+ol.list{counter-reset:step}
+ol.list li{counter-increment:step;padding-left:var(--space-10)}
+ol.list li::before{
+  content:counter(step);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:var(--radius-sm);
+  background:var(--lab-base);color:var(--neutral-white);
+  font-family:var(--font-sans);font-size:var(--fs-body-sm);font-weight:600;display:grid;place-items:center;
+}
+.list--body li{font-size:18px;line-height:28px}
+ul.check{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.check li{position:relative;padding-left:var(--space-8);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+ul.check li::before{
+  content:"";position:absolute;left:0;top:3px;width:16px;height:16px;
+  border:2px solid var(--lab-base);border-radius:var(--radius-sm);background:var(--surface-card);
+}
+ul.hints{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.hints li{
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+  background:var(--surface-card);border:1px solid var(--border-default);border-left:3px solid var(--color-warning);
+  border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);
+}
+.hints--row{flex-direction:row!important}
+.hints--row li{flex:1}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+table{
+  width:100%;border-collapse:collapse;background:var(--surface-card);
+  border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+}
+thead th{
+  text-align:left;background:var(--surface-subtle);color:var(--text-secondary);font-weight:600;
+  font-size:var(--fs-body-sm);letter-spacing:.06em;text-transform:uppercase;
+  padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--border-default);
+}
+tbody td,tbody th{padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--border-default);vertical-align:top;text-align:left}
+tbody th{font-weight:600}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td,tr.total th{background:var(--lab-tint-40);font-weight:600}
+table.dense{font-size:14px;line-height:20px}
+
+/* ── Code ──────────────────────────────────────────────────────────────── */
+pre,code{font-family:var(--font-mono)}
+pre{
+  margin:0;background:var(--neutral-grey-190);color:#e6e6e6;
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  font-size:var(--fs-slide-code);line-height:var(--lh-slide-code);
+  overflow:hidden;white-space:pre;
+}
+pre.xs{font-size:13px;line-height:19px}
+pre.out{background:var(--lab-shade-30);color:var(--lab-tint-30)}
+pre .k{color:#5fd0d4}
+pre .t{color:#9fd7ff}
+pre .s{color:#f0b77a}
+pre .n{color:#c3e88d}
+pre .c{color:var(--neutral-grey-90)}
+pre .p{color:var(--neutral-white);font-weight:600}
+.file{font-family:var(--font-mono);font-size:var(--fs-body-sm);color:var(--text-secondary);margin:0 0 var(--space-1)}
+code.inline{
+  background:var(--surface-subtle);border:1px solid var(--border-default);
+  border-radius:var(--radius-sm);padding:0 5px;font-size:.92em;color:var(--lab-shade-10);
+}
+
+/* ── Callout ───────────────────────────────────────────────────────────── */
+.callout{
+  background:var(--lab-tint-40);border:1px solid var(--lab-tint-20);border-radius:var(--radius-lg);
+  padding:var(--space-3) var(--space-5);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--lab-shade-20);
+}
+.callout--warn{background:var(--color-warning-bg);border-color:#f0d98a;color:var(--color-warning)}
+
+/* ── Solution: blurred until revealed ──────────────────────────────────── */
+.solution{position:relative;border-radius:var(--radius-lg);min-height:0;align-self:start;width:100%}
+.solution__body{display:flex;flex-direction:column;gap:var(--space-3);filter:blur(7px);transition:filter var(--duration-slow) var(--ease-standard)}
+.solution__cover{
+  position:absolute;inset:0;z-index:1;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);
+  background:rgba(1,43,44,.72);border:2px dashed var(--lab-tint-10);border-radius:var(--radius-lg);
+  color:var(--neutral-white);font:inherit;
+  transition:opacity var(--duration-slow) var(--ease-standard);
+}
+.solution__cover:hover{background:rgba(1,43,44,.82)}
+.solution__cover:focus-visible{outline:3px solid var(--lab-tint-20);outline-offset:2px}
+.solution__label{font-family:var(--font-sans);font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:600}
+.solution__key{font-size:var(--fs-body-sm);letter-spacing:.08em;text-transform:uppercase;color:var(--lab-tint-20)}
+.solution.is-revealed .solution__body{filter:none}
+.solution.is-revealed .solution__cover{opacity:0;pointer-events:none}
+.duo{display:grid;grid-template-columns:auto auto;justify-content:start;gap:var(--space-3)}
+.duo pre{font-size:12px;line-height:19px;padding:14px}
+
+/* ── Slide-type legend (how-to slide) ──────────────────────────────────── */
+.mini{position:relative;height:96px;border-radius:var(--radius-md);background:var(--surface-page);border:1px solid var(--border-default);overflow:hidden;margin-bottom:var(--space-2)}
+.mini::before{content:"";position:absolute;left:0;top:0;bottom:0;width:22px;background:var(--lab-base)}
+.mini--hint::before{background:var(--color-warning-bg);border-right:1px solid #f0d98a}
+.mini span{position:absolute;left:34px;right:12px;height:8px;border-radius:4px;background:var(--neutral-grey-40)}
+.mini .m1{top:16px;width:40%;background:var(--neutral-grey-60)}
+.mini .m2{top:34px;width:62%}
+.mini .m3{top:52px;width:50%}
+.mini .m4{top:70px;width:56%}
+.mini .blur{left:auto;right:12px;top:16px;width:52%;height:66px;background:var(--neutral-grey-190);border:2px dashed var(--lab-tint-10)}
+
+/* ── Progress, hint, home ──────────────────────────────────────────────── */
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--lab-tint-10);width:0;transition:width var(--duration-normal) var(--ease-standard);z-index:10}
+#hint{position:fixed;right:16px;bottom:14px;z-index:10;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);transition:opacity var(--duration-slow) var(--ease-standard)}
+#hint.is-hidden{opacity:0}
+#home{position:fixed;left:16px;bottom:14px;z-index:10;display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home img{width:14px;height:14px;border-radius:3px;display:block}
+#home:hover,#home:focus-visible{opacity:1;outline:none}
+
+/* ── Print / PDF: one slide per page, every solution shown ─────────────── */
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:var(--neutral-white);overflow:visible}
+  #stage{position:static;display:block;overflow:visible}
+  #deck{position:static;width:auto;height:auto;transform:none!important}
+  #progress,#hint,#home{display:none}
+  .slide{position:relative;display:flex!important;page-break-after:always;break-after:page}
+  .solution__body{filter:none!important}
+  .solution__cover{display:none!important}
+}
+
+/* ── Additions for sets 2–5: wider solution columns, tighter code ─────── */
+.cols-hint--wide{grid-template-columns:.8fr 2.2fr}
+.cols-hint--full{grid-template-columns:1fr}
+.solution pre + pre{margin-top:0}
+pre.tight{padding:var(--space-3) var(--space-4)}
+table.cmp td,table.cmp th{padding:6px var(--space-3)}
+td.num{white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage"><div id="deck">
+
+
+<!-- 1 ─ Title -->
+<section class="slide slide--lab">
+  <p class="eyebrow">Microsoft Web Technologies · Exercises · Set 2 of 5</p>
+  <h1 style="margin-top:var(--space-3)">Controllers and routing</h1>
+  <div class="rule"></div>
+  <p class="lead">Give RecipeBox its first controller, answer with text, JSON and<br>status codes, then design the URLs people will see.</p>
+  <div class="stats"><span class="stat">Covers decks 03–04</span><span class="stat">10 tasks</span><span class="stat">2 hours</span></div>
+  <div class="foot" style="margin-top:var(--space-12)"><span>Exercises · RecipeBox</span><span class="spacer"></span><span>← → navigate · S reveals a solution</span></div>
+</section>
+
+<!-- 2 ─ How this works -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">02</span></div>
+  <div class="head"><p class="eyebrow">How this set works</p></div>
+  <h2>Every task is two slides</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3 cols--auto">
+      <div class="card">
+        <div class="mini"><span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span></div>
+        <span class="badge">Teal rail</span>
+        <h3>The task</h3>
+        <p>The goal, the steps, and a <strong>Done when</strong> checklist. When every box is ticked, the task is finished.</p>
+      </div>
+      <div class="card">
+        <div class="mini mini--hint"><span class="m1" style="width:22%"></span><span class="m2" style="width:26%"></span><span class="m3" style="width:20%"></span><span class="blur"></span></div>
+        <span class="badge badge--warn">Amber rail</span>
+        <h3>The hints</h3>
+        <p>Read them when stuck. They point to the trap, not to the answer.</p>
+      </div>
+      <div class="card card--lab">
+        <div class="mini mini--hint" style="background:var(--surface-card)"><span class="m1" style="width:22%"></span><span class="m2" style="width:26%"></span><span class="m3" style="width:20%"></span><span class="blur" style="background:var(--neutral-grey-160);border-style:solid"></span></div>
+        <span class="badge">Click, or press S</span>
+        <h3>The solution</h3>
+        <p>Blurred on the hint slide until revealed. Compare it with your own after the task is done.</p>
+      </div>
+    </div>
+    <div class="cols cols-2 cols--auto">
+      <div class="callout">No views yet. Every action answers with <strong>plain text or JSON</strong>, so the browser shows exactly what the server sent. Keep DevTools on <strong>Network</strong>: every task ends with a status code.</div>
+      <div class="callout callout--warn">Task 6 is <strong>optional</strong>. Skip it and leave <code class="inline">About</code> out of Task 7 too.</div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 3 ─ Time budget -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">02</span></div>
+  <div class="head"><p class="eyebrow">Time budget</p></div>
+  <h2>Ten tasks, two hours</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <table class="dense" style="align-self:start"><thead><tr><th style="width:34px">#</th><th>Task</th><th class="num">Min</th></tr></thead><tbody><tr><td>1</td><td>Add a <code class="inline">RecipesController</code> with an <code class="inline">Index</code> action</td><td class="num">10</td></tr><tr><td>2</td><td>Return the catalog as plain text and as JSON</td><td class="num">12</td></tr><tr><td>3</td><td>Add a <code class="inline">Details(int id)</code> action</td><td class="num">10</td></tr><tr><td>4</td><td>Return 404 for an unknown recipe</td><td class="num">8</td></tr><tr><td>5</td><td>Filter by cuisine with a query-string parameter</td><td class="num">12</td></tr><tr><td>6</td><td>Add an <code class="inline">About</code> action that returns <code class="inline">Content</code> <span class="badge badge--opt">optional</span></td><td class="num">5</td></tr></tbody></table>
+      <table class="dense" style="align-self:start"><thead><tr><th style="width:34px">#</th><th>Task</th><th class="num">Min</th></tr></thead><tbody><tr><td>7</td><td>Give each action a clean URL with attribute routing</td><td class="num">20</td></tr><tr><td>8</td><td>Add an <code class="inline">int</code> route constraint to the id</td><td class="num">10</td></tr><tr><td>9</td><td>Add a by-cuisine route</td><td class="num">15</td></tr><tr><td>10</td><td>Generate links with <code class="inline">Url.Action</code></td><td class="num">18</td></tr><tr class="total"><td></td><td>Total · without optional task</td><td class="num">120 · 115</td></tr></tbody></table>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 4 ─ The project -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">02</span></div>
+  <div class="head"><p class="eyebrow">The project</p></div>
+  <h2>One controller, grown task by task</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <pre style="font-size:15px;line-height:24px;align-self:start">RecipeBox/
+├── Controllers/
+│   ├── HomeController.cs     <span class="c"># untouched</span>
+│   └── <span class="p">RecipesController.cs</span>  <span class="c"># every task</span>
+└── Models/
+    └── Recipe.cs             <span class="c"># from Set 1</span>
+
+<span class="c"># run once, leave it running:</span>
+<span class="k">dotnet</span> watch</pre>
+      <div class="stack">
+        <div class="card">
+          <span class="badge badge--opt">Starts from</span>
+          <h3>The end of Set 1</h3>
+          <p>RecipeBox runs and contains <code class="inline">Models/Recipe.cs</code>. The five recipes come from the <code class="inline">RecipeBoxBasics</code> catalog.</p>
+        </div>
+        <div class="card card--lab">
+          <span class="badge">Ends with</span>
+          <h3>Six actions at clean URLs</h3>
+          <p><code class="inline">/recipes</code>, <code class="inline">/recipes/2</code>, <code class="inline">/recipes/json</code>, <code class="inline">/recipes/cuisine/italian</code> and <code class="inline">/about</code>, in plain text or JSON. Set 3 turns them into pages.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 5 ─ Part A -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">A</div>
+  <p class="eyebrow">Part A · Tasks 1–6 · about 55 min</p>
+  <h2>Controllers and actions</h2>
+  <p class="lead" style="margin-top:var(--space-4)">One class, a list of five recipes, and the status codes from deck 01 — now chosen by us.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 6 ─ T1 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">01</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 1 · Controllers</p><span class="badge badge--time">10 min</span></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">RecipesController</code> with an <code class="inline" style="font-size:.8em">Index</code> action</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A controller the framework finds by convention, with our five recipes inside.</p>
+        <ol class="list list--body"><li>Add <code class="inline">Controllers/RecipesController.cs</code>: a <code class="inline">public class RecipesController : Controller</code>.</li><li>Declare <code class="inline">private static readonly List&lt;Recipe&gt; _recipes</code> with the five recipes from Set 1, Task 10.</li><li><code class="inline">Index()</code> returns <code class="inline">Content($"RecipeBox has {_recipes.Count} recipes.")</code>.</li><li>Open <code class="inline">/Recipes</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/Recipes</code> shows <code class="inline">RecipeBox has 5 recipes.</code></li><li>DevTools shows <strong>GET · 200 · text/plain</strong>.</li><li><code class="inline">/Recipes/Index</code> and <code class="inline">/recipes</code> show the same thing.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 7 ─ T1 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">01</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 1 · Hints and solution</p></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">RecipesController</code> with an <code class="inline" style="font-size:.8em">Index</code> action</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">using RecipeBox.Models;</code> at the top, or <code class="inline">Recipe</code> is an unknown type.</li><li>The URL is <code class="inline">/Recipes</code>: the framework strips the word <code class="inline">Controller</code>. <code class="inline">Index</code> is the default action.</li><li><code class="inline">static</code> keeps one list for the whole app, not a new one per request.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">using Microsoft.AspNetCore.Mvc;
+using RecipeBox.Models;
+
+namespace RecipeBox.Controllers;
+
+public class RecipesController : Controller
+{
+    // In-memory for now. Set 4 moves it into a database.
+    private static readonly List&lt;Recipe&gt; _recipes = new()
+    {
+        new Recipe { Id = 1, Title = "Pancakes", Cuisine = "American",
+                     PrepMinutes = 10, CookMinutes = 15, Servings = 4,
+                     Ingredients = new() { "Flour", "Milk", "Eggs", "Sugar" } },
+        // ... recipes 2–5, copied from RecipeBoxBasics
+    };
+
+    // GET /Recipes
+    public IActionResult Index()
+    {
+        return Content($"RecipeBox has {_recipes.Count} recipes.");
+    }
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 8 ─ T2 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · Results</p><span class="badge badge--time">12 min</span></div>
+  <h2>Return the catalog as plain text and as JSON</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">The same data in two formats, and the header that tells the browser which one it got.</p>
+        <ol class="list list--body"><li>Change <code class="inline">Index</code> to print a count line, then one line per recipe: <code class="inline">id: title</code>.</li><li>Add <code class="inline">All()</code> that returns <code class="inline">Json(_recipes)</code>.</li><li>Open <code class="inline">/Recipes</code> and <code class="inline">/Recipes/All</code>; compare them in DevTools.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/Recipes</code> shows <code class="inline">5 recipe(s)</code>, then <code class="inline">1: Pancakes</code> to <code class="inline">5: Chicken Curry</code>.</li><li><code class="inline">/Recipes/All</code> is a JSON array of five objects, with their <code class="inline">ingredients</code>.</li><li>DevTools: <code class="inline">text/plain</code> for one, <code class="inline">application/json</code> for the other.</li><li>JSON names start lower case: <code class="inline">title</code>, not <code class="inline">Title</code>.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 9 ─ T2 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · Hints and solution</p></div>
+  <h2>Return the catalog as plain text and as JSON</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">Select</code> turns each recipe into a string; <code class="inline">string.Join("\n", lines)</code> glues them.</li><li>Do not name the action <code class="inline">Json</code>: that is the method we are calling.</li><li>Lower-case names are the JSON convention. The framework converts them.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">// GET /Recipes
+public IActionResult Index()
+{
+    var lines = _recipes.Select(r =&gt; $"{r.Id}: {r.Title}");
+    return Content($"{_recipes.Count} recipe(s)\n" + string.Join("\n", lines));
+}
+
+// GET /Recipes/All
+public IActionResult All() =&gt; Json(_recipes);</pre><pre class="out"><span class="p">$ curl -i http://localhost:5267/Recipes/All</span>
+HTTP/1.1 200 OK
+Content-Type: <span class="p">application/json</span>; charset=utf-8
+
+[{"id":1,"title":"Pancakes","cuisine":"American",…</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 10 ─ T3 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">03</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 3 · Model binding</p><span class="badge badge--time">10 min</span></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Details(int id)</code> action</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A value from the URL arrives as a method parameter.</p>
+        <ol class="list list--body"><li>Add <code class="inline">Details(int id)</code>. Find the recipe with <code class="inline">_recipes.First(r =&gt; r.Id == id)</code>.</li><li>Return three lines: title and cuisine; total minutes and servings; the ingredients.</li><li>Open <code class="inline">/Recipes/Details/2</code>, then <code class="inline">/Recipes/Details/99</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/Recipes/Details/2</code> shows <code class="inline">Spaghetti Carbonara (Italian)</code>, <code class="inline">25 min, serves 2</code> and five ingredients.</li><li><code class="inline">/Recipes/Details/99</code> returns <strong>500</strong>. Note the exception name: Task 4 fixes it.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 11 ─ T3 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">03</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 3 · Hints and solution</p></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Details(int id)</code> action</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>The default route ends in <code class="inline">{id?}</code>. The parameter is called <code class="inline">id</code>, so the value lands in it.</li><li>Rename the parameter to <code class="inline">recipeId</code> and watch it stay <code class="inline">0</code>.</li><li>The 500 page is the <em>developer</em> exception page. Only we see it, in Development.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">// GET /Recipes/Details/2
+public IActionResult Details(int id)
+{
+    var recipe = _recipes.First(r =&gt; r.Id == id);
+
+    return Content($"{recipe.Title} ({recipe.Cuisine})\n" +
+                   $"{recipe.TotalMinutes()} min, serves {recipe.Servings}\n" +
+                   $"Ingredients: {string.Join(", ", recipe.Ingredients)}");
+}</pre><pre class="out">/Recipes/Details/99  →  <span class="p">500</span>
+InvalidOperationException: Sequence contains no matching element</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 12 ─ T4 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">04</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 4 · Status codes</p><span class="badge badge--time">8 min</span></div>
+  <h2>Return 404 for an unknown recipe</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A missing recipe is not a crash. It is the client asking for something that is not there.</p>
+        <ol class="list list--body"><li>Replace <code class="inline">First</code> with <code class="inline">FirstOrDefault</code>.</li><li>If the result is <code class="inline">null</code>, return <code class="inline">NotFound($"No recipe with id {id}.")</code>.</li><li>Reload <code class="inline">/Recipes/Details/99</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/Recipes/Details/99</code> returns <strong>404</strong> with <code class="inline">No recipe with id 99.</code></li><li><code class="inline">/Recipes/Details/2</code> still returns 200.</li><li>Nothing in the action can throw for any whole-number id.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 13 ─ T4 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">04</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 4 · Hints and solution</p></div>
+  <h2>Return 404 for an unknown recipe</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>This is Set 1's Banitsa question, now with a status code attached.</li><li><code class="inline">is null</code> reads better than <code class="inline">== null</code> and means the same here.</li><li>The message makes Task 8's difference visible.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">// GET /Recipes/Details/2
+public IActionResult Details(int id)
+{
+    var recipe = _recipes.FirstOrDefault(r =&gt; r.Id == id);
+    if (recipe is null)
+        return NotFound($"No recipe with id {id}.");
+
+    return Content($"{recipe.Title} ({recipe.Cuisine})\n" +
+                   $"{recipe.TotalMinutes()} min, serves {recipe.Servings}\n" +
+                   $"Ingredients: {string.Join(", ", recipe.Ingredients)}");
+}</pre><pre class="out">/Recipes/Details/99  →  <span class="p">404</span>  No recipe with id 99.</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 14 ─ T5 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">05</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Query string</p><span class="badge badge--time">12 min</span></div>
+  <h2>Filter by cuisine with a query-string parameter</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">An optional value from the query string, bound by name.</p>
+        <ol class="list list--body"><li>Give <code class="inline">Index</code> a parameter <code class="inline">string? cuisine</code>.</li><li>Empty → every recipe. Otherwise only recipes with exactly that cuisine.</li><li>Try <code class="inline">/Recipes</code>, <code class="inline">?cuisine=Italian</code> and <code class="inline">?cuisine=French</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/Recipes</code> still lists all five.</li><li><code class="inline">?cuisine=Italian</code> → Carbonara and Pizza, under <code class="inline">2 recipe(s)</code>.</li><li><code class="inline">?cuisine=French</code> → <code class="inline">0 recipe(s)</code> with <strong>200</strong>: an empty search is still an answer.</li><li><code class="inline">?cuisine=italian</code> also shows 0. Note it; Task 9 handles case.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 15 ─ T5 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">05</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Hints and solution</p></div>
+  <h2>Filter by cuisine with a query-string parameter</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">?cuisine=Italian</code> fills <code class="inline">string? cuisine</code> because the <strong>names</strong> match.</li><li><code class="inline">string.IsNullOrWhiteSpace(cuisine)</code> is true for missing, empty or blank.</li><li>Both sides of <code class="inline">? :</code> must be a <code class="inline">List&lt;Recipe&gt;</code>: end the <code class="inline">Where</code> with <code class="inline">.ToList()</code>.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">// GET /Recipes            GET /Recipes?cuisine=Italian
+public IActionResult Index(string? cuisine)
+{
+    var matches = string.IsNullOrWhiteSpace(cuisine)
+        ? _recipes
+        : _recipes.Where(r =&gt; r.Cuisine == cuisine).ToList();
+
+    var lines = matches.Select(r =&gt; $"{r.Id}: {r.Title}");
+    return Content($"{matches.Count} recipe(s)\n" + string.Join("\n", lines));
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 16 ─ T6 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">06</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Content</p><span class="badge badge--time">5 min</span><span class="badge badge--opt">Optional</span></div>
+  <h2>Add an <code class="inline" style="font-size:.8em">About</code> action that returns <code class="inline" style="font-size:.8em">Content</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">The smallest possible action, and one more URL for the routing tasks.</p>
+        <ol class="list list--body"><li>Add <code class="inline">About()</code> that returns one line describing the app, with the recipe count.</li><li>Open <code class="inline">/Recipes/About</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/Recipes/About</code> shows <code class="inline">RecipeBox: a small recipe catalogue with 5 recipes.</code></li><li>The count comes from <code class="inline">_recipes.Count</code>, not a typed 5.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 17 ─ T6 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">06</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Hints and solution</p></div>
+  <h2>Add an <code class="inline" style="font-size:.8em">About</code> action that returns <code class="inline" style="font-size:.8em">Content</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>A one-line action can use <code class="inline">=&gt;</code>, as in Set 1 Task 8.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">// GET /Recipes/About
+public IActionResult About()
+    =&gt; Content($"RecipeBox: a small recipe catalogue with {_recipes.Count} recipes.");</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 18 ─ Part B -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">B</div>
+  <p class="eyebrow">Part B · Tasks 7–10 · about 65 min</p>
+  <h2>Routing and URL design</h2>
+  <p class="lead" style="margin-top:var(--space-4)">URLs are a public interface. We design them for people, then let the framework write them for us.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 19 ─ T7 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">07</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Attribute routing</p><span class="badge badge--time">20 min</span></div>
+  <h2>Give each action a clean URL with attribute routing</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        
+        <ol class="list list--body"><li><table class="dense"><thead><tr><th>Action</th><th>Before</th><th>After</th></tr></thead><tbody><tr><td><code class="inline">Index</code></td><td>/Recipes</td><td><strong>/recipes</strong></td></tr><tr><td><code class="inline">All</code></td><td>/Recipes/All</td><td><strong>/recipes/json</strong></td></tr><tr><td><code class="inline">Details</code></td><td>/Recipes/Details/2</td><td><strong>/recipes/2</strong></td></tr><tr><td><code class="inline">About</code></td><td>/Recipes/About</td><td><strong>/about</strong></td></tr></tbody></table></li><li>Put <code class="inline">[Route("recipes")]</code> on the class, and <code class="inline">[HttpGet("…")]</code> on each action.</li><li>Try every <em>After</em> URL, then every <em>Before</em> URL.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>All four <em>After</em> URLs return 200; <code class="inline">?cuisine=Italian</code> still filters.</li><li><code class="inline">/Recipes/Details/2</code> now returns <strong>404</strong>. One sentence on why.</li><li><code class="inline">/about</code> works with no <code class="inline">recipes</code> in front of it.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 20 ─ T7 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">07</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Hints and solution</p></div>
+  <h2>Give each action a clean URL with attribute routing</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">[Route]</code> on the class is a prefix; <code class="inline">[HttpGet("…")]</code> completes it. <code class="inline">""</code> means the prefix itself.</li><li>A leading <code class="inline">/</code> escapes the prefix: <code class="inline">[HttpGet("/about")]</code>.</li><li>Once a controller has attribute routes, the default route no longer reaches it.</li><li>The query string is not part of the template: <code class="inline">Index</code> needs no change.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">[Route("recipes")]
+public class RecipesController : Controller
+{
+    // ... _recipes unchanged ...
+
+    [HttpGet("")]            // GET /recipes   and   /recipes?cuisine=Italian
+    public IActionResult Index(string? cuisine) { ... }
+
+    [HttpGet("json")]        // GET /recipes/json
+    public IActionResult All() =&gt; Json(_recipes);
+
+    [HttpGet("{id}")]        // GET /recipes/2
+    public IActionResult Details(int id) { ... }
+
+    [HttpGet("/about")]      // GET /about
+    public IActionResult About() =&gt; ...;
+}</pre><pre class="out">/Recipes/Details/2  →  <span class="p">404</span>   <span class="c"># attribute-routed now: the default</span>
+                              <span class="c"># route no longer reaches this controller</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 21 ─ T8 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">08</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 8 · Constraints</p><span class="badge badge--time">10 min</span></div>
+  <h2>Add an <code class="inline" style="font-size:.8em">int</code> route constraint to the id</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A route that only matches the kind of value it can use.</p>
+        <ol class="list list--body"><li><strong>Before</strong> changing anything, open <code class="inline">/recipes/banana</code>. Read the message.</li><li>Change <code class="inline">[HttpGet("{id}")]</code> to <code class="inline">[HttpGet("{id:int}")]</code>.</li><li>Open <code class="inline">/recipes/banana</code> again, then <code class="inline">/recipes/2</code> and <code class="inline">/recipes/json</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Before: <strong>404</strong> with <code class="inline">No recipe with id 0.</code> Our action ran, with a made-up id.</li><li>After: <strong>404</strong> with an <strong>empty</strong> body. No route matched; our action never ran.</li><li><code class="inline">/recipes/2</code> and <code class="inline">/recipes/json</code> still work.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 22 ─ T8 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">08</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 8 · Hints and solution</p></div>
+  <h2>Add an <code class="inline" style="font-size:.8em">int</code> route constraint to the id</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">banana</code> cannot become an <code class="inline">int</code>, so model binding leaves <code class="inline">id</code> at <code class="inline">0</code>.</li><li>The empty 404 is the framework's own: nothing matched.</li><li>A constraint is a routing filter, not input validation. Validation is Set 5.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">[HttpGet("{id:int}")]    // GET /recipes/2 — digits only
+public IActionResult Details(int id) { ... }</pre><pre class="out"><span class="p">before</span>   /recipes/banana   404   No recipe with id 0.
+<span class="p">after</span>    /recipes/banana   404   <span class="c"># empty body: no route matched</span>
+
+/recipes/2      200
+/recipes/json   200   <span class="c"># a literal segment beats a parameter</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 23 ─ T9 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Path parameters</p><span class="badge badge--time">15 min</span></div>
+  <h2>Add a by-cuisine route</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A value in the path, and a URL that does not care about case.</p>
+        <ol class="list list--body"><li>Add <code class="inline">ByCuisine(string name)</code> at <code class="inline">/recipes/cuisine/{name}</code>.</li><li>Return <code class="inline">Italian: Spaghetti Carbonara, Margherita Pizza</code>, matching cuisines regardless of case.</li><li>No matches → 404 with <code class="inline">No {name} recipes.</code></li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/recipes/cuisine/italian</code>, <code class="inline">…/Italian</code> and <code class="inline">…/ITALIAN</code> list the same two.</li><li><code class="inline">/recipes/cuisine/french</code> → <strong>404</strong> with <code class="inline">No french recipes.</code></li><li><code class="inline">/recipes/cuisine</code> with no name → 404.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 24 ─ T9 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Hints and solution</p></div>
+  <h2>Add a by-cuisine route</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">r.Cuisine.ToLower() == name.ToLower()</code> compares case-blind.</li><li>Why 404 here, but 200 in Task 5? A path names a <em>thing</em>; a query string is a <em>search</em>.</li><li><code class="inline">{name}</code> has no <code class="inline">?</code>, so it is required.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">// GET /recipes/cuisine/italian
+[HttpGet("cuisine/{name}")]
+public IActionResult ByCuisine(string name)
+{
+    var titles = _recipes
+        .Where(r =&gt; r.Cuisine.ToLower() == name.ToLower())
+        .Select(r =&gt; r.Title)
+        .ToList();
+
+    if (titles.Count == 0)
+        return NotFound($"No {name} recipes.");
+
+    return Content($"{name}: {string.Join(", ", titles)}");
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 25 ─ T10 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">10</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 10 · Generating URLs</p><span class="badge badge--time">18 min</span></div>
+  <h2>Generate links with <code class="inline" style="font-size:.8em">Url.Action</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Ask the framework for a URL instead of typing it, so a route change cannot break a link.</p>
+        <ol class="list list--body"><li>In <code class="inline">Index</code>, add each recipe's URL: <code class="inline">1: Pancakes -&gt; /recipes/1</code>, built with <code class="inline">Url.Action("Details", new { id = r.Id })</code>.</li><li>Change the class attribute to <code class="inline">[Route("dishes")]</code>. Reload <code class="inline">/dishes</code>.</li><li>Change it back to <code class="inline">[Route("recipes")]</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/recipes</code> shows <code class="inline">1: Pancakes -&gt; /recipes/1</code> and so on, for all five.</li><li>With <code class="inline">dishes</code>, the links read <code class="inline">/dishes/1</code>, with no other edit.</li><li>The string <code class="inline">"/recipes/"</code> appears nowhere in the controller.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 26 ─ T10 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">10</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 10 · Hints and solution</p></div>
+  <h2>Generate links with <code class="inline" style="font-size:.8em">Url.Action</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">new { id = r.Id }</code>: the property name must match the route parameter, <code class="inline">id</code>.</li><li><code class="inline">Url.Action</code> reads our routes, so it knows the template is <code class="inline">recipes/{id:int}</code>.</li><li>In Set 3 the same idea appears in views as <code class="inline">asp-action</code> and <code class="inline">asp-route-id</code>.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">[HttpGet("")]
+public IActionResult Index(string? cuisine)
+{
+    var matches = string.IsNullOrWhiteSpace(cuisine)
+        ? _recipes
+        : _recipes.Where(r =&gt; r.Cuisine == cuisine).ToList();
+
+    var lines = matches.Select(r =&gt;
+        $"{r.Id}: {r.Title} -&gt; {Url.Action("Details", new { id = r.Id })}");
+    return Content($"{matches.Count} recipe(s)\n" + string.Join("\n", lines));
+}</pre><pre class="out">5 recipe(s)
+1: Pancakes -> <span class="p">/recipes/1</span>
+2: Spaghetti Carbonara -> <span class="p">/recipes/2</span>
+…</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 2 · Controllers and routing</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 27 ─ Closing -->
+<section class="slide slide--lab">
+  <p class="eyebrow">End of Set 2</p>
+  <h2 style="font-size:var(--fs-title-1)">RecipeBox answers. Set 3 makes it look good.</h2>
+  <div class="rule"></div>
+  <p class="lead">Before moving on: <code class="inline">/recipes</code>, <code class="inline">/recipes/2</code>, <code class="inline">/recipes/cuisine/italian</code><br>and <code class="inline">/about</code> all return <strong>200</strong>, and <code class="inline">/recipes/99</code> returns <strong>404</strong>.</p>
+  <div class="stats"><span class="stat">Next · Set 3</span><span class="stat">Views, layouts and Bootstrap</span><span class="stat">After decks 05–06</span></div>
+  <div class="foot" style="margin-top:var(--space-12)"><span>Exercises · RecipeBox</span><span class="spacer"></span><span>Microsoft Web Technologies</span></div>
+</section>
+</div></div>
+<a id="home" href="../../index.html"><img src="../../design-system/components/images/favicon.svg" alt="" width="14" height="14">← Index</a>
+<div id="hint">← → navigate · S solution · F fullscreen · P print</div>
+
+<script>
+(function(){
+  /* ── Minimal highlighters: C#, Razor, SQL, shell ────────────────────── */
+  var KW = 'string int double bool var void new public private protected class if else for foreach in while return switch case break default try catch finally null true false namespace using get set static readonly is not async await override base this nameof throw'.split(' ');
+  var TY = 'Console List Dictionary Recipe Category Task IActionResult Controller ControllerBase DbContext DbSet DbContextOptions ModelBuilder MigrationBuilder RecipeBoxContext RecipeListViewModel ILogger StringSplitOptions DbUpdateConcurrencyException InvalidOperationException FormatException OverflowException WebApplication DateTime Route HttpGet HttpPost Bind ValidateAntiForgeryToken ActionName Required StringLength Range Display'.split(' ');
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function paint(sel, re, pick){
+    document.querySelectorAll(sel).forEach(function(pre){
+      var src = pre.textContent, out = '', last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(src))) {
+        if (m[0] === '') { re.lastIndex++; continue; }
+        out += esc(src.slice(last, m.index));
+        out += '<span class="' + pick(m) + '">' + esc(m[0]) + '</span>';
+        last = re.lastIndex;
+      }
+      pre.innerHTML = out + esc(src.slice(last));
+    });
+  }
+  paint('pre.cs', new RegExp(
+    '(\\/\\/[^\\n]*)' +
+    '|(\\$?"(?:[^"\\\\\\n]|\\\\.)*"|\'(?:[^\'\\\\\\n]|\\\\.)\')' +
+    '|\\b(\\d+(?:\\.\\d+)?)\\b' +
+    '|\\b(' + KW.join('|') + ')\\b' +
+    '|\\b(' + TY.join('|') + ')\\b', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : m[4] ? 'k' : 't'; });
+  paint('pre.cshtml', new RegExp(
+    '(@\\*[\\s\\S]*?\\*@)' +
+    '|("(?:[^"\\\\\\n]|\\\\.)*")' +
+    '|(<\\/?[a-zA-Z][\\w.-]*|\\/?>)' +
+    '|(@(?:model|foreach|if|else|section|await|using)\\b|@\\{|@\\(|@[A-Za-z_][\\w.?]*(?:\\(\\))?|\\b(?:else|var|in)\\b)', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 't' : 'k'; });
+  paint('pre.sql', new RegExp(
+    '(--[^\\n]*)' +
+    '|(\'[^\'\\n]*\')' +
+    '|\\b(\\d+)\\b' +
+    '|\\b(SELECT|FROM|WHERE|ORDER|BY|GROUP|AS|COUNT|CREATE|TABLE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|INTEGER|TEXT|NOT|NULL|PRIMARY|KEY|LIMIT|AND|LEFT|JOIN|ON|DISTINCT|lower)\\b', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : 'k'; });
+  paint('pre.json', /("(?:[^"\\\n]|\\.)*")(\s*:)?|\b(\d+)\b/g,
+    function(m){ return m[2] ? 't' : m[1] ? 's' : 'n'; });
+  document.querySelectorAll('pre.sh').forEach(function(pre){
+    pre.innerHTML = pre.innerHTML
+      .replace(/^(\s*)(dotnet|cd|curl|sqlite3|cp|copy|ls)\b/gm, '$1<span class="k">$2</span>')
+      .replace(/(#[^\n]*)$/gm, '<span class="c">$1</span>');
+  });
+
+  /* ── Deck ─────────────────────────────────────────────────────────────── */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var deck = document.getElementById('deck');
+  var progress = document.getElementById('progress');
+  var hint = document.getElementById('hint');
+  var total = slides.length, i = 0;
+
+  slides.forEach(function(s, n){
+    var num = s.querySelector('.foot .num');
+    if (num) num.textContent = (n + 1) + ' / ' + total;
+  });
+
+  function show(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-active', k === i); });
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+  function fit(){
+    var vp = window.visualViewport;
+    var vw = vp ? vp.width : window.innerWidth, vh = vp ? vp.height : window.innerHeight;
+    var scale = Math.min(vw / 1280, vh / 720);
+    deck.style.transform = 'translate(' + (vw - 1280 * scale) / 2 + 'px,' + (vh - 720 * scale) / 2 + 'px) scale(' + scale + ')';
+  }
+  function refit(){ requestAnimationFrame(fit); setTimeout(fit, 250); }
+
+  /* ── Solutions: click the cover, or press S on a hint slide ───────────── */
+  document.querySelectorAll('.solution__cover').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      btn.parentElement.classList.add('is-revealed');
+      btn.blur();
+    });
+  });
+  function toggleSolution(){
+    var sol = slides[i].querySelector('.solution');
+    if (sol) sol.classList.toggle('is-revealed');
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+    else if (e.key === 's' || e.key === 'S') { toggleSolution(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+
+  var tx = null, ty = null;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) { tx = null; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    tx = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(dx < 0 ? i + 1 : i - 1);
+  }, { passive: true });
+
+  window.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+  window.addEventListener('hashchange', function(){ show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+
+  fit();
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  setTimeout(function(){ hint.classList.add('is-hidden'); }, 4000);
+})();
+</script>
+</body>
+</html>

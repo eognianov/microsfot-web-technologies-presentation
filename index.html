@@ -109,6 +109,26 @@ main{max-width:1120px;margin:0 auto;padding:var(--space-12) var(--space-10) var(
 }
 .deck .open::after{content:" \2192"}
 
+/* ── Sections ─────────────────────────────────────────────────────────── */
+.section-head{
+  display:flex;align-items:baseline;gap:var(--space-4);
+  margin:0 0 var(--space-6);padding-bottom:var(--space-3);
+  border-bottom:1px solid var(--border-default);
+}
+.section-head h2{
+  margin:0;font-family:var(--font-sans);
+  font-size:var(--fs-title-2);line-height:var(--lh-title-2);font-weight:var(--fw-title-2);
+}
+.section-head p{margin:0;font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--text-secondary)}
+.section + .section{margin-top:var(--space-16)}
+
+/* ── Exercise cards: the teal "lab" accent of the exercise decks ──────── */
+.ex{--lab-shade-10:#025c5f;--lab-base:#038387;--lab-tint-20:#a6dfe1;--lab-tint-40:#ebf8f8;border-left:4px solid var(--lab-base)}
+.ex:hover,.ex:focus-visible{border-color:var(--lab-tint-20);border-left-color:var(--lab-base)}
+.ex .no{background:var(--lab-tint-40);color:var(--lab-shade-10)}
+.ex .open{color:var(--lab-shade-10)}
+.ex .meta{margin:0;font-size:var(--fs-body);line-height:var(--lh-body);color:var(--text-secondary)}
+
 @media print{
   body{background:var(--neutral-white)}
   .masthead{background:none;color:var(--text-primary);padding:var(--space-10) 0}
@@ -127,13 +147,15 @@ main{max-width:1120px;margin:0 auto;padding:var(--space-12) var(--space-10) var(
     <p class="eyebrow">Microsoft Web Technologies</p>
     <h1>Course decks</h1>
     <div class="rule"></div>
-    <p class="lead">Ten sessions, the course intro, and the project template. Each deck is a self-contained
+    <p class="lead">Ten sessions, the course intro, the project template, and the exercise sets. Each deck is a self-contained
       slideshow — arrow keys or click to navigate, <strong>F</strong> for fullscreen,
       <strong>P</strong> to print.</p>
   </div>
 </header>
 
 <main>
+  <section class="section">
+  <div class="section-head"><h2>Lectures</h2><p>One deck per session</p></div>
   <div class="grid">
     <a class="deck" href="presentations/slides/00-course-intro.html">
       <span class="no">00</span>
@@ -196,6 +218,43 @@ main{max-width:1120px;margin:0 auto;padding:var(--space-12) var(--space-10) var(
       <span class="open">Open deck</span>
     </a>
   </div>
+  </section>
+
+  <section class="section">
+  <div class="section-head"><h2>Exercises</h2><p>One set after every two lectures · builds the RecipeBox project</p></div>
+  <div class="grid">
+    <a class="deck ex" href="presentations/slides/ex01-http-and-csharp-basics.html">
+      <span class="no">EX 01</span>
+      <h2>HTTP and C# basics</h2>
+      <p class="meta">After decks 01–02 · 13 tasks · 2 hours</p>
+      <span class="open">Open exercises</span>
+    </a>
+    <a class="deck ex" href="presentations/slides/ex02-controllers-and-routing.html">
+      <span class="no">EX 02</span>
+      <h2>Controllers and routing</h2>
+      <p class="meta">After decks 03–04 · 10 tasks · 2 hours</p>
+      <span class="open">Open exercises</span>
+    </a>
+    <a class="deck ex" href="presentations/slides/ex03-views-layouts-and-bootstrap.html">
+      <span class="no">EX 03</span>
+      <h2>Views, layouts and Bootstrap</h2>
+      <p class="meta">After decks 05–06 · 10 tasks · 2 hours</p>
+      <span class="open">Open exercises</span>
+    </a>
+    <a class="deck ex" href="presentations/slides/ex04-database-and-ef-core.html">
+      <span class="no">EX 04</span>
+      <h2>Database and EF Core</h2>
+      <p class="meta">After decks 07–08 · 12 tasks · 2 hours</p>
+      <span class="open">Open exercises</span>
+    </a>
+    <a class="deck ex" href="presentations/slides/ex05-crud-debugging-and-deployment.html">
+      <span class="no">EX 05</span>
+      <h2>CRUD, debugging and deployment</h2>
+      <p class="meta">After decks 09–10 · 11 tasks · 2 hours</p>
+      <span class="open">Open exercises</span>
+    </a>
+  </div>
+  </section>
 </main>
 
 </body>

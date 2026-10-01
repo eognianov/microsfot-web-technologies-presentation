@@ -1,0 +1,1338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Exercises 5 — CRUD, debugging and deployment</title>
+<meta name="description" content="Exercise set 5 for decks 09–10: eleven tasks that make RecipeBox writable, then debug, log, harden and publish it.">
+<link rel="canonical" href="https://ms-web.eognyanov.com/presentations/slides/ex05-crud-debugging-and-deployment.html">
+<link rel="icon" type="image/svg+xml" href="../../design-system/components/images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../../design-system/components/images/favicon-32.png">
+<link rel="apple-touch-icon" href="../../design-system/components/images/apple-touch-icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Microsoft Web Technologies">
+<meta property="og:title" content="Exercises 5 — CRUD, debugging and deployment">
+<meta property="og:description" content="Exercise set 5 for decks 09–10: eleven tasks that make RecipeBox writable, then debug, log, harden and publish it.">
+<meta property="og:url" content="https://ms-web.eognyanov.com/presentations/slides/ex05-crud-debugging-and-deployment.html">
+<meta property="og:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
+<link rel="stylesheet" href="../../design-system/styles.css">
+<style>
+/* ── Exercise-deck extensions ──────────────────────────────────────────────
+   Same stage, scale and type tokens as the lecture decks, so the two read as
+   one course. What differs is deliberate, so an exercise deck is recognisable
+   at a glance on the projector:
+     · a teal "lab" accent replaces brand blue on block slides and accents
+       (Fluent shared-colour teal — the design system has no second hue);
+     · every task and hint slide carries a left rail with the task number —
+       teal for the brief, amber for the hints;
+     · solutions sit behind a click-to-reveal cover. */
+:root{
+  --stage-w:1280px; --stage-h:720px;
+  --fs-slide-body:20px;  --lh-slide-body:30px;
+  --fs-slide-lead:24px;  --lh-slide-lead:34px;
+  --fs-slide-sm:16px;    --lh-slide-sm:24px;
+  --fs-slide-code:14px;  --lh-slide-code:21px;
+
+  --lab-shade-30:#012b2c; --lab-shade-20:#024345; --lab-shade-10:#025c5f;
+  --lab-base:#038387;     --lab-tint-10:#2aa0a4;
+  --lab-tint-20:#a6dfe1;  --lab-tint-30:#cdeeef;  --lab-tint-40:#ebf8f8;
+
+  --rail-w:88px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--neutral-grey-160);font-family:var(--font-sans-text);color:var(--text-primary);overflow:hidden}
+
+/* ── Stage ─────────────────────────────────────────────────────────────── */
+#stage{position:fixed;inset:0;overflow:hidden}
+#deck{width:var(--stage-w);height:var(--stage-h);position:absolute;top:0;left:0;transform-origin:0 0}
+.slide{
+  position:absolute;inset:0;width:var(--stage-w);height:var(--stage-h);
+  background:var(--surface-page);
+  display:none;flex-direction:column;
+  padding:var(--space-12) var(--space-16) var(--space-8);
+  overflow:hidden;
+}
+.slide.is-active{display:flex}
+
+/* ── Rail ──────────────────────────────────────────────────────────────── */
+.slide--rail{padding-left:calc(var(--rail-w) + var(--space-12))}
+.rail{
+  position:absolute;left:0;top:0;bottom:0;width:var(--rail-w);
+  background:var(--lab-base);color:var(--neutral-white);
+  display:flex;flex-direction:column;align-items:center;
+  padding:var(--space-12) 0 var(--space-8);
+}
+.rail__label{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.rail__no{font-family:var(--font-sans);font-size:44px;line-height:52px;font-weight:600;letter-spacing:-.02em;margin-top:var(--space-1)}
+.rail__part{
+  margin-top:auto;width:36px;height:36px;border-radius:var(--radius-circular);
+  border:2px solid rgba(255,255,255,.5);display:grid;place-items:center;
+  font-family:var(--font-sans);font-size:var(--fs-slide-sm);font-weight:600;
+}
+.rail--hint{background:var(--color-warning-bg);color:var(--color-warning);border-right:1px solid #f0d98a}
+.rail--hint .rail__part{border-color:rgba(157,93,0,.45)}
+.rail--info{background:var(--lab-shade-20)}
+
+/* ── Slide chrome ──────────────────────────────────────────────────────── */
+.head{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)}
+.eyebrow{
+  margin:0;font-size:var(--fs-body-sm);line-height:var(--lh-body-sm);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--lab-shade-10);
+}
+.slide--hint .eyebrow{color:var(--color-warning)}
+h1,h2,h3{margin:0;font-family:var(--font-sans);color:var(--text-primary)}
+h1{font-size:var(--fs-display);line-height:var(--lh-display);font-weight:var(--fw-display);letter-spacing:-.02em}
+h2{font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:var(--fw-title-1);letter-spacing:-.01em}
+h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:var(--fw-title-3)}
+.slide--hint h2{font-size:var(--fs-title-2);line-height:var(--lh-title-2)}
+.rule{width:56px;height:3px;background:var(--lab-base);border-radius:var(--radius-pill);margin:var(--space-4) 0 var(--space-5)}
+.slide--hint .rule{background:var(--color-warning)}
+.body{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body)}
+.lead{margin:0;font-size:var(--fs-slide-lead);line-height:var(--lh-slide-lead);color:var(--text-secondary)}
+.goal{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);color:var(--text-secondary)}
+.muted{color:var(--text-secondary)}
+.sm{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+strong{font-weight:600}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--space-5)}
+
+.foot{
+  display:flex;align-items:center;gap:var(--space-4);
+  padding-top:var(--space-4);margin-top:auto;border-top:1px solid var(--border-default);
+  font-size:var(--fs-caption);line-height:var(--lh-caption);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-disabled);
+}
+.foot .spacer{flex:1}
+
+/* ── Block slides (teal, not brand blue) ───────────────────────────────── */
+.slide--lab{background:var(--lab-base);color:var(--neutral-white);justify-content:center}
+.slide--lab h1,.slide--lab h2{color:var(--neutral-white)}
+.slide--lab .eyebrow{color:var(--lab-tint-30)}
+.slide--lab .lead{color:var(--lab-tint-30)}
+.slide--lab .rule{background:var(--neutral-white)}
+.slide--lab .foot{border-top-color:rgba(255,255,255,.28);color:var(--lab-tint-30)}
+.slide--part{background:var(--lab-shade-20)}
+.slide--part .eyebrow{color:var(--lab-tint-20)}
+.part-letter{font-family:var(--font-sans);font-size:140px;line-height:1;font-weight:600;color:rgba(255,255,255,.2);margin-bottom:var(--space-4)}
+.stats{display:flex;gap:var(--space-3);margin-top:var(--space-8)}
+.stat{
+  border:1px solid rgba(255,255,255,.4);border-radius:var(--radius-pill);
+  padding:var(--space-2) var(--space-5);font-size:var(--fs-slide-sm);font-weight:600;color:var(--neutral-white);
+}
+.slide--lab code.inline{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:var(--neutral-white)}
+
+/* ── Layout ────────────────────────────────────────────────────────────── */
+.cols{display:grid;gap:var(--space-6);flex:1;min-height:0}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-task{grid-template-columns:1.25fr 1fr}
+.cols-task > .card{align-self:start}
+.cols-hint{grid-template-columns:1fr 2fr}
+.cols--auto{flex:0 0 auto;min-height:auto}
+.stack{display:flex;flex-direction:column;gap:var(--space-4);min-height:0}
+
+/* ── Cards, badges ─────────────────────────────────────────────────────── */
+.card{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  display:flex;flex-direction:column;gap:var(--space-2);
+}
+.card h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3)}
+.card p{margin:0;font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--text-secondary)}
+.card--lab{background:var(--lab-tint-40);border-color:var(--lab-tint-20)}
+.card--hint{background:var(--color-warning-bg);border-color:#f0d98a}
+.badge{
+  display:inline-flex;align-items:center;align-self:flex-start;height:24px;padding:0 var(--space-3);
+  border-radius:var(--radius-pill);font-size:var(--fs-body-sm);font-weight:600;white-space:nowrap;
+  background:var(--lab-tint-40);color:var(--lab-shade-10);border:1px solid var(--lab-tint-20);
+}
+.badge--time{background:var(--surface-card);color:var(--text-secondary);border-color:var(--border-strong)}
+.badge--opt{background:var(--surface-subtle);color:var(--text-secondary);border-color:var(--border-default)}
+.badge--warn{background:var(--color-warning-bg);color:var(--color-warning);border-color:#f0d98a}
+
+/* ── Lists ─────────────────────────────────────────────────────────────── */
+ul.list,ol.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.list li,ol.list li{position:relative;padding-left:var(--space-8);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+ul.list li::before{content:"";position:absolute;left:var(--space-2);top:8px;width:8px;height:8px;border-radius:var(--radius-circular);background:var(--lab-base)}
+ol.list{counter-reset:step}
+ol.list li{counter-increment:step;padding-left:var(--space-10)}
+ol.list li::before{
+  content:counter(step);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:var(--radius-sm);
+  background:var(--lab-base);color:var(--neutral-white);
+  font-family:var(--font-sans);font-size:var(--fs-body-sm);font-weight:600;display:grid;place-items:center;
+}
+.list--body li{font-size:18px;line-height:28px}
+ul.check{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.check li{position:relative;padding-left:var(--space-8);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+ul.check li::before{
+  content:"";position:absolute;left:0;top:3px;width:16px;height:16px;
+  border:2px solid var(--lab-base);border-radius:var(--radius-sm);background:var(--surface-card);
+}
+ul.hints{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.hints li{
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+  background:var(--surface-card);border:1px solid var(--border-default);border-left:3px solid var(--color-warning);
+  border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);
+}
+.hints--row{flex-direction:row!important}
+.hints--row li{flex:1}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+table{
+  width:100%;border-collapse:collapse;background:var(--surface-card);
+  border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+}
+thead th{
+  text-align:left;background:var(--surface-subtle);color:var(--text-secondary);font-weight:600;
+  font-size:var(--fs-body-sm);letter-spacing:.06em;text-transform:uppercase;
+  padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--border-default);
+}
+tbody td,tbody th{padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--border-default);vertical-align:top;text-align:left}
+tbody th{font-weight:600}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td,tr.total th{background:var(--lab-tint-40);font-weight:600}
+table.dense{font-size:14px;line-height:20px}
+
+/* ── Code ──────────────────────────────────────────────────────────────── */
+pre,code{font-family:var(--font-mono)}
+pre{
+  margin:0;background:var(--neutral-grey-190);color:#e6e6e6;
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  font-size:var(--fs-slide-code);line-height:var(--lh-slide-code);
+  overflow:hidden;white-space:pre;
+}
+pre.xs{font-size:13px;line-height:19px}
+pre.out{background:var(--lab-shade-30);color:var(--lab-tint-30)}
+pre .k{color:#5fd0d4}
+pre .t{color:#9fd7ff}
+pre .s{color:#f0b77a}
+pre .n{color:#c3e88d}
+pre .c{color:var(--neutral-grey-90)}
+pre .p{color:var(--neutral-white);font-weight:600}
+.file{font-family:var(--font-mono);font-size:var(--fs-body-sm);color:var(--text-secondary);margin:0 0 var(--space-1)}
+code.inline{
+  background:var(--surface-subtle);border:1px solid var(--border-default);
+  border-radius:var(--radius-sm);padding:0 5px;font-size:.92em;color:var(--lab-shade-10);
+}
+
+/* ── Callout ───────────────────────────────────────────────────────────── */
+.callout{
+  background:var(--lab-tint-40);border:1px solid var(--lab-tint-20);border-radius:var(--radius-lg);
+  padding:var(--space-3) var(--space-5);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--lab-shade-20);
+}
+.callout--warn{background:var(--color-warning-bg);border-color:#f0d98a;color:var(--color-warning)}
+
+/* ── Solution: blurred until revealed ──────────────────────────────────── */
+.solution{position:relative;border-radius:var(--radius-lg);min-height:0;align-self:start;width:100%}
+.solution__body{display:flex;flex-direction:column;gap:var(--space-3);filter:blur(7px);transition:filter var(--duration-slow) var(--ease-standard)}
+.solution__cover{
+  position:absolute;inset:0;z-index:1;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);
+  background:rgba(1,43,44,.72);border:2px dashed var(--lab-tint-10);border-radius:var(--radius-lg);
+  color:var(--neutral-white);font:inherit;
+  transition:opacity var(--duration-slow) var(--ease-standard);
+}
+.solution__cover:hover{background:rgba(1,43,44,.82)}
+.solution__cover:focus-visible{outline:3px solid var(--lab-tint-20);outline-offset:2px}
+.solution__label{font-family:var(--font-sans);font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:600}
+.solution__key{font-size:var(--fs-body-sm);letter-spacing:.08em;text-transform:uppercase;color:var(--lab-tint-20)}
+.solution.is-revealed .solution__body{filter:none}
+.solution.is-revealed .solution__cover{opacity:0;pointer-events:none}
+.duo{display:grid;grid-template-columns:auto auto;justify-content:start;gap:var(--space-3)}
+.duo pre{font-size:12px;line-height:19px;padding:14px}
+
+/* ── Slide-type legend (how-to slide) ──────────────────────────────────── */
+.mini{position:relative;height:96px;border-radius:var(--radius-md);background:var(--surface-page);border:1px solid var(--border-default);overflow:hidden;margin-bottom:var(--space-2)}
+.mini::before{content:"";position:absolute;left:0;top:0;bottom:0;width:22px;background:var(--lab-base)}
+.mini--hint::before{background:var(--color-warning-bg);border-right:1px solid #f0d98a}
+.mini span{position:absolute;left:34px;right:12px;height:8px;border-radius:4px;background:var(--neutral-grey-40)}
+.mini .m1{top:16px;width:40%;background:var(--neutral-grey-60)}
+.mini .m2{top:34px;width:62%}
+.mini .m3{top:52px;width:50%}
+.mini .m4{top:70px;width:56%}
+.mini .blur{left:auto;right:12px;top:16px;width:52%;height:66px;background:var(--neutral-grey-190);border:2px dashed var(--lab-tint-10)}
+
+/* ── Progress, hint, home ──────────────────────────────────────────────── */
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--lab-tint-10);width:0;transition:width var(--duration-normal) var(--ease-standard);z-index:10}
+#hint{position:fixed;right:16px;bottom:14px;z-index:10;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);transition:opacity var(--duration-slow) var(--ease-standard)}
+#hint.is-hidden{opacity:0}
+#home{position:fixed;left:16px;bottom:14px;z-index:10;display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home img{width:14px;height:14px;border-radius:3px;display:block}
+#home:hover,#home:focus-visible{opacity:1;outline:none}
+
+/* ── Print / PDF: one slide per page, every solution shown ─────────────── */
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:var(--neutral-white);overflow:visible}
+  #stage{position:static;display:block;overflow:visible}
+  #deck{position:static;width:auto;height:auto;transform:none!important}
+  #progress,#hint,#home{display:none}
+  .slide{position:relative;display:flex!important;page-break-after:always;break-after:page}
+  .solution__body{filter:none!important}
+  .solution__cover{display:none!important}
+}
+
+/* ── Additions for sets 2–5: wider solution columns, tighter code ─────── */
+.cols-hint--wide{grid-template-columns:.8fr 2.2fr}
+.cols-hint--full{grid-template-columns:1fr}
+.solution pre + pre{margin-top:0}
+pre.tight{padding:var(--space-3) var(--space-4)}
+table.cmp td,table.cmp th{padding:6px var(--space-3)}
+td.num{white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage"><div id="deck">
+
+
+<!-- 1 ─ Title -->
+<section class="slide slide--lab">
+  <p class="eyebrow">Microsoft Web Technologies · Exercises · Set 5 of 5</p>
+  <h1 style="margin-top:var(--space-3)">CRUD, debugging and deployment</h1>
+  <div class="rule"></div>
+  <p class="lead">Make RecipeBox writable — forms, validation, Edit and Delete —<br>then treat it like software that ships.</p>
+  <div class="stats"><span class="stat">Covers decks 09–10</span><span class="stat">11 tasks</span><span class="stat">2 hours</span></div>
+  <div class="foot" style="margin-top:var(--space-12)"><span>Exercises · RecipeBox</span><span class="spacer"></span><span>← → navigate · S reveals a solution</span></div>
+</section>
+
+<!-- 2 ─ How this works -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">05</span></div>
+  <div class="head"><p class="eyebrow">How this set works</p></div>
+  <h2>Every task is two slides</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3 cols--auto">
+      <div class="card">
+        <div class="mini"><span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span></div>
+        <span class="badge">Teal rail</span>
+        <h3>The task</h3>
+        <p>The goal, the steps, and a <strong>Done when</strong> checklist. When every box is ticked, the task is finished.</p>
+      </div>
+      <div class="card">
+        <div class="mini mini--hint"><span class="m1" style="width:22%"></span><span class="m2" style="width:26%"></span><span class="m3" style="width:20%"></span><span class="blur"></span></div>
+        <span class="badge badge--warn">Amber rail</span>
+        <h3>The hints</h3>
+        <p>Read them when stuck. They point to the trap, not to the answer.</p>
+      </div>
+      <div class="card card--lab">
+        <div class="mini mini--hint" style="background:var(--surface-card)"><span class="m1" style="width:22%"></span><span class="m2" style="width:26%"></span><span class="m3" style="width:20%"></span><span class="blur" style="background:var(--neutral-grey-160);border-style:solid"></span></div>
+        <span class="badge">Click, or press S</span>
+        <h3>The solution</h3>
+        <p>Blurred on the hint slide until revealed. Compare it with your own after the task is done.</p>
+      </div>
+    </div>
+    <div class="cols cols-2 cols--auto">
+      <div class="callout">Ingredients go in a <code class="inline">&lt;textarea&gt;</code>, one per line. The actions receive it as a separate <code class="inline">string? ingredientsText</code> and split it into the list.</div>
+      <div class="callout callout--warn">Task 7 is <strong>optional</strong> and works on a <strong>copy</strong> of the project. Nothing later depends on it.</div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 3 ─ Time budget -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">05</span></div>
+  <div class="head"><p class="eyebrow">Time budget</p></div>
+  <h2>Eleven tasks, two hours</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <table class="dense" style="align-self:start"><thead><tr><th style="width:34px">#</th><th>Task</th><th class="num">Min</th></tr></thead><tbody><tr><td>1</td><td>Build a Create form with tag helpers</td><td class="num">15</td></tr><tr><td>2</td><td>Validate on the server and show the errors</td><td class="num">12</td></tr><tr><td>3</td><td>Redirect after POST (POST/Redirect/GET)</td><td class="num">6</td></tr><tr><td>4</td><td>Add the anti-forgery check and prove it works</td><td class="num">6</td></tr><tr><td>5</td><td>Build the Edit action pair</td><td class="num">14</td></tr><tr><td>6</td><td>Build Delete with a confirmation page</td><td class="num">10</td></tr></tbody></table>
+      <table class="dense" style="align-self:start"><thead><tr><th style="width:34px">#</th><th>Task</th><th class="num">Min</th></tr></thead><tbody><tr><td>7</td><td>Scaffold a controller and compare it with ours <span class="badge badge--opt">optional</span></td><td class="num">12</td></tr><tr><td>8</td><td>Use breakpoints to find a planted bug</td><td class="num">12</td></tr><tr><td>9</td><td>Add a custom error page for production</td><td class="num">12</td></tr><tr><td>10</td><td>Log recipe creation with <code class="inline">ILogger</code></td><td class="num">6</td></tr><tr><td>11</td><td>Publish the app to a folder and run it</td><td class="num">15</td></tr><tr class="total"><td></td><td>Total · without optional task</td><td class="num">120 · 108</td></tr></tbody></table>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 4 ─ The project -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">05</span></div>
+  <div class="head"><p class="eyebrow">The project</p></div>
+  <h2>Writable, then shippable</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <pre style="font-size:15px;line-height:24px;align-self:start">RecipeBox/
+├── Controllers/
+│   ├── HomeController.cs   <span class="c"># + HttpStatus, T9</span>
+│   └── RecipesController.cs
+├── Program.cs              <span class="c"># error pages, T9</span>
+└── Views/
+    ├── Home/<span class="p">HttpStatus.cshtml</span>
+    └── Recipes/
+        ├── <span class="p">Create.cshtml</span>       <span class="c"># T1</span>
+        ├── <span class="p">Edit.cshtml</span>         <span class="c"># T5</span>
+        ├── <span class="p">Delete.cshtml</span>       <span class="c"># T6</span>
+        └── <span class="p">_RecipeFields.cshtml</span>
+<span class="p">../publish/</span>                 <span class="c"># T11, next to it</span></pre>
+      <div class="stack">
+        <div class="card">
+          <span class="badge badge--opt">Starts from</span>
+          <h3>The end of Set 4</h3>
+          <p>RecipeBox reads five recipes from <code class="inline">recipebox.db</code>. The Category bonus is not required; if you did it, everything here still works.</p>
+        </div>
+        <div class="card card--lab">
+          <span class="badge">Ends with</span>
+          <h3>A small app, ready to ship</h3>
+          <p>Create, edit and delete, validated and CSRF-safe; a friendly production error page; structured logs; a published build that runs on its own.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 5 ─ Part A -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">A</div>
+  <p class="eyebrow">Part A · Tasks 1–7 · about 75 min</p>
+  <h2>Forms and CRUD</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Two requests per change: a GET that shows the form, a POST that receives it. Trust nothing that arrives.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 6 ─ T1 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">01</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 1 · Tag helpers</p><span class="badge badge--time">15 min</span></div>
+  <h2>Build a Create form with tag helpers</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A form generated from the model, so the rules from Set 4 shape it without us repeating them.</p>
+        <ol class="list list--body"><li><code class="inline">Create()</code> at <code class="inline">GET /recipes/create</code> returns <code class="inline">View(new Recipe())</code>.</li><li><code class="inline">Create.cshtml</code>: for Title, Cuisine, PrepMinutes, CookMinutes, Servings, Difficulty — <code class="inline">&lt;label asp-for&gt;</code>, <code class="inline">&lt;input asp-for&gt;</code>, <code class="inline">&lt;span asp-validation-for&gt;</code>.</li><li>A <code class="inline">&lt;textarea name="ingredientsText"&gt;</code> and a <strong>Save</strong> button. A <strong>New recipe</strong> button on the list.</li><li>Open the form, view source, then click <strong>Save</strong>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Six labelled fields, a textarea and a button.</li><li>Labels read <code class="inline">Prep minutes</code>, <code class="inline">Cook minutes</code>: the <code class="inline">[Display]</code> names.</li><li>In the source, Title has <code class="inline">maxlength="100"</code>; the numbers have <code class="inline">type="number"</code>.</li><li><strong>Save</strong> returns <strong>405 Method Not Allowed</strong>: no POST action yet.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 7 ─ T1 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">01</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 1 · Hints and solution</p></div>
+  <h2>Build a Create form with tag helpers</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">asp-for</code> writes <code class="inline">name</code>, <code class="inline">id</code>, <code class="inline">value</code>, <code class="inline">type</code>, <code class="inline">maxlength</code> and <code class="inline">data-val-*</code>, all from the model.</li><li><code class="inline">new Recipe()</code>, not <code class="inline">View()</code>: the textarea reads <code class="inline">Model.Ingredients</code>.</li><li>405: "I know this URL, but not with this method".</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">[HttpGet("create")]
+public IActionResult Create() =&gt; View(new Recipe());</pre><pre class="cshtml xs">@model RecipeBox.Models.Recipe
+&lt;h1&gt;New recipe&lt;/h1&gt;
+
+&lt;form asp-action="Create" method="post"&gt;
+    &lt;div asp-validation-summary="ModelOnly" class="text-danger"&gt;&lt;/div&gt;
+    &lt;div class="mb-3"&gt;
+        &lt;label asp-for="Title" class="form-label"&gt;&lt;/label&gt;
+        &lt;input asp-for="Title" class="form-control" /&gt;
+        &lt;span asp-validation-for="Title" class="text-danger"&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    @* … the same for Cuisine, PrepMinutes, CookMinutes, Servings, Difficulty … *@
+    &lt;div class="mb-3"&gt;
+        &lt;label for="ingredientsText" class="form-label"&gt;Ingredients, one per line&lt;/label&gt;
+        &lt;textarea id="ingredientsText" name="ingredientsText" class="form-control"
+                  rows="5"&gt;@string.Join("\n", Model.Ingredients)&lt;/textarea&gt;
+    &lt;/div&gt;
+    &lt;button type="submit" class="btn btn-primary"&gt;Save&lt;/button&gt;
+    &lt;a asp-action="Index" class="btn btn-link"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 8 ─ T2 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · Validation</p><span class="badge badge--time">12 min</span></div>
+  <h2>Validate on the server and show the errors</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Never trust what the browser sends. Check on the server; hand the input back with the errors.</p>
+        <ol class="list list--body"><li><code class="inline">POST /recipes/create</code>: bind a <code class="inline">Recipe</code> limited to the six fields with <code class="inline">[Bind]</code>, plus <code class="inline">string? ingredientsText</code>.</li><li>Split the text into <code class="inline">recipe.Ingredients</code>. Add two rules: at least one ingredient; no duplicate title.</li><li>Invalid → <code class="inline">View(recipe)</code>. Valid → save, and for now <code class="inline">return View("Details", recipe)</code>.</li><li>Try an empty form, then Banitsa · Bulgarian · 20 · 40 · 6 · 2. Then add the validation scripts.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Empty title → <code class="inline">The Title field is required.</code>; Servings 0 → the range message.</li><li>No ingredients → <code class="inline">Add at least one ingredient, one per line.</code> at the top.</li><li>Title <code class="inline">Pancakes</code> → <code class="inline">A recipe with this title already exists.</code></li><li>After an error, everything typed is still there. With the scripts, errors show <strong>before</strong> sending.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 9 ─ T2 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · Hints and solution</p></div>
+  <h2>Validate on the server and show the errors</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">[Bind]</code> leaves out <code class="inline">Id</code>: nobody can post <code class="inline">Id=1</code> and overwrite recipe 1.</li><li><code class="inline">Split('\n', RemoveEmptyEntries | TrimEntries)</code> drops blank lines and the <code class="inline">\r</code>.</li><li><code class="inline">AddModelError("", …)</code> → the summary; <code class="inline">AddModelError(nameof(Recipe.Title), …)</code> → the field.</li><li>Scripts: <code class="inline">@section Scripts { &lt;partial name="_ValidationScriptsPartial" /&gt; }</code>.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">[HttpPost("create")]
+public async Task&lt;IActionResult&gt; Create(
+    [Bind("Title,Cuisine,PrepMinutes,CookMinutes,Servings,Difficulty")]
+    Recipe recipe,
+    string? ingredientsText)
+{
+    recipe.Ingredients = ParseIngredients(ingredientsText);
+
+    if (recipe.Ingredients.Count == 0)
+        ModelState.AddModelError("", "Add at least one ingredient, one per line.");
+
+    if (await _context.Recipes.AnyAsync(r =&gt; r.Title == recipe.Title))
+        ModelState.AddModelError(nameof(Recipe.Title),
+                                 "A recipe with this title already exists.");
+
+    if (!ModelState.IsValid)
+        return View(recipe);
+
+    _context.Recipes.Add(recipe);
+    await _context.SaveChangesAsync();
+
+    return View("Details", recipe);      // temporary: Task 3 replaces it
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 10 ─ T2 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · Solution, continued</p></div>
+  <h2>Validate on the server and show the errors</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">private static List&lt;string&gt; ParseIngredients(string? text)
+    =&gt; (text ?? "")
+        .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .ToList();</pre><p class="file" style="margin:0">Views/Recipes/Create.cshtml, at the end</p><pre class="cshtml">@section Scripts {
+    &lt;partial name="_ValidationScriptsPartial" /&gt;
+}</pre><pre class="out">empty form        The Title field is required.
+                  The field Servings must be between 1 and 20.
+                  Add at least one ingredient, one per line.
+Title "Pancakes"  A recipe with this title already exists.
+Banitsa           <span class="p">saved</span>, four ingredients</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 11 ─ T3 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">03</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 3 · POST/Redirect/GET</p><span class="badge badge--time">6 min</span></div>
+  <h2>Redirect after POST (POST/Redirect/GET)</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A page the user can reload, bookmark and share after saving.</p>
+        <ol class="list list--body"><li>Create a recipe, then press <strong>F5</strong> on the page Task 2 shows. Read what the browser asks. Confirm.</li><li>Replace <code class="inline">return View("Details", recipe);</code> with a redirect to the new recipe's page.</li><li>Create another and press <strong>F5</strong> again.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Before: F5 resubmits the POST. Only our duplicate-title rule stops a second copy.</li><li>After: we land on <code class="inline">/recipes/{new id}</code>, and F5 just reloads it.</li><li>DevTools: <strong>POST · 302</strong>, then <strong>GET · 200</strong>.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 12 ─ T3 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">03</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 3 · Hints and solution</p></div>
+  <h2>Redirect after POST (POST/Redirect/GET)</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">RedirectToAction(nameof(Details), new { id = recipe.Id })</code></li><li><code class="inline">nameof</code> turns a renamed action into a compile error, not a broken link.</li><li><code class="inline">recipe.Id</code> is set by the database during <code class="inline">SaveChangesAsync</code>.</li><li>Tick <strong>Preserve log</strong>, or the 302 disappears.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">_context.Recipes.Add(recipe);
+await _context.SaveChangesAsync();
+
+return RedirectToAction(nameof(Details), new { id = recipe.Id });</pre><pre class="out">POST /recipes/create    <span class="p">302 Found</span>    Location: /recipes/6
+GET  /recipes/6         <span class="p">200 OK</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 13 ─ T4 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">04</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 4 · CSRF</p><span class="badge badge--time">6 min</span></div>
+  <h2>Add the anti-forgery check and prove it works</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">See the token the form already carries, and make the server insist on it.</p>
+        <ol class="list list--body"><li>View source of <code class="inline">/recipes/create</code>; find <code class="inline">__RequestVerificationToken</code>.</li><li>In DevTools <strong>Elements</strong>, delete that hidden <code class="inline">&lt;input&gt;</code>, fill in a valid recipe, save.</li><li>Add <code class="inline">[ValidateAntiForgeryToken]</code> to the POST action.</li><li>Repeat step 2.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>The source has <code class="inline">&lt;input name="__RequestVerificationToken" type="hidden" …&gt;</code>.</li><li>Without the attribute, the tokenless form still saves.</li><li>With it, the same submission → <strong>400 Bad Request</strong>, nothing saved.</li><li>A normal submission still saves.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 14 ─ T4 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">04</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 4 · Hints and solution</p></div>
+  <h2>Add the anti-forgery check and prove it works</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>A <code class="inline">&lt;form method="post"&gt;</code> with tag helpers adds the token by itself. Checking it is our job.</li><li>The rule from now on: <strong>every</strong> POST that changes data gets the attribute.</li><li>400: a bad request — here, one that could have come from another site.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">[HttpPost("create")]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; Create(
+    [Bind("Title,Cuisine,PrepMinutes,CookMinutes,Servings,Difficulty")]
+    Recipe recipe,
+    string? ingredientsText)</pre><pre class="out">token removed, no attribute     →  302, <span class="p">saved</span>
+token removed, with attribute   →  <span class="p">400 Bad Request</span>, not saved</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 15 ─ T5 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">05</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Edit</p><span class="badge badge--time">14 min</span></div>
+  <h2>Build the Edit action pair</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">The same two-request dance as Create, starting from a filled-in form.</p>
+        <ol class="list list--body"><li>Move the fields of <code class="inline">Create.cshtml</code> into <code class="inline">Views/Recipes/_RecipeFields.cshtml</code>.</li><li><code class="inline">GET /recipes/{id}/edit</code>: find the recipe or 404, show it.</li><li><code class="inline">POST /recipes/{id}/edit</code>: bind the fields <strong>plus</strong> <code class="inline">Id</code>, check the ids match, parse, validate, update, save, redirect.</li><li><code class="inline">Edit.cshtml</code>: a hidden <code class="inline">Id</code> and the partial. An <strong>Edit</strong> button on details.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/recipes/6/edit</code> is filled in, ingredients one per line.</li><li>Prep 25 → details shows <code class="inline">65 min</code>.</li><li>An empty title shows the same error as on Create.</li><li><code class="inline">/recipes/99/edit</code> → 404.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 16 ─ T5 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">05</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Hints and solution</p></div>
+  <h2>Build the Edit action pair</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">&lt;partial name="_RecipeFields" model="Model" /&gt;</code>, next to the views that use it.</li><li><code class="inline">FindAsync(id)</code> looks up by primary key.</li><li><code class="inline">id != recipe.Id</code> → 400: the URL and the form disagree.</li><li><code class="inline">DbUpdateConcurrencyException</code>: the row vanished while the user typed.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">[HttpGet("{id:int}/edit")]
+public async Task&lt;IActionResult&gt; Edit(int id)
+{
+    var recipe = await _context.Recipes.FindAsync(id);
+    if (recipe is null) return NotFound();
+    return View(recipe);
+}</pre><p class="file" style="margin:0">Views/Recipes/Edit.cshtml</p><pre class="cshtml xs">@model RecipeBox.Models.Recipe
+&lt;h1&gt;Edit recipe&lt;/h1&gt;
+
+&lt;form asp-action="Edit" asp-route-id="@Model.Id" method="post"&gt;
+    &lt;input type="hidden" asp-for="Id" /&gt;
+    &lt;partial name="_RecipeFields" model="Model" /&gt;
+    &lt;button type="submit" class="btn btn-primary"&gt;Save changes&lt;/button&gt;
+    &lt;a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-link"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;
+
+@section Scripts {
+    &lt;partial name="_ValidationScriptsPartial" /&gt;
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 17 ─ T5 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">05</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Solution, continued</p></div>
+  <h2>Build the Edit action pair</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <div class="duo"><pre class="cs">[HttpPost("{id:int}/edit")]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; Edit(
+    int id,
+    [Bind("Id,Title,Cuisine,PrepMinutes,CookMinutes,Servings,Difficulty")]
+    Recipe recipe,
+    string? ingredientsText)
+{
+    if (id != recipe.Id)
+        return BadRequest();
+
+    recipe.Ingredients = ParseIngredients(ingredientsText);
+    if (recipe.Ingredients.Count == 0)
+        ModelState.AddModelError("",
+            "Add at least one ingredient, one per line.");
+
+    if (!ModelState.IsValid)
+        return View(recipe);
+    …</pre><pre class="cs">    …
+    try
+    {
+        _context.Update(recipe);
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!await _context.Recipes.AnyAsync(r =&gt; r.Id == id))
+            return NotFound();
+        throw;
+    }
+
+    return RedirectToAction(nameof(Details), new { id });
+}</pre></div><div class="callout"><code class="inline">_RecipeFields.cshtml</code> holds the validation summary, the six field groups and the textarea, moved unchanged from Task 1. <code class="inline">Create.cshtml</code> keeps only its <code class="inline">&lt;form&gt;</code>, the partial and its buttons.</div>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 18 ─ T6 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">06</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Delete</p><span class="badge badge--time">10 min</span></div>
+  <h2>Build Delete with a confirmation page</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Deleting is two requests: a GET that asks, and a POST that does it.</p>
+        <ol class="list list--body"><li><code class="inline">GET /recipes/{id}/delete</code> shows a confirmation page.</li><li><code class="inline">DeleteConfirmed(int id)</code> at <code class="inline">POST /recipes/{id}/delete</code>, answering to the name <code class="inline">Delete</code>: remove, save, redirect to the list.</li><li><code class="inline">Delete.cshtml</code>: a red alert naming the recipe, a form with a red <strong>Delete</strong> button.</li><li>A <strong>Delete</strong> button on the details page.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/recipes/6/delete</code> names the recipe and its ingredient count, and deletes <strong>nothing</strong>.</li><li><strong>Delete</strong> removes it and lands on <code class="inline">/recipes</code>; <code class="inline">/recipes/6</code> is now 404.</li><li>The POST has <code class="inline">[ValidateAntiForgeryToken]</code>.</li><li>Nothing in the app deletes on a GET.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 19 ─ T6 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">06</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Hints and solution</p></div>
+  <h2>Build Delete with a confirmation page</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li>C# cannot have two <code class="inline">Delete(int id)</code>. <code class="inline">[ActionName("Delete")]</code> lets <code class="inline">DeleteConfirmed</code> answer to the URL.</li><li><code class="inline">btn-danger</code> for the button that destroys data, and only for that.</li><li>A crawler follows links. It never submits a form.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">[HttpGet("{id:int}/delete")]
+public async Task&lt;IActionResult&gt; Delete(int id)
+{
+    var recipe = await _context.Recipes.AsNoTracking().FirstOrDefaultAsync(r =&gt; r.Id == id);
+    if (recipe is null)
+        return NotFound();
+
+    return View(recipe);
+}
+
+[HttpPost("{id:int}/delete"), ActionName("Delete")]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; DeleteConfirmed(int id)
+{
+    var recipe = await _context.Recipes.FindAsync(id);
+    if (recipe is not null)
+    {
+        _context.Recipes.Remove(recipe);
+        await _context.SaveChangesAsync();
+    }
+
+    return RedirectToAction(nameof(Index));
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 20 ─ T6 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">06</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Solution, continued</p></div>
+  <h2>Build Delete with a confirmation page</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <p class="file" style="margin:0">Views/Recipes/Delete.cshtml</p><pre class="cshtml xs">@model RecipeBox.Models.Recipe
+@{
+    ViewData["Title"] = $"Delete {Model.Title}";
+}
+&lt;h1&gt;Delete recipe&lt;/h1&gt;
+
+&lt;div class="alert alert-danger"&gt;
+    Delete &lt;strong&gt;@Model.Title&lt;/strong&gt; and its @Model.Ingredients.Count ingredients?
+    This cannot be undone.
+&lt;/div&gt;
+
+&lt;form asp-action="Delete" asp-route-id="@Model.Id" method="post"&gt;
+    &lt;button type="submit" class="btn btn-danger"&gt;Delete&lt;/button&gt;
+    &lt;a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-link"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;</pre><p class="file" style="margin:0">Views/Recipes/Details.cshtml, at the bottom</p><pre class="cshtml xs">&lt;a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary"&gt;Edit&lt;/a&gt;
+&lt;a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger"&gt;Delete&lt;/a&gt;
+&lt;a asp-action="Index" class="btn btn-link"&gt;Back to all recipes&lt;/a&gt;</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 21 ─ T7 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">07</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Scaffolding</p><span class="badge badge--time">12 min</span><span class="badge badge--opt">Optional</span></div>
+  <h2>Scaffold a controller and compare it with ours</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        
+        <ol class="list list--body"><li>Copy <code class="inline">RecipeBox</code> to <code class="inline">RecipeBoxScaffold</code>, and work in the copy:</li></ol><pre class="sh xs" style="margin-left:var(--space-10)">dotnet tool install --global dotnet-aspnet-codegenerator
+dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet aspnet-codegenerator controller -name RecipesScaffoldController \
+    -m Recipe -dc RecipeBoxContext -dbProvider sqlite \
+    --relativeFolderPath Controllers --useDefaultLayout</pre><ol class="list list--body" style="counter-reset:step 1"><li>Open <code class="inline">RecipesScaffoldController.cs</code> next to ours.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>One controller and five views in <code class="inline">Views/RecipesScaffold/</code>.</li><li>You can point at: the action pairs, <code class="inline">ModelState.IsValid</code>, <code class="inline">[ValidateAntiForgeryToken]</code>, <code class="inline">RedirectToAction</code>, <code class="inline">NotFound()</code>, <code class="inline">[Bind]</code>.</li><li>Three differences that make ours better for RecipeBox.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 22 ─ T7 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">07</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Hints and solution</p></div>
+  <h2>Scaffold a controller and compare it with ours</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li>Visual Studio: right-click <code class="inline">Controllers</code> → Add → New Scaffolded Item.</li><li>Without <code class="inline">-dbProvider sqlite</code>, it asks for the SQL Server package.</li><li>Compare the <code class="inline">[Bind]</code> list, the <code class="inline">Ingredients</code> field, where Create redirects, and which rules it checks.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">// generated
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; Create(
+    [Bind("Id,Title,Cuisine,PrepMinutes,CookMinutes,Servings,Ingredients,Difficulty")]
+    Recipe recipe)
+{
+    if (ModelState.IsValid)
+    {
+        _context.Add(recipe);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+    return View(recipe);
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 23 ─ T7 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">07</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Solution, continued</p></div>
+  <h2>Scaffold a controller and compare it with ours</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <table class="dense cmp"><thead><tr><th></th><th>Scaffolded</th><th>Ours</th></tr></thead><tbody>
+<tr><th>[Bind]</th><td>includes <code class="inline">Id</code></td><td>the six form fields</td></tr>
+<tr><th>Ingredients</th><td>one <code class="inline">&lt;input&gt;</code> for a list</td><td>a textarea, parsed</td></tr>
+<tr><th>Own rules</th><td>none</td><td>ingredients, unique title</td></tr>
+<tr><th>After Create</th><td>the list</td><td>the new recipe's page</td></tr>
+<tr><th>URLs</th><td>/RecipesScaffold/Edit/5</td><td>/recipes/5/edit</td></tr></tbody></table><div class="callout">Scaffolding is a fast first draft: every pattern in it is one we wrote by hand. Delete the copy when done.</div>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 24 ─ Part B -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">B</div>
+  <p class="eyebrow">Part B · Tasks 8–11 · about 45 min</p>
+  <h2>Ship it</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Find a bug by watching, not guessing. Give visitors a friendly error, ourselves a log, and the server a build.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 25 ─ T8 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">08</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 8 · Debugging</p><span class="badge badge--time">12 min</span></div>
+  <h2>Use breakpoints to find a planted bug</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        
+        <ol class="list list--body"><li>Paste this action into <code class="inline">RecipesController</code>. It has one bug.</li></ol><pre class="cs xs" style="margin-left:var(--space-10)">// GET /recipes/2/scale/3
+[HttpGet("{id:int}/scale/{servings:int}")]
+public async Task&lt;IActionResult&gt; Scale(int id, int servings)
+{
+    var recipe = await _context.Recipes.FindAsync(id);
+    if (recipe is null)
+        return NotFound();
+
+    double factor = servings / recipe.Servings;
+    return Content($"{recipe.Title} for {servings}: multiply every amount by {factor}");
+}</pre><ol class="list list--body" style="counter-reset:step 1"><li>Open <code class="inline">/recipes/2/scale/3</code>: Carbonara serves 2, so it should say 1.5.</li><li>Run under the debugger (<code class="inline">F5</code>). Break on <code class="inline">double factor</code>; read <strong>Locals</strong>, step over, read again. Fix it.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Before: <code class="inline">/recipes/2/scale/3</code> says <code class="inline">by 1</code>; <code class="inline">/recipes/1/scale/2</code> says <code class="inline">by 0</code>.</li><li>Paused: <code class="inline">servings = 3</code>, <code class="inline">recipe.Servings = 2</code>. After the step, <code class="inline">factor = 1</code>.</li><li>After the fix: <code class="inline">by 1.5</code> and <code class="inline">by 0.5</code>.</li><li>One sentence naming the bug. We have met it before.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 26 ─ T8 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">08</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 8 · Hints and solution</p></div>
+  <h2>Use breakpoints to find a planted bug</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>Reproduce · find the <strong>first</strong> wrong value · explain · fix · verify.</li><li>Expand <code class="inline">recipe</code> in Locals, or add <code class="inline">recipe.Servings</code> to <strong>Watch</strong>.</li><li><code class="inline">3 / 2</code> with two <code class="inline">int</code>s… Set 1, Task 3.</li><li>Some language settings print <code class="inline">1,5</code>. Same number.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs">double factor = (double)servings / recipe.Servings;</pre><div class="callout">The bug is <strong>integer division</strong>: <code class="inline">int / int</code> throws the remainder away <em>before</em> the result is stored in a <code class="inline">double</code>. <code class="inline">3 / 2</code> is <code class="inline">1</code>; <code class="inline">2 / 4</code> is <code class="inline">0</code>. Converting one side first makes it a <code class="inline">double</code> division.</div><pre class="out">/recipes/2/scale/3   Spaghetti Carbonara for 3: multiply every amount by <span class="p">1.5</span>
+/recipes/1/scale/2   Pancakes for 2: multiply every amount by <span class="p">0.5</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 27 ─ T9 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Error pages</p><span class="badge badge--time">12 min</span></div>
+  <h2>Add a custom error page for production</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Developers see the stack trace; visitors see a friendly page. Both get the right status code.</p>
+        <ol class="list list--body"><li>Add a temporary <code class="inline">[HttpGet("boom")] Boom()</code> that throws. Open <code class="inline">/recipes/boom</code> and <code class="inline">/recipes/99</code>.</li><li><code class="inline">HomeController.HttpStatus(int code)</code> at <code class="inline">/error/{code:int}</code>, with a friendly view for 404 and for the rest.</li><li>In <code class="inline">Program.cs</code>, inside <code class="inline">!IsDevelopment()</code>: exceptions → <code class="inline">/error/500</code>, status codes → <code class="inline">/error/{0}</code>.</li><li>Run <code class="inline">dotnet run -e ASPNETCORE_ENVIRONMENT=Production</code>; open both again, and <code class="inline">/nope</code>. Delete <code class="inline">Boom</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Development: the stack trace for <code class="inline">boom</code>; an empty 404 for <code class="inline">/recipes/99</code>.</li><li>Production: our page with <strong>500</strong> for <code class="inline">boom</code>, <strong>404</strong> for <code class="inline">/recipes/99</code> and <code class="inline">/nope</code>.</li><li>DevTools still reports 500 and 404: friendly page, honest status.</li><li>The console still logs the <code class="inline">boom</code> exception.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 28 ─ T9 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Hints and solution</p></div>
+  <h2>Add a custom error page for production</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">ASPNETCORE_ENVIRONMENT=Production dotnet run</code> does <strong>not</strong> work: the launch profile sets Development and wins. <code class="inline">dotnet run -e</code> overrides it, in every shell.</li><li>Check the console's <code class="inline">Hosting environment:</code> line.</li><li>Not <code class="inline">StatusCode</code>: the controller already has a method by that name.</li><li><em>ReExecute</em> keeps the 404; a redirect would turn it into 302 then 200.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <p class="file" style="margin:0">Program.cs</p><pre class="cs xs">if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/error/500");
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+    app.UseHsts();
+}</pre><p class="file" style="margin:0">Controllers/HomeController.cs</p><pre class="cs xs">[Route("error/{code:int}")]
+public IActionResult HttpStatus(int code)
+{
+    return View(code);
+}</pre><pre class="out xs"><span class="p">$ dotnet run -e ASPNETCORE_ENVIRONMENT=Production</span>
+      Hosting environment: <span class="p">Production</span>
+/recipes/boom   500   Something went wrong on our side.
+/recipes/99     404   We could not find that page.</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 29 ─ T9 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Solution, continued</p></div>
+  <h2>Add a custom error page for production</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <p class="file" style="margin:0">Views/Home/HttpStatus.cshtml</p><pre class="cshtml">@model int
+@{
+    ViewData["Title"] = Model == 404 ? "Not found" : "Something went wrong";
+}
+
+&lt;div class="text-center py-5"&gt;
+    &lt;p class="display-1 fw-bold text-secondary"&gt;@Model&lt;/p&gt;
+    @if (Model == 404)
+    {
+        &lt;h1 class="h3"&gt;We could not find that page.&lt;/h1&gt;
+        &lt;p class="text-muted"&gt;The recipe may have been deleted, or the link is wrong.&lt;/p&gt;
+    }
+    else
+    {
+        &lt;h1 class="h3"&gt;Something went wrong on our side.&lt;/h1&gt;
+        &lt;p class="text-muted"&gt;It has been logged. Please try again in a moment.&lt;/p&gt;
+    }
+    &lt;a asp-controller="Recipes" asp-action="Index" class="btn btn-primary"&gt;Back to the recipes&lt;/a&gt;
+&lt;/div&gt;</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 30 ─ T10 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">10</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 10 · Logging</p><span class="badge badge--time">6 min</span></div>
+  <h2>Log recipe creation with <code class="inline" style="font-size:.8em">ILogger</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Leave a searchable record of what the app changed and what it could not find.</p>
+        <ol class="list list--body"><li>Ask for an <code class="inline">ILogger&lt;RecipesController&gt;</code> in the constructor, next to the context.</li><li>After saving, log <code class="inline">Created recipe {RecipeId} ({Title}).</code> at Information.</li><li>When <code class="inline">Details</code> returns 404, log <code class="inline">Recipe {RecipeId} was not found.</code> at Warning.</li><li>Create a recipe, open <code class="inline">/recipes/99</code>, watch the terminal.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">info: RecipeBox.Controllers.RecipesController[0]</code> · <code class="inline">Created recipe 7 (Banitsa).</code></li><li><code class="inline">warn: …</code> · <code class="inline">Recipe 99 was not found.</code></li><li>Placeholders <code class="inline">{RecipeId}</code>, not <code class="inline">$"…"</code> interpolation.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 31 ─ T10 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">10</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 10 · Hints and solution</p></div>
+  <h2>Log recipe creation with <code class="inline" style="font-size:.8em">ILogger</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">ILogger&lt;T&gt;</code> arrives by DI, like the context. Nothing to register.</li><li><code class="inline">{RecipeId}</code> reads the same as <code class="inline">$"…"</code>, but a log system can search <code class="inline">RecipeId = 7</code>.</li><li>The category is the class name: that is what <code class="inline">T</code> is for.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">private readonly RecipeBoxContext _context;
+private readonly ILogger&lt;RecipesController&gt; _logger;
+
+public RecipesController(RecipeBoxContext context, ILogger&lt;RecipesController&gt; logger)
+{
+    _context = context;
+    _logger = logger;
+}
+
+// in Create, after SaveChangesAsync
+_logger.LogInformation("Created recipe {RecipeId} ({Title}).", recipe.Id, recipe.Title);
+
+// in Details
+if (recipe is null)
+{
+    _logger.LogWarning("Recipe {RecipeId} was not found.", id);
+    return NotFound();
+}</pre><pre class="out xs">info: RecipeBox.Controllers.RecipesController[0]
+      <span class="p">Created recipe 7 (Banitsa).</span>
+warn: RecipeBox.Controllers.RecipesController[0]
+      <span class="p">Recipe 99 was not found.</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 32 ─ T11 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">11</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 11 · Publishing</p><span class="badge badge--time">15 min</span></div>
+  <h2>Publish the app to a folder and run it</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        
+        <ol class="list list--body"><li>Stop the app. Publish <strong>next to</strong> the project, not inside it:</li></ol><pre class="sh tight" style="margin-left:var(--space-10)">dotnet publish -c Release -o ../publish</pre><ol class="list list--body" style="counter-reset:step 1"><li>Look inside <code class="inline">../publish</code>. Then copy the database in and run it:</li></ol><pre class="sh tight" style="margin-left:var(--space-10)">cd ../publish
+cp ../RecipeBox/recipebox.db .     # Windows: copy ..\RecipeBox\recipebox.db .
+dotnet RecipeBox.dll --urls http://localhost:5080</pre><ol class="list list--body" style="counter-reset:step 2"><li>Open <code class="inline">/recipes</code>, <code class="inline">/recipes/2</code> and <code class="inline">/recipes/99</code> on port 5080.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">publish/</code> has <code class="inline">RecipeBox.dll</code>, <code class="inline">appsettings.json</code>, <code class="inline">wwwroot/</code>, the EF Core DLLs — and <strong>no <code class="inline">.cs</code> files</strong>.</li><li>The console says <code class="inline">Hosting environment: Production</code>, with no <code class="inline">-e</code>.</li><li>Recipes load, styled; <code class="inline">/recipes/99</code> shows the Task 9 page with 404.</li><li>One sentence on why the database had to be copied.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 33 ─ T11 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">11</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 11 · Hints and solution</p></div>
+  <h2>Publish the app to a folder and run it</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">-c Release</code>: optimised. <code class="inline">Debug</code> is for our own machine.</li><li>Publishing <strong>inside</strong> the project makes the next build pick the output up as content.</li><li><code class="inline">no such table: Recipes</code> means no database file was found, so an empty one was created.</li><li>No <code class="inline">launchSettings.json</code> in play: the default is Production.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="out xs"><span class="p">$ ls ../publish</span>
+Microsoft.Data.Sqlite.dll                  RecipeBox.runtimeconfig.json
+Microsoft.EntityFrameworkCore.dll          SQLitePCLRaw.core.dll
+Microsoft.EntityFrameworkCore.Sqlite.dll   appsettings.json
+<span class="p">RecipeBox.dll</span>                              web.config
+RecipeBox.deps.json                        wwwroot/
+…                                          <span class="c"># no .cs files</span>
+
+<span class="p">$ dotnet RecipeBox.dll --urls http://localhost:5080</span>
+      Hosting environment: <span class="p">Production</span>
+/recipes      200
+/recipes/99   404   We could not find that page.</pre><div class="callout">The connection string is <code class="inline">Data Source=recipebox.db</code>, relative to the folder the app runs from. The published folder is a new place, so it needs its own copy. On a real server the connection string comes from the host's settings and points at a real database.</div>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 5 · CRUD, debugging and deployment</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 34 ─ Closing -->
+<section class="slide slide--lab">
+  <p class="eyebrow">End of Set 5</p>
+  <h2 style="font-size:var(--fs-title-1)">RecipeBox ships. That is the shape of the final project.</h2>
+  <div class="rule"></div>
+  <p class="lead">List, filter, details, create, edit and delete — validated, CSRF-safe,<br>logged, with a production error page and a published build.</p>
+  <div class="stats"><span class="stat">End of the exercises</span><span class="stat">5 sets · 56 tasks</span><span class="stat">Microsoft Web Technologies</span></div>
+  <div class="foot" style="margin-top:var(--space-12)"><span>Exercises · RecipeBox</span><span class="spacer"></span><span>Microsoft Web Technologies</span></div>
+</section>
+</div></div>
+<a id="home" href="../../index.html"><img src="../../design-system/components/images/favicon.svg" alt="" width="14" height="14">← Index</a>
+<div id="hint">← → navigate · S solution · F fullscreen · P print</div>
+
+<script>
+(function(){
+  /* ── Minimal highlighters: C#, Razor, SQL, shell ────────────────────── */
+  var KW = 'string int double bool var void new public private protected class if else for foreach in while return switch case break default try catch finally null true false namespace using get set static readonly is not async await override base this nameof throw'.split(' ');
+  var TY = 'Console List Dictionary Recipe Category Task IActionResult Controller ControllerBase DbContext DbSet DbContextOptions ModelBuilder MigrationBuilder RecipeBoxContext RecipeListViewModel ILogger StringSplitOptions DbUpdateConcurrencyException InvalidOperationException FormatException OverflowException WebApplication DateTime Route HttpGet HttpPost Bind ValidateAntiForgeryToken ActionName Required StringLength Range Display'.split(' ');
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function paint(sel, re, pick){
+    document.querySelectorAll(sel).forEach(function(pre){
+      var src = pre.textContent, out = '', last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(src))) {
+        if (m[0] === '') { re.lastIndex++; continue; }
+        out += esc(src.slice(last, m.index));
+        out += '<span class="' + pick(m) + '">' + esc(m[0]) + '</span>';
+        last = re.lastIndex;
+      }
+      pre.innerHTML = out + esc(src.slice(last));
+    });
+  }
+  paint('pre.cs', new RegExp(
+    '(\\/\\/[^\\n]*)' +
+    '|(\\$?"(?:[^"\\\\\\n]|\\\\.)*"|\'(?:[^\'\\\\\\n]|\\\\.)\')' +
+    '|\\b(\\d+(?:\\.\\d+)?)\\b' +
+    '|\\b(' + KW.join('|') + ')\\b' +
+    '|\\b(' + TY.join('|') + ')\\b', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : m[4] ? 'k' : 't'; });
+  paint('pre.cshtml', new RegExp(
+    '(@\\*[\\s\\S]*?\\*@)' +
+    '|("(?:[^"\\\\\\n]|\\\\.)*")' +
+    '|(<\\/?[a-zA-Z][\\w.-]*|\\/?>)' +
+    '|(@(?:model|foreach|if|else|section|await|using)\\b|@\\{|@\\(|@[A-Za-z_][\\w.?]*(?:\\(\\))?|\\b(?:else|var|in)\\b)', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 't' : 'k'; });
+  paint('pre.sql', new RegExp(
+    '(--[^\\n]*)' +
+    '|(\'[^\'\\n]*\')' +
+    '|\\b(\\d+)\\b' +
+    '|\\b(SELECT|FROM|WHERE|ORDER|BY|GROUP|AS|COUNT|CREATE|TABLE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|INTEGER|TEXT|NOT|NULL|PRIMARY|KEY|LIMIT|AND|LEFT|JOIN|ON|DISTINCT|lower)\\b', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : 'k'; });
+  paint('pre.json', /("(?:[^"\\\n]|\\.)*")(\s*:)?|\b(\d+)\b/g,
+    function(m){ return m[2] ? 't' : m[1] ? 's' : 'n'; });
+  document.querySelectorAll('pre.sh').forEach(function(pre){
+    pre.innerHTML = pre.innerHTML
+      .replace(/^(\s*)(dotnet|cd|curl|sqlite3|cp|copy|ls)\b/gm, '$1<span class="k">$2</span>')
+      .replace(/(#[^\n]*)$/gm, '<span class="c">$1</span>');
+  });
+
+  /* ── Deck ─────────────────────────────────────────────────────────────── */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var deck = document.getElementById('deck');
+  var progress = document.getElementById('progress');
+  var hint = document.getElementById('hint');
+  var total = slides.length, i = 0;
+
+  slides.forEach(function(s, n){
+    var num = s.querySelector('.foot .num');
+    if (num) num.textContent = (n + 1) + ' / ' + total;
+  });
+
+  function show(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-active', k === i); });
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+  function fit(){
+    var vp = window.visualViewport;
+    var vw = vp ? vp.width : window.innerWidth, vh = vp ? vp.height : window.innerHeight;
+    var scale = Math.min(vw / 1280, vh / 720);
+    deck.style.transform = 'translate(' + (vw - 1280 * scale) / 2 + 'px,' + (vh - 720 * scale) / 2 + 'px) scale(' + scale + ')';
+  }
+  function refit(){ requestAnimationFrame(fit); setTimeout(fit, 250); }
+
+  /* ── Solutions: click the cover, or press S on a hint slide ───────────── */
+  document.querySelectorAll('.solution__cover').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      btn.parentElement.classList.add('is-revealed');
+      btn.blur();
+    });
+  });
+  function toggleSolution(){
+    var sol = slides[i].querySelector('.solution');
+    if (sol) sol.classList.toggle('is-revealed');
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+    else if (e.key === 's' || e.key === 'S') { toggleSolution(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+
+  var tx = null, ty = null;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) { tx = null; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    tx = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(dx < 0 ? i + 1 : i - 1);
+  }, { passive: true });
+
+  window.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+  window.addEventListener('hashchange', function(){ show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+
+  fit();
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  setTimeout(function(){ hint.classList.add('is-hidden'); }, 4000);
+})();
+</script>
+</body>
+</html>

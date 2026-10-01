@@ -1,0 +1,1331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Exercises 4 — Database and EF Core</title>
+<meta name="description" content="Exercise set 4 for decks 07–08: twelve tasks that move RecipeBox from an in-memory list into a SQLite database with EF Core and migrations.">
+<link rel="canonical" href="https://ms-web.eognyanov.com/presentations/slides/ex04-database-and-ef-core.html">
+<link rel="icon" type="image/svg+xml" href="../../design-system/components/images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../../design-system/components/images/favicon-32.png">
+<link rel="apple-touch-icon" href="../../design-system/components/images/apple-touch-icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Microsoft Web Technologies">
+<meta property="og:title" content="Exercises 4 — Database and EF Core">
+<meta property="og:description" content="Exercise set 4 for decks 07–08: twelve tasks that move RecipeBox from an in-memory list into a SQLite database with EF Core and migrations.">
+<meta property="og:url" content="https://ms-web.eognyanov.com/presentations/slides/ex04-database-and-ef-core.html">
+<meta property="og:image" content="https://ms-web.eognyanov.com/design-system/components/images/favicon-512.png">
+<link rel="stylesheet" href="../../design-system/styles.css">
+<style>
+/* ── Exercise-deck extensions ──────────────────────────────────────────────
+   Same stage, scale and type tokens as the lecture decks, so the two read as
+   one course. What differs is deliberate, so an exercise deck is recognisable
+   at a glance on the projector:
+     · a teal "lab" accent replaces brand blue on block slides and accents
+       (Fluent shared-colour teal — the design system has no second hue);
+     · every task and hint slide carries a left rail with the task number —
+       teal for the brief, amber for the hints;
+     · solutions sit behind a click-to-reveal cover. */
+:root{
+  --stage-w:1280px; --stage-h:720px;
+  --fs-slide-body:20px;  --lh-slide-body:30px;
+  --fs-slide-lead:24px;  --lh-slide-lead:34px;
+  --fs-slide-sm:16px;    --lh-slide-sm:24px;
+  --fs-slide-code:14px;  --lh-slide-code:21px;
+
+  --lab-shade-30:#012b2c; --lab-shade-20:#024345; --lab-shade-10:#025c5f;
+  --lab-base:#038387;     --lab-tint-10:#2aa0a4;
+  --lab-tint-20:#a6dfe1;  --lab-tint-30:#cdeeef;  --lab-tint-40:#ebf8f8;
+
+  --rail-w:88px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--neutral-grey-160);font-family:var(--font-sans-text);color:var(--text-primary);overflow:hidden}
+
+/* ── Stage ─────────────────────────────────────────────────────────────── */
+#stage{position:fixed;inset:0;overflow:hidden}
+#deck{width:var(--stage-w);height:var(--stage-h);position:absolute;top:0;left:0;transform-origin:0 0}
+.slide{
+  position:absolute;inset:0;width:var(--stage-w);height:var(--stage-h);
+  background:var(--surface-page);
+  display:none;flex-direction:column;
+  padding:var(--space-12) var(--space-16) var(--space-8);
+  overflow:hidden;
+}
+.slide.is-active{display:flex}
+
+/* ── Rail ──────────────────────────────────────────────────────────────── */
+.slide--rail{padding-left:calc(var(--rail-w) + var(--space-12))}
+.rail{
+  position:absolute;left:0;top:0;bottom:0;width:var(--rail-w);
+  background:var(--lab-base);color:var(--neutral-white);
+  display:flex;flex-direction:column;align-items:center;
+  padding:var(--space-12) 0 var(--space-8);
+}
+.rail__label{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.rail__no{font-family:var(--font-sans);font-size:44px;line-height:52px;font-weight:600;letter-spacing:-.02em;margin-top:var(--space-1)}
+.rail__part{
+  margin-top:auto;width:36px;height:36px;border-radius:var(--radius-circular);
+  border:2px solid rgba(255,255,255,.5);display:grid;place-items:center;
+  font-family:var(--font-sans);font-size:var(--fs-slide-sm);font-weight:600;
+}
+.rail--hint{background:var(--color-warning-bg);color:var(--color-warning);border-right:1px solid #f0d98a}
+.rail--hint .rail__part{border-color:rgba(157,93,0,.45)}
+.rail--info{background:var(--lab-shade-20)}
+
+/* ── Slide chrome ──────────────────────────────────────────────────────── */
+.head{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)}
+.eyebrow{
+  margin:0;font-size:var(--fs-body-sm);line-height:var(--lh-body-sm);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--lab-shade-10);
+}
+.slide--hint .eyebrow{color:var(--color-warning)}
+h1,h2,h3{margin:0;font-family:var(--font-sans);color:var(--text-primary)}
+h1{font-size:var(--fs-display);line-height:var(--lh-display);font-weight:var(--fw-display);letter-spacing:-.02em}
+h2{font-size:var(--fs-title-1);line-height:var(--lh-title-1);font-weight:var(--fw-title-1);letter-spacing:-.01em}
+h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:var(--fw-title-3)}
+.slide--hint h2{font-size:var(--fs-title-2);line-height:var(--lh-title-2)}
+.rule{width:56px;height:3px;background:var(--lab-base);border-radius:var(--radius-pill);margin:var(--space-4) 0 var(--space-5)}
+.slide--hint .rule{background:var(--color-warning)}
+.body{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body)}
+.lead{margin:0;font-size:var(--fs-slide-lead);line-height:var(--lh-slide-lead);color:var(--text-secondary)}
+.goal{margin:0;font-size:var(--fs-slide-body);line-height:var(--lh-slide-body);color:var(--text-secondary)}
+.muted{color:var(--text-secondary)}
+.sm{font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+strong{font-weight:600}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--space-5)}
+
+.foot{
+  display:flex;align-items:center;gap:var(--space-4);
+  padding-top:var(--space-4);margin-top:auto;border-top:1px solid var(--border-default);
+  font-size:var(--fs-caption);line-height:var(--lh-caption);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-disabled);
+}
+.foot .spacer{flex:1}
+
+/* ── Block slides (teal, not brand blue) ───────────────────────────────── */
+.slide--lab{background:var(--lab-base);color:var(--neutral-white);justify-content:center}
+.slide--lab h1,.slide--lab h2{color:var(--neutral-white)}
+.slide--lab .eyebrow{color:var(--lab-tint-30)}
+.slide--lab .lead{color:var(--lab-tint-30)}
+.slide--lab .rule{background:var(--neutral-white)}
+.slide--lab .foot{border-top-color:rgba(255,255,255,.28);color:var(--lab-tint-30)}
+.slide--part{background:var(--lab-shade-20)}
+.slide--part .eyebrow{color:var(--lab-tint-20)}
+.part-letter{font-family:var(--font-sans);font-size:140px;line-height:1;font-weight:600;color:rgba(255,255,255,.2);margin-bottom:var(--space-4)}
+.stats{display:flex;gap:var(--space-3);margin-top:var(--space-8)}
+.stat{
+  border:1px solid rgba(255,255,255,.4);border-radius:var(--radius-pill);
+  padding:var(--space-2) var(--space-5);font-size:var(--fs-slide-sm);font-weight:600;color:var(--neutral-white);
+}
+.slide--lab code.inline{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:var(--neutral-white)}
+
+/* ── Layout ────────────────────────────────────────────────────────────── */
+.cols{display:grid;gap:var(--space-6);flex:1;min-height:0}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-task{grid-template-columns:1.25fr 1fr}
+.cols-task > .card{align-self:start}
+.cols-hint{grid-template-columns:1fr 2fr}
+.cols--auto{flex:0 0 auto;min-height:auto}
+.stack{display:flex;flex-direction:column;gap:var(--space-4);min-height:0}
+
+/* ── Cards, badges ─────────────────────────────────────────────────────── */
+.card{
+  background:var(--surface-card);border:1px solid var(--border-default);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  display:flex;flex-direction:column;gap:var(--space-2);
+}
+.card h3{font-size:var(--fs-title-3);line-height:var(--lh-title-3)}
+.card p{margin:0;font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--text-secondary)}
+.card--lab{background:var(--lab-tint-40);border-color:var(--lab-tint-20)}
+.card--hint{background:var(--color-warning-bg);border-color:#f0d98a}
+.badge{
+  display:inline-flex;align-items:center;align-self:flex-start;height:24px;padding:0 var(--space-3);
+  border-radius:var(--radius-pill);font-size:var(--fs-body-sm);font-weight:600;white-space:nowrap;
+  background:var(--lab-tint-40);color:var(--lab-shade-10);border:1px solid var(--lab-tint-20);
+}
+.badge--time{background:var(--surface-card);color:var(--text-secondary);border-color:var(--border-strong)}
+.badge--opt{background:var(--surface-subtle);color:var(--text-secondary);border-color:var(--border-default)}
+.badge--warn{background:var(--color-warning-bg);color:var(--color-warning);border-color:#f0d98a}
+
+/* ── Lists ─────────────────────────────────────────────────────────────── */
+ul.list,ol.list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.list li,ol.list li{position:relative;padding-left:var(--space-8);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+ul.list li::before{content:"";position:absolute;left:var(--space-2);top:8px;width:8px;height:8px;border-radius:var(--radius-circular);background:var(--lab-base)}
+ol.list{counter-reset:step}
+ol.list li{counter-increment:step;padding-left:var(--space-10)}
+ol.list li::before{
+  content:counter(step);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:var(--radius-sm);
+  background:var(--lab-base);color:var(--neutral-white);
+  font-family:var(--font-sans);font-size:var(--fs-body-sm);font-weight:600;display:grid;place-items:center;
+}
+.list--body li{font-size:18px;line-height:28px}
+ul.check{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.check li{position:relative;padding-left:var(--space-8);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm)}
+ul.check li::before{
+  content:"";position:absolute;left:0;top:3px;width:16px;height:16px;
+  border:2px solid var(--lab-base);border-radius:var(--radius-sm);background:var(--surface-card);
+}
+ul.hints{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+ul.hints li{
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+  background:var(--surface-card);border:1px solid var(--border-default);border-left:3px solid var(--color-warning);
+  border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);
+}
+.hints--row{flex-direction:row!important}
+.hints--row li{flex:1}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+table{
+  width:100%;border-collapse:collapse;background:var(--surface-card);
+  border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;
+  font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);
+}
+thead th{
+  text-align:left;background:var(--surface-subtle);color:var(--text-secondary);font-weight:600;
+  font-size:var(--fs-body-sm);letter-spacing:.06em;text-transform:uppercase;
+  padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--border-default);
+}
+tbody td,tbody th{padding:var(--space-2) var(--space-4);border-bottom:1px solid var(--border-default);vertical-align:top;text-align:left}
+tbody th{font-weight:600}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td,tr.total th{background:var(--lab-tint-40);font-weight:600}
+table.dense{font-size:14px;line-height:20px}
+
+/* ── Code ──────────────────────────────────────────────────────────────── */
+pre,code{font-family:var(--font-mono)}
+pre{
+  margin:0;background:var(--neutral-grey-190);color:#e6e6e6;
+  border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);
+  font-size:var(--fs-slide-code);line-height:var(--lh-slide-code);
+  overflow:hidden;white-space:pre;
+}
+pre.xs{font-size:13px;line-height:19px}
+pre.out{background:var(--lab-shade-30);color:var(--lab-tint-30)}
+pre .k{color:#5fd0d4}
+pre .t{color:#9fd7ff}
+pre .s{color:#f0b77a}
+pre .n{color:#c3e88d}
+pre .c{color:var(--neutral-grey-90)}
+pre .p{color:var(--neutral-white);font-weight:600}
+.file{font-family:var(--font-mono);font-size:var(--fs-body-sm);color:var(--text-secondary);margin:0 0 var(--space-1)}
+code.inline{
+  background:var(--surface-subtle);border:1px solid var(--border-default);
+  border-radius:var(--radius-sm);padding:0 5px;font-size:.92em;color:var(--lab-shade-10);
+}
+
+/* ── Callout ───────────────────────────────────────────────────────────── */
+.callout{
+  background:var(--lab-tint-40);border:1px solid var(--lab-tint-20);border-radius:var(--radius-lg);
+  padding:var(--space-3) var(--space-5);font-size:var(--fs-slide-sm);line-height:var(--lh-slide-sm);color:var(--lab-shade-20);
+}
+.callout--warn{background:var(--color-warning-bg);border-color:#f0d98a;color:var(--color-warning)}
+
+/* ── Solution: blurred until revealed ──────────────────────────────────── */
+.solution{position:relative;border-radius:var(--radius-lg);min-height:0;align-self:start;width:100%}
+.solution__body{display:flex;flex-direction:column;gap:var(--space-3);filter:blur(7px);transition:filter var(--duration-slow) var(--ease-standard)}
+.solution__cover{
+  position:absolute;inset:0;z-index:1;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);
+  background:rgba(1,43,44,.72);border:2px dashed var(--lab-tint-10);border-radius:var(--radius-lg);
+  color:var(--neutral-white);font:inherit;
+  transition:opacity var(--duration-slow) var(--ease-standard);
+}
+.solution__cover:hover{background:rgba(1,43,44,.82)}
+.solution__cover:focus-visible{outline:3px solid var(--lab-tint-20);outline-offset:2px}
+.solution__label{font-family:var(--font-sans);font-size:var(--fs-title-3);line-height:var(--lh-title-3);font-weight:600}
+.solution__key{font-size:var(--fs-body-sm);letter-spacing:.08em;text-transform:uppercase;color:var(--lab-tint-20)}
+.solution.is-revealed .solution__body{filter:none}
+.solution.is-revealed .solution__cover{opacity:0;pointer-events:none}
+.duo{display:grid;grid-template-columns:auto auto;justify-content:start;gap:var(--space-3)}
+.duo pre{font-size:12px;line-height:19px;padding:14px}
+
+/* ── Slide-type legend (how-to slide) ──────────────────────────────────── */
+.mini{position:relative;height:96px;border-radius:var(--radius-md);background:var(--surface-page);border:1px solid var(--border-default);overflow:hidden;margin-bottom:var(--space-2)}
+.mini::before{content:"";position:absolute;left:0;top:0;bottom:0;width:22px;background:var(--lab-base)}
+.mini--hint::before{background:var(--color-warning-bg);border-right:1px solid #f0d98a}
+.mini span{position:absolute;left:34px;right:12px;height:8px;border-radius:4px;background:var(--neutral-grey-40)}
+.mini .m1{top:16px;width:40%;background:var(--neutral-grey-60)}
+.mini .m2{top:34px;width:62%}
+.mini .m3{top:52px;width:50%}
+.mini .m4{top:70px;width:56%}
+.mini .blur{left:auto;right:12px;top:16px;width:52%;height:66px;background:var(--neutral-grey-190);border:2px dashed var(--lab-tint-10)}
+
+/* ── Progress, hint, home ──────────────────────────────────────────────── */
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--lab-tint-10);width:0;transition:width var(--duration-normal) var(--ease-standard);z-index:10}
+#hint{position:fixed;right:16px;bottom:14px;z-index:10;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);transition:opacity var(--duration-slow) var(--ease-standard)}
+#hint.is-hidden{opacity:0}
+#home{position:fixed;left:16px;bottom:14px;z-index:10;display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-grey-90);text-decoration:none;opacity:.35;transition:opacity var(--duration-normal) var(--ease-standard)}
+#home img{width:14px;height:14px;border-radius:3px;display:block}
+#home:hover,#home:focus-visible{opacity:1;outline:none}
+
+/* ── Print / PDF: one slide per page, every solution shown ─────────────── */
+@media print{
+  @page{size:1280px 720px;margin:0}
+  body{background:var(--neutral-white);overflow:visible}
+  #stage{position:static;display:block;overflow:visible}
+  #deck{position:static;width:auto;height:auto;transform:none!important}
+  #progress,#hint,#home{display:none}
+  .slide{position:relative;display:flex!important;page-break-after:always;break-after:page}
+  .solution__body{filter:none!important}
+  .solution__cover{display:none!important}
+}
+
+/* ── Additions for sets 2–5: wider solution columns, tighter code ─────── */
+.cols-hint--wide{grid-template-columns:.8fr 2.2fr}
+.cols-hint--full{grid-template-columns:1fr}
+.solution pre + pre{margin-top:0}
+pre.tight{padding:var(--space-3) var(--space-4)}
+table.cmp td,table.cmp th{padding:6px var(--space-3)}
+td.num{white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage"><div id="deck">
+
+
+<!-- 1 ─ Title -->
+<section class="slide slide--lab">
+  <p class="eyebrow">Microsoft Web Technologies · Exercises · Set 4 of 5</p>
+  <h1 style="margin-top:var(--space-3)">Database and EF Core</h1>
+  <div class="rule"></div>
+  <p class="lead">Move RecipeBox from a list in memory into a SQLite file:<br>SQL by hand first, then EF Core, migrations and seed data.</p>
+  <div class="stats"><span class="stat">Covers decks 07–08</span><span class="stat">12 tasks</span><span class="stat">2 hours</span></div>
+  <div class="foot" style="margin-top:var(--space-12)"><span>Exercises · RecipeBox</span><span class="spacer"></span><span>← → navigate · S reveals a solution</span></div>
+</section>
+
+<!-- 2 ─ How this works -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">04</span></div>
+  <div class="head"><p class="eyebrow">How this set works</p></div>
+  <h2>Every task is two slides</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3 cols--auto">
+      <div class="card">
+        <div class="mini"><span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span></div>
+        <span class="badge">Teal rail</span>
+        <h3>The task</h3>
+        <p>The goal, the steps, and a <strong>Done when</strong> checklist. When every box is ticked, the task is finished.</p>
+      </div>
+      <div class="card">
+        <div class="mini mini--hint"><span class="m1" style="width:22%"></span><span class="m2" style="width:26%"></span><span class="m3" style="width:20%"></span><span class="blur"></span></div>
+        <span class="badge badge--warn">Amber rail</span>
+        <h3>The hints</h3>
+        <p>Read them when stuck. They point to the trap, not to the answer.</p>
+      </div>
+      <div class="card card--lab">
+        <div class="mini mini--hint" style="background:var(--surface-card)"><span class="m1" style="width:22%"></span><span class="m2" style="width:26%"></span><span class="m3" style="width:20%"></span><span class="blur" style="background:var(--neutral-grey-160);border-style:solid"></span></div>
+        <span class="badge">Click, or press S</span>
+        <h3>The solution</h3>
+        <p>Blurred on the hint slide until revealed. Compare it with your own after the task is done.</p>
+      </div>
+    </div>
+    <div class="cols cols-2 cols--auto">
+      <div class="callout">By the end, every page looks <strong>exactly</strong> as it did after Set 3. That is the point: the view model insulates the pages from where the data comes from.</div>
+      <div class="callout callout--warn">Task 12 is a <strong>bonus</strong>. Set 5 does not depend on it. Start it only when everything else is done.</div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 3 ─ Time budget -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">04</span></div>
+  <div class="head"><p class="eyebrow">Time budget</p></div>
+  <h2>Twelve tasks, two hours</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <table class="dense" style="align-self:start"><thead><tr><th style="width:34px">#</th><th>Task</th><th class="num">Min</th></tr></thead><tbody><tr><td>1</td><td>Sketch the <code class="inline">Recipes</code> table on paper</td><td class="num">6</td></tr><tr><td>2</td><td>Write four SQL queries against a sample table</td><td class="num">12</td></tr><tr><td>3</td><td>Install the EF Core SQLite packages</td><td class="num">5</td></tr><tr><td>4</td><td>Create <code class="inline">RecipeBoxContext</code> and register it with DI</td><td class="num">12</td></tr><tr><td>5</td><td>Add the connection string to <code class="inline">appsettings.json</code></td><td class="num">5</td></tr><tr><td>6</td><td>Add data annotations</td><td class="num">10</td></tr></tbody></table>
+      <table class="dense" style="align-self:start"><thead><tr><th style="width:34px">#</th><th>Task</th><th class="num">Min</th></tr></thead><tbody><tr><td>7</td><td>Create and apply the first migration</td><td class="num">12</td></tr><tr><td>8</td><td>Seed five recipes</td><td class="num">10</td></tr><tr><td>9</td><td>Switch the controller to the database</td><td class="num">16</td></tr><tr><td>10</td><td>Add <code class="inline">Difficulty</code> with a second migration</td><td class="num">12</td></tr><tr><td>11</td><td>Find the generated SQL in the console log</td><td class="num">5</td></tr><tr><td>12</td><td>Add a <code class="inline">Category</code> entity <span class="badge badge--opt">bonus</span></td><td class="num">15</td></tr><tr class="total"><td></td><td>Total · without the bonus</td><td class="num">120 · 105</td></tr></tbody></table>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 4 ─ The project -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">04</span></div>
+  <div class="head"><p class="eyebrow">The project</p></div>
+  <h2>From a list to a file</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-2">
+      <pre style="font-size:15px;line-height:24px;align-self:start">RecipeBox/
+├── Controllers/
+│   └── RecipesController.cs  <span class="c"># gets the context</span>
+├── <span class="p">Data/RecipeBoxContext.cs</span>  <span class="c"># Task 4</span>
+├── <span class="p">Migrations/</span>               <span class="c"># Tasks 7, 8, 10</span>
+├── Models/Recipe.cs          <span class="c"># annotations</span>
+├── Program.cs                <span class="c"># one registration</span>
+├── appsettings.json          <span class="c"># connection string</span>
+└── <span class="p">recipebox.db</span>              <span class="c"># created by Task 7</span></pre>
+      <div class="stack">
+        <div class="card">
+          <span class="badge badge--opt">Starts from</span>
+          <h3>The end of Set 3</h3>
+          <p>Bootstrap views fed by a view model. The recipes still live in a <code class="inline">static</code> list in the controller.</p>
+        </div>
+        <div class="card card--lab">
+          <span class="badge">Ends with</span>
+          <h3>The same pages, fed by SQLite</h3>
+          <p>EF Core creates <code class="inline">recipebox.db</code> from our <code class="inline">Recipe</code> class, seeds five recipes, and keeps three migrations of history.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 5 ─ Tools -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">04</span></div>
+  <div class="head"><p class="eyebrow">Before we start</p></div>
+  <h2>A way to look inside a SQLite file</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-3 cols--auto">
+      <div class="card"><span class="badge">Terminal</span><h3><code class="inline">sqlite3</code></h3><p>Built into macOS and most Linux. On Windows, download the command-line tools from sqlite.org.</p></div>
+      <div class="card"><span class="badge">VS Code</span><h3>SQLite Viewer</h3><p>An extension: click <code class="inline">recipebox.db</code> in the file tree and browse its tables.</p></div>
+      <div class="card"><span class="badge">App</span><h3>DB Browser for SQLite</h3><p>A free desktop app for every platform, with a SQL tab for running queries.</p></div>
+    </div>
+    <div class="callout">Any one of the three is enough. Tasks 2, 7, 8 and 9 ask us to look inside a database file; the solutions show <code class="inline">sqlite3</code>.</div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 6 ─ Part A -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">A</div>
+  <p class="eyebrow">Part A · Tasks 1–2 · 18 min</p>
+  <h2>SQL, by hand</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Before a tool writes SQL for us, we write some ourselves.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 7 ─ T1 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">01</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 1 · Tables</p><span class="badge badge--time">6 min</span></div>
+  <h2>Sketch the <code class="inline" style="font-size:.8em">Recipes</code> table on paper</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Decide what a table looks like before any tool decides it for us.</p>
+        <ol class="list list--body"><li>Draw a table called <code class="inline">Recipes</code> for our <code class="inline">Recipe</code> class.</li><li>For each column: a name, a type (<code class="inline">INTEGER</code> or <code class="inline">TEXT</code>), and whether it may be empty.</li><li>Mark the primary key. Fill in two rows from the sample data.</li><li>Decide what to do with <code class="inline">Ingredients</code>: a cell holds one value, a recipe has five.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Seven columns, one per property.</li><li><code class="inline">Id</code> is marked as the primary key.</li><li>One sentence on how <code class="inline">Ingredients</code> fits, with its trade-off.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 8 ─ T1 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">01</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 1 · Hints and solution</p></div>
+  <h2>Sketch the <code class="inline" style="font-size:.8em">Recipes</code> table on paper</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">TotalMinutes()</code> and <code class="inline">IsQuick()</code> are not columns. They are computed from columns.</li><li>Two honest answers for <code class="inline">Ingredients</code>: a separate table, one row per ingredient, or all of them packed into one text cell.</li><li>Task 7 shows which one EF Core picks.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="out xs"><span class="p">Recipes</span>
+Id  Title          Cuisine    PrepMinutes  CookMinutes  Servings  Ingredients
+PK  TEXT req.      TEXT req.  INTEGER      INTEGER      INTEGER   TEXT req.
+──  ─────────────  ─────────  ───────────  ───────────  ────────  ─────────────────────────
+1   Pancakes       American   10           15           4         ["Flour","Milk","Eggs",…]
+3   Shopska Salad  Bulgarian  15            0           4         ["Tomatoes","Cucumbers",…]</pre><div class="callout">One <code class="inline">TEXT</code> cell is simple and fine for display, but makes “all recipes with Eggs” a text search instead of a join. A separate <code class="inline">Ingredients</code> table with a <code class="inline">RecipeId</code> foreign key is the textbook design; Task 12 shows that shape with categories.</div>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 9 ─ T2 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · SQL</p><span class="badge badge--time">12 min</span></div>
+  <h2>Write four SQL queries against a sample table</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        
+        <ol class="list list--body"><li>Save the script on the right as <code class="inline">practice.sql</code>, load it, open the database:</li></ol><pre class="sh tight" style="margin-left:var(--space-10)">sqlite3 practice.db &lt; practice.sql
+sqlite3 practice.db</pre><ol class="list list--body" style="counter-reset:step 1"><li><span>Write one query per question:<br>① title and cuisine of every recipe<br>② every column of the Italian recipes<br>③ title and total minutes under 30, fastest first<br>④ how many recipes each cuisine has</span></li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>① five rows, two columns.</li><li>② Carbonara and Pizza, six columns.</li><li>③ Shopska 15, Pancakes 25, Carbonara 25.</li><li>④ American 1, Bulgarian 1, Indian 1, Italian 2.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 10 ─ T2 sample table -->
+<section class="slide slide--rail">
+  <div class="rail rail--info"><span class="rail__label">Set</span><span class="rail__no">04</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · The sample table</p></div>
+  <h2>Save this as <code class="inline" style="font-size:.8em">practice.sql</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <pre class="sql" style="font-size:16px;line-height:25px">CREATE TABLE Recipes (
+    Id          INTEGER PRIMARY KEY,
+    Title       TEXT    NOT NULL,
+    Cuisine     TEXT    NOT NULL,
+    PrepMinutes INTEGER NOT NULL,
+    CookMinutes INTEGER NOT NULL,
+    Servings    INTEGER NOT NULL
+);
+
+INSERT INTO Recipes VALUES (1, 'Pancakes',            'American',  10, 15, 4);
+INSERT INTO Recipes VALUES (2, 'Spaghetti Carbonara', 'Italian',   10, 15, 2);
+INSERT INTO Recipes VALUES (3, 'Shopska Salad',       'Bulgarian', 15,  0, 4);
+INSERT INTO Recipes VALUES (4, 'Margherita Pizza',    'Italian',   30, 12, 2);
+INSERT INTO Recipes VALUES (5, 'Chicken Curry',       'Indian',    20, 40, 4);</pre>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 11 ─ T2 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">02</span><span class="rail__part">A</span></div>
+  <div class="head"><p class="eyebrow">Task 2 · Hints and solution</p></div>
+  <h2>Write four SQL queries against a sample table</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">.headers on</code> and <code class="inline">.mode column</code> first; <code class="inline">.quit</code> to leave.</li><li>Strings use single quotes: <code class="inline">'Italian'</code>.</li><li>Name a computed column with <code class="inline">AS TotalMinutes</code>, then sort by it.</li><li><code class="inline">COUNT(*)</code> with <code class="inline">GROUP BY Cuisine</code> counts per group.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="sql">-- 1 · every title and cuisine
+SELECT Title, Cuisine FROM Recipes;
+
+-- 2 · Italian recipes, every column
+SELECT * FROM Recipes WHERE Cuisine = 'Italian';
+
+-- 3 · under 30 minutes, fastest first
+SELECT Title, PrepMinutes + CookMinutes AS TotalMinutes
+FROM Recipes
+WHERE PrepMinutes + CookMinutes &lt; 30
+ORDER BY TotalMinutes, Title;
+
+-- 4 · recipes per cuisine
+SELECT Cuisine, COUNT(*) AS Recipes FROM Recipes GROUP BY Cuisine;</pre><pre class="out">Title                TotalMinutes      Cuisine    Recipes
+Shopska Salad        15                American   1
+Pancakes             25                Bulgarian  1
+Spaghetti Carbonara  25                Indian     1
+                                       Italian    <span class="p">2</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 12 ─ Part B -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">B</div>
+  <p class="eyebrow">Part B · Tasks 3–11 · about 90 min</p>
+  <h2>EF Core and migrations</h2>
+  <p class="lead" style="margin-top:var(--space-4)">Our <code class="inline">Recipe</code> class becomes a table. We describe the change; EF Core writes the SQL.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 13 ─ T3 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">03</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 3 · Packages</p><span class="badge badge--time">5 min</span></div>
+  <h2>Install the EF Core SQLite packages</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Two packages and one command-line tool that the rest of the set uses.</p>
+        <ol class="list list--body"><li>Stop <code class="inline">dotnet watch</code>. From the <code class="inline">RecipeBox</code> folder:</li></ol><pre class="sh tight" style="margin-left:var(--space-10)">dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet tool install --global dotnet-ef</pre><ol class="list list--body" style="counter-reset:step 1"><li>Open <code class="inline">RecipeBox.csproj</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>Two new <code class="inline">&lt;PackageReference&gt;</code> lines, both <code class="inline">10.x</code>.</li><li><code class="inline">dotnet ef --version</code> prints <code class="inline">10.x</code>.</li><li><code class="inline">dotnet build</code> → 0 errors.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 14 ─ T3 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">03</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 3 · Hints and solution</p></div>
+  <h2>Install the EF Core SQLite packages</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>Already installed? <code class="inline">dotnet tool update --global dotnet-ef</code>.</li><li><code class="inline">dotnet ef</code> not found right after installing: open a new terminal.</li><li>A warning that the tools are older than the runtime is harmless.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <p class="file" style="margin:0">RecipeBox.csproj</p><pre class="out">&lt;ItemGroup&gt;
+  &lt;PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="<span class="p">10.0.12</span>" /&gt;
+  &lt;PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="<span class="p">10.0.12</span>" /&gt;
+&lt;/ItemGroup&gt;</pre><pre class="out"><span class="p">$ dotnet ef --version</span>
+Entity Framework Core .NET Command-line Tools
+10.0.12          <span class="c"># the patch number may be higher</span></pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 15 ─ T4 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">04</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 4 · DbContext and DI</p><span class="badge badge--time">12 min</span></div>
+  <h2>Create <code class="inline" style="font-size:.8em">RecipeBoxContext</code> and register it with DI</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">The database as a C# object, built by the framework, never by us.</p>
+        <ol class="list list--body"><li>Create <code class="inline">Data/RecipeBoxContext.cs</code>: inherits <code class="inline">DbContext</code>, takes <code class="inline">DbContextOptions&lt;RecipeBoxContext&gt;</code>, has a <code class="inline">DbSet&lt;Recipe&gt; Recipes</code>.</li><li>In <code class="inline">Program.cs</code>, register it with <code class="inline">AddDbContext</code>, using SQLite and a connection string named <code class="inline">RecipeBox</code>.</li><li><code class="inline">dotnet build</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">RecipeBoxContext</code> is in the <code class="inline">RecipeBox.Data</code> namespace.</li><li><code class="inline">new RecipeBoxContext</code> appears nowhere in the project.</li><li><code class="inline">dotnet build</code> → 0 errors, 0 warnings.</li><li>The app still runs: nothing asks for the context yet.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 16 ─ T4 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">04</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 4 · Hints and solution</p></div>
+  <h2>Create <code class="inline" style="font-size:.8em">RecipeBoxContext</code> and register it with DI</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">public DbSet&lt;Recipe&gt; Recipes =&gt; Set&lt;Recipe&gt;();</code> is one table.</li><li><code class="inline">: base(options)</code>: our class does not decide which database it talks to.</li><li><code class="inline">Program.cs</code> needs <code class="inline">using Microsoft.EntityFrameworkCore;</code> and <code class="inline">using RecipeBox.Data;</code>.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <p class="file" style="margin:0">Data/RecipeBoxContext.cs</p><pre class="cs xs">using Microsoft.EntityFrameworkCore;
+using RecipeBox.Models;
+
+namespace RecipeBox.Data;
+
+public class RecipeBoxContext : DbContext
+{
+    public RecipeBoxContext(DbContextOptions&lt;RecipeBoxContext&gt; options)
+        : base(options) { }
+
+    public DbSet&lt;Recipe&gt; Recipes =&gt; Set&lt;Recipe&gt;();
+}</pre><p class="file" style="margin:0">Program.cs, after AddControllersWithViews()</p><pre class="cs xs">builder.Services.AddDbContext&lt;RecipeBoxContext&gt;(options =&gt;
+    options.UseSqlite(builder.Configuration.GetConnectionString("RecipeBox")));</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 17 ─ T5 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">05</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Configuration</p><span class="badge badge--time">5 min</span></div>
+  <h2>Add the connection string to <code class="inline" style="font-size:.8em">appsettings.json</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Tell the app where the database lives, in configuration rather than in code.</p>
+        <ol class="list list--body"><li>Add a <code class="inline">ConnectionStrings</code> section to <code class="inline">appsettings.json</code>, with one entry, <code class="inline">RecipeBox</code>, pointing at <code class="inline">recipebox.db</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>The name matches <code class="inline">GetConnectionString("RecipeBox")</code> exactly.</li><li>The file is still valid JSON: the app starts.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 18 ─ T5 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">05</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 5 · Hints and solution</p></div>
+  <h2>Add the connection string to <code class="inline" style="font-size:.8em">appsettings.json</code></h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li>For SQLite the whole string is <code class="inline">Data Source=recipebox.db</code>: a path relative to the folder the app runs from.</li><li>A missing comma between sections is the usual mistake.</li><li>A real database's string holds a password. Never commit one; deck 10 comes back to it.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="json" style="font-size:16px;line-height:25px">{
+  "ConnectionStrings": {
+    "RecipeBox": "Data Source=recipebox.db"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 19 ─ T6 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">06</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Data annotations</p><span class="badge badge--time">10 min</span></div>
+  <h2>Add data annotations</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Write the rules once, on the model. The database (Task 7) and the forms (Set 5) both read them.</p>
+        <ol class="list list--body"><li>Add <code class="inline">using System.ComponentModel.DataAnnotations;</code> to <code class="inline">Recipe.cs</code>.</li><li><code class="inline">Title</code>: required, 3–100 characters. <code class="inline">Cuisine</code>: required, at most 50.</li><li><code class="inline">PrepMinutes</code>, <code class="inline">CookMinutes</code>: 0–600. <code class="inline">Servings</code>: 1–20.</li><li>Give the two minutes properties a friendly <code class="inline">[Display(Name = …)]</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">[Required]</code> and <code class="inline">[StringLength]</code> on both strings; <code class="inline">[Range]</code> on the numbers.</li><li><code class="inline">dotnet build</code> → 0 warnings.</li><li>The pages look the same: nothing reads the annotations yet.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 20 ─ T6 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">06</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 6 · Hints and solution</p></div>
+  <h2>Add data annotations</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint">
+      <ul class="hints"><li><code class="inline">[StringLength(100, MinimumLength = 3)]</code> sets both limits.</li><li><code class="inline">[Range(1, 20)]</code> includes both ends.</li><li>Attributes stack: one per line above the property.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">public class Recipe
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(100, MinimumLength = 3)]
+    public string Title { get; set; } = "";
+
+    [Required]
+    [StringLength(50)]
+    public string Cuisine { get; set; } = "";
+
+    [Range(0, 600)]
+    [Display(Name = "Prep minutes")]
+    public int PrepMinutes { get; set; }
+
+    [Range(0, 600)]
+    [Display(Name = "Cook minutes")]
+    public int CookMinutes { get; set; }
+
+    [Range(1, 20)]
+    public int Servings { get; set; }
+
+    // Ingredients, TotalMinutes() and IsQuick() unchanged
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 21 ─ T7 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">07</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Migrations</p><span class="badge badge--time">12 min</span></div>
+  <h2>Create and apply the first migration</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Let EF Core turn the class into a table, and read what it wrote before running it.</p>
+        <ol class="list list--body"><li><code class="inline">dotnet ef migrations add InitialCreate</code></li><li>Open the file in <code class="inline">Migrations/</code> ending in <code class="inline">_InitialCreate.cs</code>. Read <code class="inline">Up</code>.</li><li><code class="inline">dotnet ef database update</code></li><li>Open <code class="inline">recipebox.db</code> and look at its tables.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">Up</code> creates <code class="inline">Recipes</code> with seven columns; <code class="inline">Title</code> has <code class="inline">maxLength: 100</code>, <code class="inline">Cuisine</code> <code class="inline">maxLength: 50</code>, both <code class="inline">nullable: false</code>.</li><li><code class="inline">recipebox.db</code> contains <code class="inline">Recipes</code> and <code class="inline">__EFMigrationsHistory</code>, with one row.</li><li>Your Task 1 sketch: what did EF Core choose for <code class="inline">Ingredients</code>?</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 22 ─ T7 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">07</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 7 · Hints and solution</p></div>
+  <h2>Create and apply the first migration</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">[StringLength]</code> → <code class="inline">maxLength</code>; <code class="inline">[Required]</code> → <code class="inline">nullable: false</code>. <code class="inline">[Range]</code> leaves no trace: the app checks it, not the table.</li><li><code class="inline">List&lt;string&gt;</code> became one <code class="inline">TEXT</code> column holding a JSON array.</li><li>Run <code class="inline">database update</code> again: nothing happens. The history table knows.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">migrationBuilder.CreateTable(
+    name: "Recipes",
+    columns: table =&gt; new
+    {
+        Id = table.Column&lt;int&gt;(type: "INTEGER", nullable: false)
+            .Annotation("Sqlite:Autoincrement", true),
+        Title = table.Column&lt;string&gt;(type: "TEXT", maxLength: 100, nullable: false),
+        Cuisine = table.Column&lt;string&gt;(type: "TEXT", maxLength: 50, nullable: false),
+        PrepMinutes = table.Column&lt;int&gt;(type: "INTEGER", nullable: false),
+        CookMinutes = table.Column&lt;int&gt;(type: "INTEGER", nullable: false),
+        Servings = table.Column&lt;int&gt;(type: "INTEGER", nullable: false),
+        Ingredients = table.Column&lt;string&gt;(type: "TEXT", nullable: false)
+    },
+    constraints: table =&gt;
+    {
+        table.PrimaryKey("PK_Recipes", x =&gt; x.Id);
+    });</pre><pre class="out xs"><span class="p">$ sqlite3 recipebox.db ".tables"</span>
+Recipes                __EFMigrationsHistory  __EFMigrationsLock</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 23 ─ T8 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">08</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 8 · Seeding</p><span class="badge badge--time">10 min</span></div>
+  <h2>Seed five recipes</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Known starting data, recorded in the migration history like any other change.</p>
+        <ol class="list list--body"><li>In <code class="inline">RecipeBoxContext</code>, override <code class="inline">OnModelCreating</code> and call <code class="inline">HasData(...)</code> with the five recipes from the controller's list.</li><li><code class="inline">dotnet ef migrations add SeedRecipes</code>, and read it.</li><li><code class="inline">dotnet ef database update</code>.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">SeedRecipes</code> contains <code class="inline">InsertData</code>, not <code class="inline">CreateTable</code>.</li><li><code class="inline">SELECT Id, Title FROM Recipes;</code> returns five rows.</li><li>Row 1's <code class="inline">Ingredients</code> holds <code class="inline">["Flour","Milk","Eggs","Sugar"]</code>.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 24 ─ T8 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">08</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 8 · Hints and solution</p></div>
+  <h2>Seed five recipes</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li>Type <code class="inline">override</code> and let the editor complete <code class="inline">OnModelCreating</code>.</li><li>Every seeded recipe <strong>must</strong> set its <code class="inline">Id</code>: EF Core uses it to tell an insert from an update later.</li><li>The controller still uses its own list. Task 9 switches it.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity&lt;Recipe&gt;().HasData(
+        new Recipe { Id = 1, Title = "Pancakes", Cuisine = "American",
+                     PrepMinutes = 10, CookMinutes = 15, Servings = 4,
+                     Ingredients = new() { "Flour", "Milk", "Eggs", "Sugar" } },
+        new Recipe { Id = 2, Title = "Spaghetti Carbonara", Cuisine = "Italian",
+                     PrepMinutes = 10, CookMinutes = 15, Servings = 2,
+                     Ingredients = new() { "Spaghetti", "Eggs", "Pecorino",
+                                           "Guanciale", "Black pepper" } },
+        // ... 3 Shopska Salad, 4 Margherita Pizza, 5 Chicken Curry
+    );
+}</pre><pre class="out xs"><span class="p">$ sqlite3 recipebox.db "SELECT Id, Title, Ingredients FROM Recipes;"</span>
+1|Pancakes|["Flour","Milk","Eggs","Sugar"]
+2|Spaghetti Carbonara|["Spaghetti","Eggs","Pecorino","Guanciale","Black pepper"]
+…</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 25 ─ T9 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Querying</p><span class="badge badge--time">16 min</span></div>
+  <h2>Switch the controller from the list to the database</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Ask for the context in the constructor, query it with the same LINQ, and change no view.</p>
+        <ol class="list list--body"><li>Delete the <code class="inline">static</code> list. Add a constructor taking <code class="inline">RecipeBoxContext</code>, stored in a <code class="inline">private readonly</code> field.</li><li>Make every action <code class="inline">async Task&lt;IActionResult&gt;</code> and use <code class="inline">ToListAsync</code>, <code class="inline">FirstOrDefaultAsync</code>, <code class="inline">CountAsync</code>.</li><li>Make <code class="inline">BuildList</code> async, and build its query step by step.</li><li>Prove it: change a title in SQLite, reload, change it back.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li><code class="inline">/recipes</code>, <code class="inline">/recipes/3</code>, <code class="inline">/recipes/cuisine/italian</code>, <code class="inline">/about</code>, <code class="inline">/recipes/json</code> look as before.</li><li>No file in <code class="inline">Views/</code> was edited.</li><li>After <code class="inline">UPDATE Recipes SET Title = 'Fluffy Pancakes' WHERE Id = 1;</code> a reload shows it, with no rebuild.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 26 ─ T9 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Hints and solution</p></div>
+  <h2>Switch the controller from the list to the database</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">using Microsoft.EntityFrameworkCore;</code> brings in the <code class="inline">…Async</code> methods.</li><li><code class="inline">var query = _context.Recipes.AsNoTracking();</code> then <code class="inline">query = query.Where(...)</code> only if needed. Nothing runs until <code class="inline">ToListAsync()</code>.</li><li><code class="inline">ToLower()</code> still works: EF Core translates it into SQL.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">private readonly RecipeBoxContext _context;
+
+public RecipesController(RecipeBoxContext context)
+{
+    _context = context;
+}
+
+[HttpGet("")]
+public async Task&lt;IActionResult&gt; Index(string? cuisine)
+    =&gt; View(await BuildList(cuisine));
+
+[HttpGet("{id:int}")]
+public async Task&lt;IActionResult&gt; Details(int id)
+{
+    var recipe = await _context.Recipes.FirstOrDefaultAsync(r =&gt; r.Id == id);
+    if (recipe is null)
+        return NotFound();
+
+    return View(recipe);
+}</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 27 ─ T9 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">09</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 9 · Solution, continued</p></div>
+  <h2>Switch the controller from the list to the database</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <div class="duo"><pre class="cs">private async Task&lt;RecipeListViewModel&gt; BuildList(string? cuisine)
+{
+    var query = _context.Recipes.AsNoTracking();
+
+    if (!string.IsNullOrWhiteSpace(cuisine))
+        query = query.Where(r =&gt; r.Cuisine.ToLower() == cuisine.ToLower());
+
+    var matches = await query.OrderBy(r =&gt; r.Title).ToListAsync();
+
+    return new RecipeListViewModel
+    {
+        Recipes     = matches,
+        TotalCount  = await _context.Recipes.CountAsync(),
+        Cuisine     = string.IsNullOrWhiteSpace(cuisine)
+                          ? null : matches.FirstOrDefault()?.Cuisine ?? cuisine,
+        AllCuisines = await _context.Recipes.Select(r =&gt; r.Cuisine)
+                          .Distinct().OrderBy(c =&gt; c).ToListAsync()
+    };
+}</pre><pre class="cs">[HttpGet("json")]
+public async Task&lt;IActionResult&gt; All()
+    =&gt; Json(await _context.Recipes.ToListAsync());
+
+[HttpGet("cuisine/{name}")]
+public async Task&lt;IActionResult&gt; ByCuisine(string name)
+    =&gt; View("Index", await BuildList(name));
+
+[HttpGet("/about")]
+public async Task&lt;IActionResult&gt; About()
+    =&gt; View(await _context.Recipes.CountAsync());</pre></div>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 28 ─ T10 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">10</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 10 · Schema changes</p><span class="badge badge--time">12 min</span></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Difficulty</code> property with a second migration</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">Change the schema of a database that already holds data, without losing any.</p>
+        <ol class="list list--body"><li>Add <code class="inline">Difficulty</code> to <code class="inline">Recipe</code>: an <code class="inline">int</code> from 1 to 3, starting at 1.</li><li>Seed values: Pancakes 1, Carbonara 2, Shopska 1, Pizza 3, Curry 2.</li><li><code class="inline">dotnet ef migrations add AddDifficulty</code>. Read it. Then <code class="inline">database update</code>.</li><li>Show <code class="inline">difficulty 2 / 3</code> on the details page.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>The migration has one <code class="inline">AddColumn</code> and five <code class="inline">UpdateData</code>; no <code class="inline">CreateTable</code>, no <code class="inline">DropTable</code>.</li><li>All five recipes are still there, with their difficulty.</li><li><code class="inline">/recipes/4</code> shows <code class="inline">difficulty 3 / 3</code>.</li><li><code class="inline">__EFMigrationsHistory</code> now has three rows.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 29 ─ T10 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">10</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 10 · Hints and solution</p></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Difficulty</code> property with a second migration</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li><code class="inline">[Range(1, 3)] public int Difficulty { get; set; } = 1;</code></li><li>The cycle: change the class · <code class="inline">migrations add</code> · <strong>read it</strong> · <code class="inline">database update</code> · run.</li><li>Changing seed data is a migration too: that is where <code class="inline">UpdateData</code> comes from.</li><li>Mistake before <code class="inline">update</code>? <code class="inline">dotnet ef migrations remove</code>.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">[Range(1, 3)]
+public int Difficulty { get; set; } = 1;
+
+// each seeded recipe gains one value:
+new Recipe { Id = 1, Title = "Pancakes", ..., Servings = 4, Difficulty = 1, ... },</pre><p class="file" style="margin:0">Migrations/…_AddDifficulty.cs</p><pre class="cs xs">migrationBuilder.AddColumn&lt;int&gt;(
+    name: "Difficulty", table: "Recipes", type: "INTEGER",
+    nullable: false, defaultValue: 0);
+
+migrationBuilder.UpdateData(
+    table: "Recipes", keyColumn: "Id", keyValue: 1,
+    column: "Difficulty", value: 1);
+// ... four more UpdateData calls</pre><p class="file" style="margin:0">Views/Recipes/Details.cshtml</p><pre class="cshtml xs">= &lt;strong&gt;@Model.TotalMinutes() min&lt;/strong&gt; · serves @Model.Servings
+· difficulty @Model.Difficulty / 3</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 30 ─ T11 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">11</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 11 · Reading the SQL</p><span class="badge badge--time">5 min</span></div>
+  <h2>Find the generated SQL in the console log</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">See what EF Core sent to the database for our LINQ.</p>
+        <ol class="list list--body"><li>Run the app and open <code class="inline">/recipes/cuisine/italian</code>.</li><li>In the terminal, find its <code class="inline">Executed DbCommand</code> entries.</li><li>Open <code class="inline">/recipes/2</code> and find its query.</li><li>Run <code class="inline">dotnet ef migrations script</code> and skim it.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>A <code class="inline">SELECT … WHERE lower("r"."Cuisine") = @…</code> for the cuisine page.</li><li>A <code class="inline">SELECT … WHERE "r"."Id" = @id LIMIT 1</code> for details.</li><li>One sentence: how many queries does one list page run, and why?</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 31 ─ T11 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">11</span><span class="rail__part">B</span></div>
+  <div class="head"><p class="eyebrow">Task 11 · Hints and solution</p></div>
+  <h2>Find the generated SQL in the console log</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li>The lines start with <code class="inline">info: Microsoft.EntityFrameworkCore.Database.Command</code>.</li><li><code class="inline">LIMIT 1</code> is <code class="inline">FirstOrDefault</code>; <code class="inline">lower(...)</code> is <code class="inline">ToLower()</code>.</li><li><code class="inline">@ToLower</code> and <code class="inline">@id</code> are <strong>parameters</strong>: values sent apart from the SQL, never pasted in.</li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="out xs">info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@ToLower='?' (Size = 7)], …]
+      SELECT "r"."Id", "r"."CookMinutes", "r"."Cuisine", …
+      FROM "Recipes" AS "r"
+      <span class="p">WHERE lower("r"."Cuisine") = @ToLower</span>
+      ORDER BY "r"."Title"
+
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      SELECT "r"."Id", …
+      FROM "Recipes" AS "r"
+      <span class="p">WHERE "r"."Id" = @id</span>
+      <span class="p">LIMIT 1</span></pre><div class="callout">A list page runs <strong>three</strong> queries: the matching recipes, the total count, and the distinct cuisines for the button group. One per <code class="inline">…Async</code> call in <code class="inline">BuildList</code>.</div>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 32 ─ Part C -->
+<section class="slide slide--lab slide--part">
+  <div class="part-letter">C</div>
+  <p class="eyebrow">Part C · Task 12 · 15 min · bonus</p>
+  <h2>A second table</h2>
+  <p class="lead" style="margin-top:var(--space-4)">A foreign key, a navigation property, and <code class="inline">Include</code> to load what we ask for.</p>
+  <div class="foot" style="margin-top:var(--space-16)"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 33 ─ T12 task -->
+<section class="slide slide--rail">
+  <div class="rail"><span class="rail__label">Task</span><span class="rail__no">12</span><span class="rail__part">C</span></div>
+  <div class="head"><p class="eyebrow">Task 12 · Relationships</p><span class="badge badge--time">15 min</span><span class="badge badge--opt">Bonus</span></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Category</code> entity with a one-to-many relationship</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-task">
+      <div class="stack">
+        <p class="goal">A second table, a foreign key, and <code class="inline">Include</code> to load related rows.</p>
+        <ol class="list list--body"><li><code class="inline">Models/Category.cs</code>: <code class="inline">Id</code>, a required <code class="inline">Name</code> (≤ 50), a <code class="inline">List&lt;Recipe&gt; Recipes</code>.</li><li>In <code class="inline">Recipe</code>: <code class="inline">int? CategoryId</code> and <code class="inline">Category? Category</code>.</li><li><code class="inline">DbSet&lt;Category&gt; Categories</code>; seed Breakfast, Main course, Salad; give each recipe a <code class="inline">CategoryId</code>.</li><li><code class="inline">migrations add AddCategories</code>, read it, <code class="inline">database update</code>. Show the category on details.</li></ol>
+      </div>
+      <div class="card card--lab">
+        <h3>Done when…</h3>
+        <ul class="check" style="margin-top:var(--space-2)"><li>The migration creates <code class="inline">Categories</code>, adds <code class="inline">CategoryId</code>, an index and a foreign key.</li><li><code class="inline">/recipes/3</code> shows <strong>Salad</strong>; <code class="inline">/recipes/1</code> shows <strong>Breakfast</strong>.</li><li>Without <code class="inline">.Include(r =&gt; r.Category)</code>, every recipe shows <strong>Uncategorised</strong>.</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 34 ─ T12 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">12</span><span class="rail__part">C</span></div>
+  <div class="head"><p class="eyebrow">Task 12 · Hints and solution</p></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Category</code> entity with a one-to-many relationship</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--wide">
+      <ul class="hints"><li>Pancakes 1, Carbonara 2, Shopska 3, Pizza 2, Curry 2.</li><li><code class="inline">int?</code> makes the relationship optional.</li><li>EF Core never loads what we did not ask for. <code class="inline">Include</code> becomes a <code class="inline">LEFT JOIN</code>.</li><li><code class="inline">@(Model.Category?.Name ?? "Uncategorised")</code></li></ul>
+      <div class="solution">
+        <div class="solution__body">
+          <pre class="cs xs">public class Category
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string Name { get; set; } = "";
+
+    public List&lt;Recipe&gt; Recipes { get; set; } = new();
+}
+
+// in Recipe
+public int? CategoryId { get; set; }        // foreign key
+public Category? Category { get; set; }     // navigation property</pre><pre class="cs xs">var recipe = await _context.Recipes
+    .Include(r =&gt; r.Category)
+    .FirstOrDefaultAsync(r =&gt; r.Id == id);</pre><pre class="out xs">FROM "Recipes" AS "r"
+<span class="p">LEFT JOIN "Categories" AS "c" ON "r"."CategoryId" = "c"."Id"</span>
+WHERE "r"."Id" = @id</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 35 ─ T12 hints -->
+<section class="slide slide--rail slide--hint">
+  <div class="rail rail--hint"><span class="rail__label">Hints</span><span class="rail__no">12</span><span class="rail__part">C</span></div>
+  <div class="head"><p class="eyebrow">Task 12 · Solution, continued</p></div>
+  <h2>Add a <code class="inline" style="font-size:.8em">Category</code> entity with a one-to-many relationship</h2>
+  <div class="rule"></div>
+  <div class="content">
+    <div class="cols cols-hint cols-hint--full">
+      
+      <div class="solution">
+        <div class="solution__body">
+          <p class="file" style="margin:0">Data/RecipeBoxContext.cs</p><pre class="cs">public DbSet&lt;Category&gt; Categories =&gt; Set&lt;Category&gt;();
+
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity&lt;Category&gt;().HasData(
+        new Category { Id = 1, Name = "Breakfast" },
+        new Category { Id = 2, Name = "Main course" },
+        new Category { Id = 3, Name = "Salad" }
+    );
+
+    modelBuilder.Entity&lt;Recipe&gt;().HasData(
+        // each recipe gains CategoryId = 1, 2 or 3, for example:
+        // new Recipe { Id = 3, Title = "Shopska Salad", ..., CategoryId = 3, ... }
+    );
+}</pre><p class="file" style="margin:0">Views/Recipes/Details.cshtml</p><pre class="cshtml">· difficulty @Model.Difficulty / 3
+· @(Model.Category?.Name ?? "Uncategorised")</pre>
+        </div>
+        <button class="solution__cover" type="button"><span class="solution__label">Show the solution</span><span class="solution__key">Click · or press S</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Set 4 · Database and EF Core</span><span class="spacer"></span><span class="num"></span></div>
+</section>
+
+<!-- 36 ─ Closing -->
+<section class="slide slide--lab">
+  <p class="eyebrow">End of Set 4</p>
+  <h2 style="font-size:var(--fs-title-1)">RecipeBox remembers. Set 5 lets people write to it.</h2>
+  <div class="rule"></div>
+  <p class="lead">Before moving on: the pages read from <code class="inline">recipebox.db</code>, three migrations<br>are applied, and <strong>no view changed</strong> on the way.</p>
+  <div class="stats"><span class="stat">Next · Set 5</span><span class="stat">CRUD, debugging and deployment</span><span class="stat">After decks 09–10</span></div>
+  <div class="foot" style="margin-top:var(--space-12)"><span>Exercises · RecipeBox</span><span class="spacer"></span><span>Microsoft Web Technologies</span></div>
+</section>
+</div></div>
+<a id="home" href="../../index.html"><img src="../../design-system/components/images/favicon.svg" alt="" width="14" height="14">← Index</a>
+<div id="hint">← → navigate · S solution · F fullscreen · P print</div>
+
+<script>
+(function(){
+  /* ── Minimal highlighters: C#, Razor, SQL, shell ────────────────────── */
+  var KW = 'string int double bool var void new public private protected class if else for foreach in while return switch case break default try catch finally null true false namespace using get set static readonly is not async await override base this nameof throw'.split(' ');
+  var TY = 'Console List Dictionary Recipe Category Task IActionResult Controller ControllerBase DbContext DbSet DbContextOptions ModelBuilder MigrationBuilder RecipeBoxContext RecipeListViewModel ILogger StringSplitOptions DbUpdateConcurrencyException InvalidOperationException FormatException OverflowException WebApplication DateTime Route HttpGet HttpPost Bind ValidateAntiForgeryToken ActionName Required StringLength Range Display'.split(' ');
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function paint(sel, re, pick){
+    document.querySelectorAll(sel).forEach(function(pre){
+      var src = pre.textContent, out = '', last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(src))) {
+        if (m[0] === '') { re.lastIndex++; continue; }
+        out += esc(src.slice(last, m.index));
+        out += '<span class="' + pick(m) + '">' + esc(m[0]) + '</span>';
+        last = re.lastIndex;
+      }
+      pre.innerHTML = out + esc(src.slice(last));
+    });
+  }
+  paint('pre.cs', new RegExp(
+    '(\\/\\/[^\\n]*)' +
+    '|(\\$?"(?:[^"\\\\\\n]|\\\\.)*"|\'(?:[^\'\\\\\\n]|\\\\.)\')' +
+    '|\\b(\\d+(?:\\.\\d+)?)\\b' +
+    '|\\b(' + KW.join('|') + ')\\b' +
+    '|\\b(' + TY.join('|') + ')\\b', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : m[4] ? 'k' : 't'; });
+  paint('pre.cshtml', new RegExp(
+    '(@\\*[\\s\\S]*?\\*@)' +
+    '|("(?:[^"\\\\\\n]|\\\\.)*")' +
+    '|(<\\/?[a-zA-Z][\\w.-]*|\\/?>)' +
+    '|(@(?:model|foreach|if|else|section|await|using)\\b|@\\{|@\\(|@[A-Za-z_][\\w.?]*(?:\\(\\))?|\\b(?:else|var|in)\\b)', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 't' : 'k'; });
+  paint('pre.sql', new RegExp(
+    '(--[^\\n]*)' +
+    '|(\'[^\'\\n]*\')' +
+    '|\\b(\\d+)\\b' +
+    '|\\b(SELECT|FROM|WHERE|ORDER|BY|GROUP|AS|COUNT|CREATE|TABLE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|INTEGER|TEXT|NOT|NULL|PRIMARY|KEY|LIMIT|AND|LEFT|JOIN|ON|DISTINCT|lower)\\b', 'g'),
+    function(m){ return m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : 'k'; });
+  paint('pre.json', /("(?:[^"\\\n]|\\.)*")(\s*:)?|\b(\d+)\b/g,
+    function(m){ return m[2] ? 't' : m[1] ? 's' : 'n'; });
+  document.querySelectorAll('pre.sh').forEach(function(pre){
+    pre.innerHTML = pre.innerHTML
+      .replace(/^(\s*)(dotnet|cd|curl|sqlite3|cp|copy|ls)\b/gm, '$1<span class="k">$2</span>')
+      .replace(/(#[^\n]*)$/gm, '<span class="c">$1</span>');
+  });
+
+  /* ── Deck ─────────────────────────────────────────────────────────────── */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var deck = document.getElementById('deck');
+  var progress = document.getElementById('progress');
+  var hint = document.getElementById('hint');
+  var total = slides.length, i = 0;
+
+  slides.forEach(function(s, n){
+    var num = s.querySelector('.foot .num');
+    if (num) num.textContent = (n + 1) + ' / ' + total;
+  });
+
+  function show(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, k){ s.classList.toggle('is-active', k === i); });
+    progress.style.width = ((i + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (i + 1)) history.replaceState(null, '', '#' + (i + 1));
+  }
+  function fit(){
+    var vp = window.visualViewport;
+    var vw = vp ? vp.width : window.innerWidth, vh = vp ? vp.height : window.innerHeight;
+    var scale = Math.min(vw / 1280, vh / 720);
+    deck.style.transform = 'translate(' + (vw - 1280 * scale) / 2 + 'px,' + (vh - 720 * scale) / 2 + 'px) scale(' + scale + ')';
+  }
+  function refit(){ requestAnimationFrame(fit); setTimeout(fit, 250); }
+
+  /* ── Solutions: click the cover, or press S on a hint slide ───────────── */
+  document.querySelectorAll('.solution__cover').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      btn.parentElement.classList.add('is-revealed');
+      btn.blur();
+    });
+  });
+  function toggleSolution(){
+    var sol = slides[i].querySelector('.solution');
+    if (sol) sol.classList.toggle('is-revealed');
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+    else if (e.key === 's' || e.key === 'S') { toggleSolution(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+
+  var tx = null, ty = null;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) { tx = null; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    tx = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(dx < 0 ? i + 1 : i - 1);
+  }, { passive: true });
+
+  window.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+  window.addEventListener('hashchange', function(){ show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+
+  fit();
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  setTimeout(function(){ hint.classList.add('is-hidden'); }, 4000);
+})();
+</script>
+</body>
+</html>
